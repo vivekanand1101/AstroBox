@@ -46,6 +46,7 @@ class NetworkManagerEvents(threading.Thread):
 		self._currentIpv4Address = None
 		self._activeDevice = None
 		self._activatingConnection = None
+		self._setOnlineCondition = threading.Condition()
 
 	def getActiveConnectionDevice(self):
 		connections = NetworkManager.NetworkManager.ActiveConnections
@@ -65,17 +66,17 @@ class NetworkManagerEvents(threading.Thread):
 		self._devicePropertiesListener = None
 		self._monitorActivatingListener = None
 
+		logger.info('Looking for Active Connections...')
 		if NetworkManager.NetworkManager.State == NetworkManager.NM_STATE_CONNECTED_GLOBAL:
 			self._setOnline(True)
 
-		logger.info('Looking for Active Connections...')
-		d = self.getActiveConnectionDevice()
-		if d:
-			self._devicePropertiesListener = d.Dhcp4Config.connect_to_signal('PropertiesChanged', self.activeDeviceConfigChanged)
-			self._currentIpv4Address = d.Ip4Address
-			self._activeDevice = d
-			self._online = True
-			logger.info('Active Connection found at %s (%s)' % (d.IpInterface, d.Ip4Address))
+		#d = self.getActiveConnectionDevice()
+		#if d:
+		#	self._devicePropertiesListener = d.Dhcp4Config.connect_to_signal('PropertiesChanged', self.activeDeviceConfigChanged)
+		#	self._currentIpv4Address = d.Ip4Address
+		#	self._activeDevice = d
+		#	self._online = True
+		#	logger.info('Active Connection found at %s (%s)' % (d.IpInterface, d.Ip4Address))
 
 		while not self._stopped:
 			try:
@@ -113,8 +114,10 @@ class NetworkManagerEvents(threading.Thread):
 	def globalStateChanged(self, state):
 		#uncomment for debugging only
 		#logger.info('Network Global State Changed, new(%s)' % NetworkManager.const('state', state))
-		if not self._online and state == NetworkManager.NM_STATE_CONNECTED_GLOBAL:
+		if state == NetworkManager.NM_STATE_CONNECTED_GLOBAL:
 			self._setOnline(True)
+		elif state != NetworkManager.NM_STATE_CONNECTING:
+			self._setOnline(False)
 
 	@idle_add_decorator
 	def propertiesChanged(self, properties):
@@ -190,37 +193,38 @@ class NetworkManagerEvents(threading.Thread):
 			eventManager.fire(Events.NETWORK_IP_CHANGED, self._currentIpv4Address)
 
 	def _setOnline(self, value):
-		if value == self._online:
-			return
+		with self._setOnlineCondition:
+			if value == self._online:
+				return
 
-		if value:
-			d = self.getActiveConnectionDevice()
+			if value:
+				d = self.getActiveConnectionDevice()
 
-			if d:
-				self._activeDevice = d
-				if self._devicePropertiesListener:
-					self._devicePropertiesListener.remove()
+				if d:
+					self._activeDevice = d
+					if self._devicePropertiesListener:
+						self._devicePropertiesListener.remove()
 
-				if self._activeDevice:
-					self._currentIpv4Address = self._activeDevice.Ip4Address
+					if self._activeDevice:
+						self._currentIpv4Address = self._activeDevice.Ip4Address
 
-				self._devicePropertiesListener = d.Dhcp4Config.connect_to_signal('PropertiesChanged', self.activeDeviceConfigChanged)
-				logger.info('Active Connection changed to %s (%s)' % (d.IpInterface, self._currentIpv4Address))
+					self._devicePropertiesListener = d.Dhcp4Config.connect_to_signal('PropertiesChanged', self.activeDeviceConfigChanged)
+					logger.info('Active Connection is now %s (%s)' % (d.IpInterface, self._currentIpv4Address))
 
-				self._online = True
-				eventManager.fire(Events.NETWORK_STATUS, 'online')
+					self._online = True
+					eventManager.fire(Events.NETWORK_STATUS, 'online')
 
-		else:
-			self._online = False
-			self._currentIpv4Address = None
-			eventManager.fire(Events.NETWORK_STATUS, 'offline')
-			if self._manager.isHotspotActive() is False: #isHotspotActive returns None if not possible
-				logger.info('AstroBox is offline. Starting hotspot...')
-				result = self._manager.startHotspot() 
-				if result is True:
-					logger.info('Hostspot started')
-				else:
-					logger.error('Failed to start hostspot: %s' % result)
+			else:
+				self._online = False
+				self._currentIpv4Address = None
+				eventManager.fire(Events.NETWORK_STATUS, 'offline')
+				if self._manager.isHotspotActive() is False: #isHotspotActive returns None if not possible
+					logger.info('AstroBox is offline. Starting hotspot...')
+					result = self._manager.startHotspot() 
+					if result is True:
+						logger.info('Hostspot started')
+					else:
+						logger.error('Failed to start hostspot: %s' % result)
 
 
 class DebianNetworkManager(NetworkManagerBase):
@@ -228,6 +232,7 @@ class DebianNetworkManager(NetworkManagerBase):
 		super(DebianNetworkManager, self).__init__()
 		self._nm = NetworkManager
 		self._eventListener = NetworkManagerEvents(self)
+		self._startHotspotCondition = threading.Condition()
 
 		threads_init()
 		self._eventListener.start()
@@ -236,13 +241,13 @@ class DebianNetworkManager(NetworkManagerBase):
 		if not self.settings.getBoolean(['wifi', 'hotspotOnlyOffline']):
 			self.startHotspot()
 
-	def __del__(self):
-		self._eventListener.stop()
-		self._eventListener = None
-
 	def close(self):
 		self._eventListener.stop()
 		self._eventListener = None
+
+	def shutdown(self):
+		logging.info('Shutting Down DebianNetworkManager')
+		self.close();
 
 	def conectionStatus(self):
 		return self._nm.const('state', self._nm.NetworkManager.status())
@@ -436,22 +441,23 @@ class DebianNetworkManager(NetworkManagerBase):
 		return None
 
 	def startHotspot(self):
-		if self.isHotspotActive():
-			return True
-
-		try:
-			p = sarge.run("service wifi_access_point start", stderr=sarge.Capture())
-			if p.returncode != 0:
-				returncode = p.returncode
-				stderr_text = p.stderr.text
-				logger.warn("Start hotspot failed with return code %i: %s" % (returncode, stderr_text))
-				return "Start hotspot failed with return code %i: %s" % (returncode, stderr_text)
-			else:
+		with self._startHotspotCondition:
+			if self.isHotspotActive():
 				return True
 
-		except Exception, e:
-			logger.warn("Start hotspot failed with return code: %s" % e)
-			return "Start hotspot failed with return code: %s" % e
+			try:
+				p = sarge.run("service wifi_access_point start", stderr=sarge.Capture())
+				if p.returncode != 0:
+					returncode = p.returncode
+					stderr_text = p.stderr.text
+					logger.warn("Start hotspot failed with return code %i: %s" % (returncode, stderr_text))
+					return "Start hotspot failed with return code %i: %s" % (returncode, stderr_text)
+				else:
+					return True
+
+			except Exception, e:
+				logger.warn("Start hotspot failed with return code: %s" % e)
+				return "Start hotspot failed with return code: %s" % e
 
 	def stopHotspot(self):
 		try:

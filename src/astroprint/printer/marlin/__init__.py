@@ -19,6 +19,7 @@ from octoprint.events import eventManager, Events
 from astroprint.printer import Printer
 from astroprint.printfiles.gcode import PrintFileManagerGcode
 from astroprint.printfiles import FileDestinations
+from astroprint.camera import cameraManager
 
 class PrinterMarlin(Printer):
 	driverName = 'marlin'
@@ -235,9 +236,9 @@ class PrinterMarlin(Printer):
 
 		#the functions already check if there's a timelapse in progress
 		if wasPaused:
-			self._cameraManager.resume_timelapse()
+			cameraManager().resume_timelapse()
 		else:
-			self._cameraManager.pause_timelapse()
+			cameraManager().pause_timelapse()
 
 	def cancelPrint(self, disableMotorsAndHeater=True):
 		"""
@@ -268,11 +269,21 @@ class PrinterMarlin(Printer):
 
 		self._comm.cancelPrint()
 
-		#self._comm._sendCommand("M112");
-
 		#don't send home command, some printers don't have stoppers.
 		#self.home(['x','y'])
-		self.commands(["G92 E0", "G1 X0 Y0 E-2.0 F3000 S1", "G92"]) # this replaces home
+		#self.commands(["G92 E0", "G1 X0 Y0 E-2.0 F3000 S1", "G92"]) # this replaces home
+
+		#prepare cancel commands
+		cancelCommands = []
+		for c in self._profileManager.data.get('cancel_gcode'):
+			if ";" in c:
+				c = c[0:c.find(";")]
+
+			c = c.strip()
+			if len(c) > 0:
+				cancelCommands.append(c)
+
+		self.commands(cancelCommands or ['G28 X Y']);
 
 		if disableMotorsAndHeater:
 			self.disableMotorsAndHeater()
