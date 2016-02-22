@@ -51,7 +51,7 @@ class NetworkManager(object):
 	def getActiveConnections(self):
 		return None
 
-	def setWifiNetwork(self, bssid, password):
+	def setWifiNetwork(self, bssid, username, password):
 		return None
 
 	def forgetWifiNetworks(self):

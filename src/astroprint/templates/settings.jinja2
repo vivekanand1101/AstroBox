@@ -183,13 +183,23 @@
 						<button class="secondary radius cancel" onclick="$('#wifi-network-password-modal').foundation('reveal', 'close')">Cancel</button>
 					</div>
 				<% } else { %>
-					<h2 class="bold" align="center">WiFi Password</h2>
+					<h2 class="bold" align="center">WiFi Access</h2>
 					<div class="modal-content">
-						<p align="center">Enter the password for <span class="name bold"><%= wifi.name %></span>.</p>
-						<form>
-							<input type="hidden" class="network-id-field" name="id" value="<%= wifi.id %>">
-							<input type="password" class="network-password-field" name="password"/>
-						</form>
+						<% if (wifi['802_1x']) { %>
+							<p align="center">Enter credentials for <span class="name bold"><%= wifi.name %></span>.</p>
+							<form>
+								<input type="hidden" class="network-id-field" name="id" value="<%= wifi.id %>">
+								<input type="text" class="network-username-field focus" name="username" placeholder="Username"/>
+								<input type="password" class="network-password-field" name="password" placeholder="Password"/>
+							</form>							
+						<% } else { %>
+							<p align="center">Enter the password for <span class="name bold"><%= wifi.name %></span>.</p>
+							<form>
+								<input type="hidden" class="network-id-field" name="id" value="<%= wifi.id %>">
+								<input type="hidden" class="network-username-field" name="username"/>
+								<input type="password" class="network-password-field focus" name="password" placeholder="Network Password"/>
+							</form>
+						<% } %>
 					</div>
 					<div class="modal-actions" align="center">
 						<button class="secondary radius cancel" onclick="$('#wifi-network-password-modal').foundation('reveal', 'close')">Cancel</button>

@@ -80,7 +80,7 @@ def getInternetSettings():
 def setWifiNetwork():
 	if "application/json" in request.headers["Content-Type"]:
 		data = request.json
-		result = networkManager().setWifiNetwork(data['id'], data['password'])
+		result = networkManager().setWifiNetwork(data['id'], data['username'], data['password'])
 
 		if result:
 			return jsonify(result)

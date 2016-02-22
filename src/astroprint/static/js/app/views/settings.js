@@ -252,7 +252,7 @@ var InternetConnectionView = SettingsPage.extend({
 			settings: this.settings
 		}));
 	},
-	connect: function(id, password) {
+	connect: function(id, username, password) {
 		var promise = $.Deferred();
 
 		$.ajax({
@@ -260,7 +260,7 @@ var InternetConnectionView = SettingsPage.extend({
 			type: 'POST',
 			contentType: 'application/json',
 			dataType: 'json',
-			data: JSON.stringify({id: id, password: password})
+			data: JSON.stringify({id: id, username: username, password: password})
 		})
 			.done(_.bind(function(data) {
 				if (data.name) {
@@ -428,7 +428,7 @@ var WiFiNetworkPasswordDialog = Backbone.View.extend({
 			close_on_esc: false	
 		});
 		this.$el.one('opened', _.bind(function() {
-			this.$el.find('.network-password-field').focus();
+			this.$el.find('input.focus').focus();
 		}, this));
 	},
 	connectClicked: function(e) {
@@ -443,13 +443,14 @@ var WiFiNetworkPasswordDialog = Backbone.View.extend({
 
 		var id = form.find('.network-id-field').val();
 		var password = form.find('.network-password-field').val();
+		var username = form.find('.network-username-field').val();
 		var loadingBtn = this.$('button.connect').closest('.loading-button');
 		var cancelBtn = this.$('button.cancel');
 
 		loadingBtn.addClass('loading');
 		cancelBtn.hide();
 
-		this.parent.connect(id, password)
+		this.parent.connect(id, username, password)
 			.done(_.bind(function(){
 				form.find('.network-password-field').val('');
 				this.$el.foundation('reveal', 'close');

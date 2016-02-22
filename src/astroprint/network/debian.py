@@ -261,12 +261,15 @@ class DebianNetworkManager(NetworkManagerBase):
 					wpaSecured = True if ap.WpaFlags or ap.RsnFlags else False
 					wepSecured = not wpaSecured and ap.Flags == NetworkManager.NM_802_11_AP_FLAGS_PRIVACY
 
+					logger.info("%s: 802_1x: %d, rsn: %d" % (ssid, (ap.RsnFlags & NetworkManager.NM_802_11_AP_SEC_KEY_MGMT_802_1X == NetworkManager.NM_802_11_AP_SEC_KEY_MGMT_802_1X), ap.RsnFlags))
+
 					networks[ssid] = {
 						'id': ap.HwAddress,
 						'signal': signal,
 						'name': ssid,
 						'secured': wpaSecured or wepSecured,
-						'wep': wepSecured
+						'wep': wepSecured,
+						'802_1x': (ap.RsnFlags & NetworkManager.NM_802_11_AP_SEC_KEY_MGMT_802_1X) == NetworkManager.NM_802_11_AP_SEC_KEY_MGMT_802_1X
 					}
 
 			return [v for k,v in networks.iteritems()]
@@ -322,7 +325,7 @@ class DebianNetworkManager(NetworkManagerBase):
 	def isOnline(self):
 		return self._eventListener._online
 
-	def setWifiNetwork(self, bssid, password = None):
+	def setWifiNetwork(self, bssid, username = None, password = None):
 		wifiDevice = self.getWifiDevice()
 
 		if bssid and wifiDevice:
@@ -339,6 +342,9 @@ class DebianNetworkManager(NetworkManagerBase):
 				options = {}
 				for c in self._nm.Settings.ListConnections():
 					currentOptions = c.GetSettings()
+
+					logger.info(currentOptions);
+
 					if currentOptions['connection']['id'] == ssid:
 						options = currentOptions
 						#these are empty and cause trouble when putting it back
@@ -351,14 +357,33 @@ class DebianNetworkManager(NetworkManagerBase):
 						connection = c
 						break
 
-				if password:
-					if '802-11-wireless-security' in options:
-						options['802-11-wireless-security']['psk'] = password
+				if username:
+					if '802-1x' in options:
+						options['802-1x']['identity'] = username
+						options['802-1x']['password'] = password
 
 					else:
 						options['802-11-wireless-security'] = {
-							'psk': password,
+							'key-mgmt': "wpa-eap"
 						}
+
+						options['802-1x'] = {
+							'identity': username,
+							'password': password,
+							'eap': ['fast'],
+							#'eap': ['peap', 'fast'],
+							#'phase2-auth': 
+							'phase1-fast-provisioning': 1
+						}					
+				else:
+					if password:
+						if '802-11-wireless-security' in options:
+							options['802-11-wireless-security']['psk'] = password
+
+						else:
+							options['802-11-wireless-security'] = {
+								'psk': password,
+							}
 
 				try:
 					if connection:
