@@ -13,6 +13,10 @@ from flask.ext.login import LoginManager, current_user, logout_user
 from flask.ext.principal import Principal, Permission, RoleNeed, identity_loaded, UserNeed
 from flask.ext.compress import Compress
 from flask.ext.assets import Environment
+# Import Babel
+from flask.ext.babel import Babel, gettext, ngettext
+from babel import Locale
+# end Babel
 from watchdog.observers import Observer
 from sys import platform
 
@@ -54,6 +58,7 @@ from octoprint.server.util import LargeResponseHandler, ReverseProxied, restrict
 	UrlForwardHandler, user_validator
 from astroprint.printer.manager import printerManager
 from octoprint.settings import settings
+from octoprint.settings import LANGUAGES
 import octoprint.util as util
 import octoprint.events as events
 #import octoprint.timelapse
@@ -70,6 +75,13 @@ from astroprint.discovery import DiscoveryManager
 
 UI_API_KEY = ''.join('%02X' % ord(z) for z in uuid.uuid4().bytes)
 VERSION = None
+
+babel = Babel(app)
+@babel.localeselector
+def get_locale():
+	print LANGUAGES.keys()
+	return request.accept_languages.best_match(LANGUAGES.keys())
+	#return 'en'
 
 @app.route('/astrobox/identify', methods=['GET'])
 def box_identify():
@@ -89,6 +101,7 @@ def box_identify():
 
 @app.route("/")
 def index():
+	print babel.list_translations()
 	s = settings()
 	loggedUsername = s.get(["cloudSlicer", "loggedUser"])
 
@@ -418,7 +431,7 @@ class Server():
 					"class": "logging.handlers.TimedRotatingFileHandler",
 					"level": "DEBUG",
 					"formatter": "simple",
-					"when": "D",
+						"when": "D",
 					"backupCount": 5,
 					"filename": os.path.join(settings().getBaseFolder("logs"), "astrobox.log")
 				},
@@ -465,7 +478,7 @@ class Server():
 
 	def cleanup(self):
 		global discoveryManager
-		
+
 		discoveryManager.shutdown()
 		discoveryManager = None
 		boxrouterManager().shutdown()

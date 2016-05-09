@@ -1,6 +1,6 @@
 <div class="row heading">
 	<div class="small-12 title-heading">
-		<h1 class="bold">File Manager</h1>
+		<h1 class="bold">{{ _('fileManager') }}File Manager</h1>
 	</div>
 </div>
 
@@ -8,7 +8,7 @@
 	<div class="row upload-buttons">
 		<div class="small-12 medium-7 large-4 medium-centered columns">
 			<span class="file-upload-button button success radius expand" style="margin-bottom: 10px">
-				<i class="icon-upload-cloud-1"></i> Upload File ( <span class="extensions"></span> )
+				<i class="icon-upload-cloud-1"></i> {{ _('uploadFile') }}Upload File ( <span class="extensions"></span> )
 				<input class="file-upload" type="file" name="file" accept="">
 			</span>
 		</div>
@@ -30,18 +30,18 @@
 <div class="design-list">
 	<div class="row list-header">
 		<div class="small-12 medium-7 large-8 columns">
-			<h3 class="bold">Printable Files</h3>
-			{%- if user_email %} 
+			<h3 class="bold">{{ _('printaFiles') }}Printable Files</h3>
+			{%- if user_email %}
 				<div class="loading-button sync">
-					<button class="tiny success radius sync"><i class="icon-refresh"></i> Sync</button>
-					<span class="tiny success button radius disabled loading"><i class="icon-refresh animate-spin"></i> Sync</span>
+					<button class="tiny success radius sync"><i class="icon-refresh"></i> {{ _('sync') }}Sync</button>
+					<span class="tiny success button radius disabled loading"><i class="icon-refresh animate-spin"></i> {{ _('sync') }}Sync</span>
 				</div>
 			{%- endif %}
 		</div>
 		<div class="small-12 medium-5 large-4 columns">
 			<ul class="button-group radius even-2 storage">
-			  <li><a href="#" class="button small secondary local">Local</a></li>
-			  <li><a href="#" class="button small secondary cloud">Cloud</a></li>
+			  <li><a href="#" class="button small secondary local">{{ _('local') }}Local</a></li>
+			  <li><a href="#" class="button small secondary cloud">{{ _('cloud') }}Cloud</a></li>
 			</ul>
 		</div>
 	</div>
@@ -149,7 +149,7 @@
 				· <i class="icon-stopwatch" title="Print Time"></i> <%= time_format(p.info.print_time) %>
 			<% } %>
 		<% } else { %>
-			· <i class="icon-rocket-spinner animate-spin"></i> Analyzing G-Code
+			· <i class="icon-rocket-spinner animate-spin"></i> {{ _('analyGcode') }}Analyzing G-Code
 		<% } %>
 	</div>
 	<div class="small-2 large-1 columns right-section">

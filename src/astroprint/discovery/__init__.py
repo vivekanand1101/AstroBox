@@ -111,7 +111,7 @@ class DiscoveryManager(object):
 	serialNumber=self.get_uuid(),
 	uuid=self.get_uuid(),
 	presentationUrl=flask.url_for("index", _external=True)
-)	
+)
 
 	def _ssdp_register(self):
 		"""
@@ -267,4 +267,3 @@ class DiscoveryManager(object):
 				sock.close()
 			except:
 				pass
-
