@@ -14,7 +14,7 @@ from flask.ext.principal import Principal, Permission, RoleNeed, identity_loaded
 from flask.ext.compress import Compress
 from flask.ext.assets import Environment
 # Import Babel
-from flask.ext.babel import Babel, gettext, ngettext
+from flask.ext.babel import Babel, gettext, ngettext, lazy_gettext
 from babel import Locale
 # end Babel
 from watchdog.observers import Observer
@@ -58,7 +58,6 @@ from octoprint.server.util import LargeResponseHandler, ReverseProxied, restrict
 	UrlForwardHandler, user_validator
 from astroprint.printer.manager import printerManager
 from octoprint.settings import settings
-from octoprint.settings import LANGUAGES
 import octoprint.util as util
 import octoprint.events as events
 #import octoprint.timelapse
@@ -79,9 +78,13 @@ VERSION = None
 babel = Babel(app)
 @babel.localeselector
 def get_locale():
-	print LANGUAGES.keys()
+	print "== function localeselector =="
+	print "detected browser language:"
+	print request.accept_languages
+	print "list translation locale:"
+	print babel.list_translations()
+	print "mejor coincidencia:"
 	return request.accept_languages.best_match(LANGUAGES.keys())
-	#return 'en'
 
 @app.route('/astrobox/identify', methods=['GET'])
 def box_identify():
@@ -101,7 +104,10 @@ def box_identify():
 
 @app.route("/")
 def index():
+	print "== function index =="
+	print "list_translations babel:"
 	print babel.list_translations()
+	print gettext('dashboard')
 	s = settings()
 	loggedUsername = s.get(["cloudSlicer", "loggedUser"])
 

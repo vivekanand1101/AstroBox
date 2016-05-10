@@ -15,15 +15,6 @@ APPNAME="OctoPrint"
 
 instance = None
 
-# available languages
-LANGUAGES = {
-    'en': 'English',
-    'es': 'Español',
-    'de': 'Deutsch'
-}
-#SUPPORTED_LANGUAGES = {'en': 'English', 'fr': 'Francais'}
-#BABEL_DEFAULT_LOCALE = 'de'
-#BABEL_DEFAULT_TIMEZONE = 'UTC'
 
 def settings(init=False, configfile=None, basedir=None):
 	global instance
