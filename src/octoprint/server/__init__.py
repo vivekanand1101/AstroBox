@@ -78,13 +78,14 @@ VERSION = None
 babel = Babel(app)
 @babel.localeselector
 def get_locale():
-	print "== function localeselector =="
-	print "detected browser language:"
-	print request.accept_languages
-	print "list translation locale:"
 	print babel.list_translations()
-	print "mejor coincidencia:"
-	return request.accept_languages.best_match(LANGUAGES.keys())
+	langBrowser = str(request.accept_languages).split("-")[0]
+	langsSupported = ['en','es']
+	if langBrowser in langsSupported:
+		return langBrowser
+	else :
+		return 'en'
+
 
 @app.route('/astrobox/identify', methods=['GET'])
 def box_identify():

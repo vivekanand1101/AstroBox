@@ -1,0 +1,1083 @@
+# Spanish translations for PROJECT.
+# Copyright (C) 2016 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2016.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2016-05-10 17:30+0200\n"
+"PO-Revision-Date: 2016-05-10 13:13+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+
+#: ../src/astroprint/templates/app.jinja2:42
+msgid "dashboard"
+msgstr ""
+
+#: ../src/astroprint/templates/app.jinja2:44
+msgid "signAstro"
+msgstr ""
+
+#: ../src/astroprint/templates/app.jinja2:47
+msgid "signOut"
+msgstr ""
+
+#: ../src/astroprint/templates/app.jinja2:52
+#: ../src/astroprint/templates/turnoff.jinja2:10
+msgid "shutdown"
+msgstr ""
+
+#: ../src/astroprint/templates/app.jinja2:55
+#: ../src/astroprint/templates/reboot.jinja2:10
+msgid "restart"
+msgstr ""
+
+#: ../src/astroprint/templates/app.jinja2:58
+msgid "poweredBy"
+msgstr ""
+
+#: ../src/astroprint/templates/control.jinja2:2
+#: ../src/astroprint/templates/setup.jinja2:196
+msgid "printerCon"
+msgstr ""
+
+#: ../src/astroprint/templates/control.jinja2:6
+msgid "resumPrinting"
+msgstr ""
+
+#: ../src/astroprint/templates/control.jinja2:7
+msgid "resuming"
+msgstr ""
+
+#: ../src/astroprint/templates/control.jinja2:11
+msgid "printPaus"
+msgstr ""
+
+#: ../src/astroprint/templates/control.jinja2:18
+msgid "horizontal"
+msgstr ""
+
+#: ../src/astroprint/templates/control.jinja2:26
+msgid "vertical"
+msgstr ""
+
+#: ../src/astroprint/templates/control.jinja2:44
+msgid "extrudeFil"
+msgstr ""
+
+#: ../src/astroprint/templates/control.jinja2:51
+msgid "extrude"
+msgstr ""
+
+#: ../src/astroprint/templates/control.jinja2:54
+msgid "retract"
+msgstr ""
+
+#: ../src/astroprint/templates/control.jinja2:62
+msgid "selectNozz"
+msgstr ""
+
+#: ../src/astroprint/templates/control.jinja2:82
+msgid "filAmount"
+msgstr ""
+
+#: ../src/astroprint/templates/control.jinja2:88
+msgid "other"
+msgstr ""
+
+#: ../src/astroprint/templates/control.jinja2:119
+#: ../src/astroprint/templates/control.jinja2:134
+#: ../src/astroprint/templates/printing.jinja2:14
+msgid "off"
+msgstr ""
+
+#: ../src/astroprint/templates/control.jinja2:130
+msgid "currenTemp"
+msgstr ""
+
+#: ../src/astroprint/templates/control.jinja2:132
+msgid "fans"
+msgstr ""
+
+#: ../src/astroprint/templates/control.jinja2:133
+msgid "on"
+msgstr ""
+
+#: ../src/astroprint/templates/files.jinja2:3
+#: ../src/astroprint/templates/home.jinja2:42
+msgid "fileManager"
+msgstr ""
+
+#: ../src/astroprint/templates/files.jinja2:11
+msgid "uploadFile"
+msgstr ""
+
+#: ../src/astroprint/templates/files.jinja2:33
+msgid "printaFiles"
+msgstr ""
+
+#: ../src/astroprint/templates/files.jinja2:36
+#: ../src/astroprint/templates/files.jinja2:37
+msgid "sync"
+msgstr ""
+
+#: ../src/astroprint/templates/files.jinja2:43
+msgid "local"
+msgstr ""
+
+#: ../src/astroprint/templates/files.jinja2:44
+msgid "cloud"
+msgstr ""
+
+#: ../src/astroprint/templates/files.jinja2:152
+msgid "analyGcode"
+msgstr ""
+
+#: ../src/astroprint/templates/home.jinja2:9
+msgid "serialLogEnable"
+msgstr ""
+
+#: ../src/astroprint/templates/home.jinja2:9
+msgid "disableHere"
+msgstr ""
+
+#: ../src/astroprint/templates/home.jinja2:13
+msgid "newSoftware"
+msgstr ""
+
+#: ../src/astroprint/templates/home.jinja2:13
+msgid "availableFor"
+msgstr ""
+
+#: ../src/astroprint/templates/home.jinja2:13
+msgid "moreInfo"
+msgstr ""
+
+#: ../src/astroprint/templates/home.jinja2:23
+msgid "upload"
+msgstr ""
+
+#: ../src/astroprint/templates/home.jinja2:34
+msgid "fileUploader"
+msgstr ""
+
+#: ../src/astroprint/templates/home.jinja2:40
+#: ../src/astroprint/templates/home.jinja2:47
+#: ../src/astroprint/templates/home.jinja2:63
+#: ../src/astroprint/templates/home.jinja2:70
+msgid "launch"
+msgstr ""
+
+#: ../src/astroprint/templates/home.jinja2:49
+msgid "control"
+msgstr ""
+
+#: ../src/astroprint/templates/home.jinja2:55
+#: ../src/astroprint/templates/home.jinja2:77
+msgid "visit"
+msgstr ""
+
+#: ../src/astroprint/templates/home.jinja2:57
+msgid "supplies"
+msgstr ""
+
+#: ../src/astroprint/templates/home.jinja2:65
+#: ../src/astroprint/templates/settings.jinja2:3
+msgid "settings"
+msgstr ""
+
+#: ../src/astroprint/templates/home.jinja2:72
+msgid "gcTerminal"
+msgstr ""
+
+#: ../src/astroprint/templates/home.jinja2:79
+msgid "support"
+msgstr ""
+
+#: ../src/astroprint/templates/locked.jinja2:15
+msgid "passProtected"
+msgstr ""
+
+#: ../src/astroprint/templates/locked.jinja2:16
+msgid "user"
+msgstr ""
+
+#: ../src/astroprint/templates/locked.jinja2:17
+#: ../src/astroprint/templates/setup.jinja2:138
+msgid "enterPass"
+msgstr ""
+
+#: ../src/astroprint/templates/locked.jinja2:23
+msgid "enter"
+msgstr ""
+
+#: ../src/astroprint/templates/locked.jinja2:24
+#: ../src/astroprint/templates/settings.jinja2:500
+#: ../src/astroprint/templates/terminal.jinja2:22
+msgid "sending"
+msgstr ""
+
+#: ../src/astroprint/templates/login.jinja2:11
+#: ../src/astroprint/templates/setup.jinja2:205
+msgid "email"
+msgstr ""
+
+#: ../src/astroprint/templates/login.jinja2:11
+msgid "noAccount"
+msgstr ""
+
+#: ../src/astroprint/templates/login.jinja2:14
+msgid "validEmail"
+msgstr ""
+
+#: ../src/astroprint/templates/login.jinja2:17
+#: ../src/astroprint/templates/setup.jinja2:209
+msgid "password"
+msgstr ""
+
+#: ../src/astroprint/templates/login.jinja2:17
+#: ../src/astroprint/templates/setup.jinja2:209
+msgid "forgot"
+msgstr ""
+
+#: ../src/astroprint/templates/login.jinja2:20
+msgid "providePass"
+msgstr ""
+
+#: ../src/astroprint/templates/login.jinja2:24
+msgid "signIn"
+msgstr ""
+
+#: ../src/astroprint/templates/login.jinja2:25
+msgid "signinIn"
+msgstr ""
+
+#: ../src/astroprint/templates/printing.jinja2:2
+msgid "printing"
+msgstr ""
+
+#: ../src/astroprint/templates/printing.jinja2:15
+msgid "eaLayer"
+msgstr ""
+
+#: ../src/astroprint/templates/printing.jinja2:45
+msgid "timeRemaining"
+msgstr ""
+
+#: ../src/astroprint/templates/printing.jinja2:51
+msgid "printingLayer"
+msgstr ""
+
+#: ../src/astroprint/templates/printing.jinja2:60
+msgid "heatingUp"
+msgstr ""
+
+#: ../src/astroprint/templates/printing.jinja2:67
+msgid "currentTemp"
+msgstr ""
+
+#: ../src/astroprint/templates/printing.jinja2:84
+msgid "printerTemperature"
+msgstr ""
+
+#: ../src/astroprint/templates/printing.jinja2:92
+msgid "pausePrint"
+msgstr ""
+
+#: ../src/astroprint/templates/printing.jinja2:93
+msgid "pausing"
+msgstr ""
+
+#: ../src/astroprint/templates/printing.jinja2:97
+msgid "printerControls"
+msgstr ""
+
+#: ../src/astroprint/templates/printing.jinja2:100
+msgid "cancelPrint"
+msgstr ""
+
+#: ../src/astroprint/templates/printing.jinja2:105
+msgid "cancelCurrent"
+msgstr ""
+
+#: ../src/astroprint/templates/printing.jinja2:107
+msgid "cancelCurrentDesc"
+msgstr ""
+
+#: ../src/astroprint/templates/printing.jinja2:108
+#: ../src/astroprint/templates/reboot.jinja2:13
+#: ../src/astroprint/templates/settings.jinja2:457
+#: ../src/astroprint/templates/turnoff.jinja2:13
+msgid "aysure"
+msgstr ""
+
+#: ../src/astroprint/templates/printing.jinja2:112
+msgid "no"
+msgstr ""
+
+#: ../src/astroprint/templates/printing.jinja2:116
+msgid "yesCancel"
+msgstr ""
+
+#: ../src/astroprint/templates/printing.jinja2:117
+msgid "cancelling"
+msgstr ""
+
+#: ../src/astroprint/templates/reboot.jinja2:4
+msgid "rebooting"
+msgstr ""
+
+#: ../src/astroprint/templates/reboot.jinja2:5
+msgid "waitFor"
+msgstr ""
+
+#: ../src/astroprint/templates/reboot.jinja2:5
+msgid "toReboot"
+msgstr ""
+
+#: ../src/astroprint/templates/reboot.jinja2:12
+msgid "willStart"
+msgstr ""
+
+#: ../src/astroprint/templates/reboot.jinja2:17
+#: ../src/astroprint/templates/settings.jinja2:203
+#: ../src/astroprint/templates/settings.jinja2:238
+#: ../src/astroprint/templates/settings.jinja2:408
+#: ../src/astroprint/templates/settings.jinja2:469
+#: ../src/astroprint/templates/settings.jinja2:495
+#: ../src/astroprint/templates/settings.jinja2:519
+#: ../src/astroprint/templates/setup.jinja2:144
+#: ../src/astroprint/templates/turnoff.jinja2:17
+msgid "cancel"
+msgstr ""
+
+#: ../src/astroprint/templates/reboot.jinja2:20
+msgid "yesRestart"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:11
+#: ../src/astroprint/templates/settings.jinja2:27
+msgid "3dPrinter"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:12
+msgid "connection"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:13
+msgid "profile"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:14
+msgid "network"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:15
+#: ../src/astroprint/templates/setup.jinja2:32
+msgid "name"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:16
+msgid "internet"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:17
+#: ../src/astroprint/templates/settings.jinja2:324
+msgid "hotspot"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:18
+msgid "software"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:19
+msgid "update"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:20
+msgid "advanced"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:32
+#: ../src/astroprint/templates/settings.jinja2:83
+#: ../src/astroprint/templates/setup.jinja2:300
+msgid "connecting"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:33
+msgid "noConnection"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:34
+msgid "connectedPrinter"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:44
+msgid "usbDevice"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:44
+msgid "rescan"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:59
+msgid "noPrintDetecte"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:60
+msgid "plugRetry"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:82
+msgid "testConnection"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:90
+msgid "3dPrinterProfile"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:98
+msgid "driver"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:105
+msgid "noExtruders"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:115
+msgid "maxNozzTemp"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:120
+msgid "invNozzTemp"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:126
+msgid "heatedBed"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:134
+msgid "maxBedTemp"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:139
+msgid "invBedTemp"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:146
+msgid "cancelGcode"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:152
+msgid "saveProfile"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:153
+#: ../src/astroprint/templates/settings.jinja2:186
+#: ../src/astroprint/templates/setup.jinja2:44
+msgid "saving"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:162
+#: ../src/astroprint/templates/settings.jinja2:171
+msgid "networkName"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:174
+msgid "invDeviceName"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:177
+msgid "fewImportThings"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:180
+msgid "hotstopWifi"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:185
+msgid "save"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:194
+msgid "internetConnection"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:199
+msgid "selectWifi"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:212
+#: ../src/astroprint/templates/setup.jinja2:123
+msgid "wepSecDepre"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:215
+msgid "the"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:215
+msgid "wepSecDepreDesc1-2"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:218
+msgid "wepSecDepreDesc2-2"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:218
+#: ../src/astroprint/templates/setup.jinja2:128
+msgid "deprecated"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:219
+#: ../src/astroprint/templates/setup.jinja2:129
+msgid "wepSecDepreDesc3-3"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:224
+#: ../src/astroprint/templates/settings.jinja2:420
+#: ../src/astroprint/templates/setup.jinja2:133
+#: ../src/astroprint/templates/updating.jinja2:59
+msgid "close"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:228
+#: ../src/astroprint/templates/setup.jinja2:137
+msgid "wifiPassword"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:230
+msgid "enterPassFor"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:242
+#: ../src/astroprint/templates/settings.jinja2:311
+#: ../src/astroprint/templates/setup.jinja2:101
+#: ../src/astroprint/templates/setup.jinja2:299
+msgid "connect"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:244
+#: ../src/astroprint/templates/setup.jinja2:108
+#: ../src/astroprint/templates/setup.jinja2:150
+msgid "mightBeWhile"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:256
+msgid "wiredConnection"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:257
+#: ../src/astroprint/templates/settings.jinja2:308
+msgid "connected"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:258
+msgid "ipAdress"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:262
+msgid "manuallyConfigured"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:264
+#: ../src/astroprint/templates/settings.jinja2:278
+msgid "ipAddress"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:268
+msgid "wirelessConnection"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:283
+msgid "scanWifi"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:285
+msgid "lookingNetworks"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:313
+msgid "pleaseBePatient"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:329
+msgid "hotspotNot"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:331
+msgid "localHotspot"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:334
+msgid "runningHotspot"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:336
+msgid "stopHotspot"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:338
+msgid "stopingpHotspot"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:343
+msgid "startHotspot"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:345
+msgid "startingpHotspot"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:355
+#: ../src/astroprint/templates/setup.jinja2:76
+msgid "turnHotspotOff"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:364
+msgid "softwareUpdate"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:368
+msgid "installed"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:374
+msgid "checkUpdates"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:375
+#: ../src/astroprint/templates/unreachable.jinja2:13
+msgid "checking"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:384
+msgid "avaiable"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:390
+msgid "currentInstalled"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:392
+#: ../src/astroprint/templates/updating.jinja2:19
+msgid "version"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:393
+msgid "published"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:396
+msgid "needWizard"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:400
+#: ../src/astroprint/templates/updating.jinja2:22
+msgid "releaseNotes"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:414
+#: ../src/astroprint/templates/updating.jinja2:31
+#: ../src/astroprint/templates/updating.jinja2:65
+msgid "initiating"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:427
+msgid "advancedSettings"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:435
+msgid "factorySettings"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:436
+msgid "restoreFactory"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:438
+msgid "logs"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:439
+#: ../src/astroprint/templates/settings.jinja2:482
+msgid "sendLogs"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:440
+msgid "sizeOfLogs"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:440
+#: ../src/astroprint/templates/terminal.jinja2:28
+msgid "clear"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:448
+msgid "turnOnLogs"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:450
+msgid "turnOnLogsDesc"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:459
+msgid "thisWillDeleteSettings"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:462
+msgid "writeReset"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:473
+msgid "reset"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:474
+msgid "reseting"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:484
+msgid "sendLogsDesc"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:487
+msgid "supportTicket"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:487
+msgid "creatingOne"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:499
+msgid "sendLogsv2"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:508
+msgid "deleteAstroLogs"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:511
+msgid "deleteAstroLogsDesc"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:514
+msgid "aysureDelLogs"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:523
+msgid "deleteLogs"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:524
+msgid "deleting"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:18
+msgid "beginSetup"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:23
+msgid "nameYour"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:27
+msgid "ifYouHaveMore"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:27
+msgid "makeSure"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:36
+msgid "fewThingRemember"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:39
+msgid "hotspotName"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:43
+#: ../src/astroprint/templates/setup.jinja2:81
+#: ../src/astroprint/templates/setup.jinja2:196
+#: ../src/astroprint/templates/setup.jinja2:214
+msgid "next"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:43
+#: ../src/astroprint/templates/setup.jinja2:61
+msgid "internetSetup"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:50
+msgid "checkingName"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:55
+#: ../src/astroprint/templates/setup.jinja2:90
+#: ../src/astroprint/templates/updating.jinja2:63
+msgid "retry"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:65
+msgid "success"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:67
+msgid "your"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:67
+msgid "isConnectedTo"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:77
+msgid "thisCanbeChanged"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:81
+msgid "astroprintAccount"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:85
+msgid "checkingConnection"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:92
+msgid "skipInternet"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:92
+msgid "offline"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:96
+msgid "chooseWifiNetwork"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:104
+msgid "skip"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:114
+msgid "withoutConnected"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:115
+msgid "useThe"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:115
+msgid "whenNearIt"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:125
+msgid "wepSecDepreDesc1-3"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:128
+msgid "wepSecDepreDesc2-3"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:183
+msgid "astroprintcomAccount"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:187
+msgid "checkingAstro"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:194
+msgid "logout"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:201
+msgid "thisAllowsSlice"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:201
+msgid "createNewAccount"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:205
+msgid "dontHaveAccount"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:214
+msgid "printerConnection"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:215
+msgid "loggingIn"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:220
+msgid "skipAstroprint"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:227
+#: ../src/astroprint/templates/setup.jinja2:241
+msgid "connectYourPrinter"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:231
+msgid "plugYourPrinterUsb1-2"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:231
+msgid "plugYourPrinterUsb2-2"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:233
+msgid "continue"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:235
+msgid "skipAndConfigure"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:246
+msgid "checkingPrinterSettings"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:250
+msgid "selectYourConnection"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:254
+msgid "skipPrinterConnection"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:308
+msgid "youreDone"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:321
+msgid "startPrinting"
+msgstr ""
+
+#: ../src/astroprint/templates/setup.jinja2:322
+msgid "launching"
+msgstr ""
+
+#: ../src/astroprint/templates/terminal.jinja2:3
+msgid "gcodeTerminal"
+msgstr ""
+
+#: ../src/astroprint/templates/terminal.jinja2:8
+msgid "gcodeTerminalWarning"
+msgstr ""
+
+#: ../src/astroprint/templates/terminal.jinja2:17
+msgid "enterYourGcode"
+msgstr ""
+
+#: ../src/astroprint/templates/terminal.jinja2:21
+msgid "send"
+msgstr ""
+
+#: ../src/astroprint/templates/terminal.jinja2:23
+msgid "failed"
+msgstr ""
+
+#: ../src/astroprint/templates/turnoff.jinja2:4
+msgid "goingToSleep"
+msgstr ""
+
+#: ../src/astroprint/templates/turnoff.jinja2:5
+msgid "safeToUnplug"
+msgstr ""
+
+#: ../src/astroprint/templates/turnoff.jinja2:12
+msgid "willGoSuspend"
+msgstr ""
+
+#: ../src/astroprint/templates/turnoff.jinja2:20
+msgid "yesShutDown"
+msgstr ""
+
+#: ../src/astroprint/templates/unreachable.jinja2:4
+msgid "lostConnection"
+msgstr ""
+
+#: ../src/astroprint/templates/unreachable.jinja2:5
+msgid "connectionLost2-2"
+msgstr ""
+
+#: ../src/astroprint/templates/unreachable.jinja2:7
+msgid "goneOffline"
+msgstr ""
+
+#: ../src/astroprint/templates/unreachable.jinja2:8
+msgid "deviceDiffeNetwork1-2"
+msgstr ""
+
+#: ../src/astroprint/templates/unreachable.jinja2:8
+msgid "deviceDiffeNetwork2-2"
+msgstr ""
+
+#: ../src/astroprint/templates/unreachable.jinja2:10
+msgid "tryUsingButton"
+msgstr ""
+
+#: ../src/astroprint/templates/unreachable.jinja2:12
+msgid "tryReconnecting"
+msgstr ""
+
+#: ../src/astroprint/templates/updating.jinja2:14
+msgid "systemUpdate"
+msgstr ""
+
+#: ../src/astroprint/templates/updating.jinja2:16
+msgid "softwareOutDate"
+msgstr ""
+
+#: ../src/astroprint/templates/updating.jinja2:20
+msgid "releaseDate"
+msgstr ""
+
+#: ../src/astroprint/templates/updating.jinja2:20
+msgid "noPublished"
+msgstr ""
+
+#: ../src/astroprint/templates/updating.jinja2:29
+msgid "installNow"
+msgstr ""
+
+#: ../src/astroprint/templates/updating.jinja2:38
+msgid "softwareUpdateProgress"
+msgstr ""
+
+#: ../src/astroprint/templates/updating.jinja2:42
+msgid "downloadingRelease"
+msgstr ""
+
+#: ../src/astroprint/templates/updating.jinja2:52
+msgid "systemUpdateFailed"
+msgstr ""
+
+#: ../src/astroprint/templates/updating.jinja2:54
+msgid "systemUpdateFailedDesc1-2"
+msgstr ""
+
+#: ../src/astroprint/templates/updating.jinja2:54
+msgid "systemUpdateFailedDesc2-2"
+msgstr ""
+
+#~ msgid "wepSecDepreDesc1-3"
+#~ msgstr ""
+
+#~ msgid "wepSecDepreDesc2-3"
+#~ msgstr ""
+
+#~ msgid "internetSetupt"
+#~ msgstr ""
+

@@ -1,21 +1,21 @@
 <div class="row">
-	<h1 class="bold" align="center">{{ _('printerCon') }}Printer Controls</h1>
+	<h1 class="bold" align="center">{{ _('printerCon') }}</h1>
 	<div class="row back-to-print panel callout radius">
 		<div class="small-12 medium-4 large-3 columns">
 			<div class="loading-button expand">
-				<button class="radius tiny expand"><i class="icon-play"></i> {{ _('resumPrinting') }}Resume Printing</button>
-				<span class="radius button tiny expand loading"><i class="icon-rocket-spinner animate-spin"></i> {{ _('resuming') }}Resuming...</span>
+				<button class="radius tiny expand"><i class="icon-play"></i> {{ _('resumPrinting') }}</button>
+				<span class="radius button tiny expand loading"><i class="icon-rocket-spinner animate-spin"></i> {{ _('resuming') }}...</span>
 			</div>
 		</div>
 		<div class="small-12 medium-8 large-9 columns hide-for-small">
-			{{ _('printPaus') }}Printing paused:
+			{{ _('printPaus') }}:
 			<div class="filename bold"></div>
 		</div>
 	</div>
 	<div class="medium-12 large-7 columns">
 		<div class="row">
 			<div class="small-12 medium-7 columns" id="xy-controls" align="center">
-				<h2 class="bold">{{ _('horizontal') }}Horizontal</h2>
+				<h2 class="bold">{{ _('horizontal') }}</h2>
 				<div class="control_bg_xy" align="center">
 					<button class="control_btn_y_plus"></button><br/>
 					<button class="control_btn_x_minus"></button> <button class="home_z"></button> <button class="control_btn_x_plus"></button><br/>
@@ -23,7 +23,7 @@
 				</div>
 			</div>
 			<div class="small-12 medium-5 columns" id="z-controls">
-				<h2 class="bold" align="center">{{ _('vertical') }}Vertical</h2>
+				<h2 class="bold" align="center">{{ _('vertical') }}</h2>
 				<center>
 					<button class="control_btn_z_plus"></button><br/>
 					<button class="home_z"></button><br/>
@@ -41,17 +41,17 @@
 				</center>
 			</div>
 			<div class="small-12 columns" id="extrusion-control">
-				<h2 class="bold">{{ _('extrudeFil') }}Extrude Filament</h2>
+				<h2 class="bold">{{ _('extrudeFil') }}</h2>
 				<div class="small-12 medium-7 columns">
 					<div class="row extruder-switch"></div>
 				</div>
 				<div class="small-12 medium-5 columns">
 					<div class="row closer">
 						<div class="small-6 columns">
-							<button class="small radius expand success extrude">{{ _('extrude') }}Extrude</button>
+							<button class="small radius expand success extrude">{{ _('extrude') }}</button>
 						</div>
 						<div class="small-6 columns">
-							<button class="small radius expand success retract">{{ _('retract') }}Retract</button>
+							<button class="small radius expand success retract">{{ _('retract') }}</button>
 						</div>
 					</div>
 				</div>
@@ -59,7 +59,7 @@
 					<% if (profile.extruder_count > 1) { %>
 						<div class="small-6 columns">
 							<div class="row closer">
-								<label class="bold">{{ _('selectNozz') }}Select Nozzle</label>
+								<label class="bold">{{ _('selectNozz') }}</label>
 								<div class="small-5 columns">
 									<i class="icon-extruder"></i>
 								</div>
@@ -79,13 +79,13 @@
 					<% } %>
 
 					<div class="<% if (profile.extruder_count > 1) { %> small-6 <% } else { %> small-9 <% } %>columns">
-						<label class="bold">{{ _('filAmount') }}Filament Amount</label>
+						<label class="bold">{{ _('filAmount') }}</label>
 						<select class="extrusion-length">
 							<option value="10" selected>10 mm</option>
 							<option value="50">50 mm</option>
 							<option value="100">100 mm</option>
 							<option value="200">200 mm</option>
-							<option value="other">Other...</option>
+							<option value="other">{{ _('other') }}Other...</option>
 						</select>
 						<div class="row collapse other hide">
 							<div class="small-8 columns">
@@ -116,7 +116,7 @@
 				<input type="number" class="hide"/>
 			</div>
 		</div>
-		<button class="temp-off secondary small radius expand">{{ _('off') }}OFF</button>
+		<button class="temp-off secondary small radius expand">{{ _('off') }}</button>
 	</div>
 {%- endmacro %}
 
@@ -127,11 +127,11 @@
 			</div>
 			<div class="small-4 columns fan-control">
 				<div class="fan-control-push" align="center">
-					{{ _('currenTemp') }}Current Temp (&deg;C)
+					{{ _('currenTemp') }} (&deg;C)
 				</div>
-				<h2 class="bold">{{ _('fans') }}Fans <span class="fan_icon"></span></h2>
-				<button class="radius small success expand fan-on">{{ _('on') }}ON</button>
-				<button class="radius small secondary expand fan-off">{{ _('off') }}OFF</button>
+				<h2 class="bold">{{ _('fans') }} <span class="fan_icon"></span></h2>
+				<button class="radius small success expand fan-on">{{ _('on') }}</button>
+				<button class="radius small secondary expand fan-off">{{ _('off') }}</button>
 			</div>
 			<div class="small-4 columns" align="center">
 				{{ temp_control('bed', 'Bed')}}

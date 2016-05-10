@@ -39,23 +39,23 @@
 			<aside class="left-off-canvas-menu">
 				<ul class="off-canvas-list" id="main-menu">
 					<li class="header bold"><label>{{astroboxName}}</label></li>
-					<li><a href="#"><i class="icon-th"></i> {{ _('dashboard') }}Dashboard</a></li>
+					<li><a href="#"><i class="icon-th"></i> {{ _('dashboard') }}</a></li>
 					{% if not user_email %}
-						<li><a class="button small login" data-reveal-id="login-modal"><i class="icon-user"></i> {{ _('signAstro') }}Sign in to AstroPrint</a></li>
+						<li><a class="button small login" data-reveal-id="login-modal"><i class="icon-user"></i> {{ _('signAstro') }}</a></li>
 					{% else %}
 						<li><label class="account bold"><i class="icon-user"></i> {{user_email}}</label></li>
-						<li class="logout"><a href="#"><i class="icon-logout"></i> {{ _('signOut') }}Sign out <i class="icon-rocket-spinner animate-spin hide"></i></a></li>
+						<li class="logout"><a href="#"><i class="icon-logout"></i> {{ _('signOut') }} <i class="icon-rocket-spinner animate-spin hide"></i></a></li>
 					{% endif %}
 				</ul>
 				<div class="turn-off-area row">
 					<div class="small-6 columns">
-						<button class="alert tiny radius turn-off"><i class="icon-off"></i><br/>{{ _('shutdown') }}Shutdown</button>
+						<button class="alert tiny radius turn-off"><i class="icon-off"></i><br/>{{ _('shutdown') }}</button>
 					</div>
 					<div class="small-6 columns">
-						<button class="secondary tiny radius reboot"><i class="icon-refresh"></i> {{ _('restart') }}Restart</button>
+						<button class="secondary tiny radius reboot"><i class="icon-refresh"></i> {{ _('restart') }}</button>
 					</div>
 				</div>
-				<div class="copy" align="center">{{ _('poweredBy') }}Powered by <a href="https://www.astroprint.com">AstroPrint&reg;</a><br/>{{version}}</div>
+				<div class="copy" align="center">{{ _('poweredBy') }} <a href="https://www.astroprint.com">AstroPrint&reg;</a><br/>{{version}}</div>
 			</aside>
 			<div id="main">
 				<div class="row">

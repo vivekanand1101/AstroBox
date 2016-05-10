@@ -15,56 +15,56 @@
 			<div class="content" align="center">
 				<img src="/img/setup/step_1_rocket.png" height="104"/>
 				{{variantData['welcomeMsgContent']}}
-				<a class="button success radius expand bold" href="#name">{{ _('beginSetup') }}Begin Setup</i></a>
+				<a class="button success radius expand bold" href="#name">{{ _('beginSetup') }}</i></a>
 			</div>
 		</div>
 
 		<div id="step-name" class="step hide">
-			<h1 class="bold">{{ _('nameYour') }}Name Your <span class="light">Astro</span>Box&trade;<div class="nub"></div></h1>
+			<h1 class="bold">{{ _('nameYour') }} <span class="light">Astro</span>Box&trade;<div class="nub"></div></h1>
 			<div class="content">
 				<img src="/img/setup/step_2_rocket.png" height="104"/>
 				<p>
-					{{ _('ifYouHaveMore') }}If you have more than one {{variantData['productName']}}, make sure and give them different names!
+					{{ _('ifYouHaveMore') }} {{variantData['productName']}}, {{ _('makeSure') }}
 				</p>
 				<div class="settings-state">
 					<form align="center">
 						<label for="astrobox-name">
-							<b>{{variantData['productName']}} {{ _('name') }}Name:</b>
+							<b>{{variantData['productName']}} {{ _('name') }}:</b>
 							<input id="astrobox-name" class="radius" type="text" name="name" autocomplete="off"/>
 						</label>
 						<p>
-							{{ _('fewThingRemember') }}A few important things to remember:
+							{{ _('fewThingRemember') }}:
 						</p>
 						<ul class="preview">
-							<li><i class="icon-signal"></i> {{ _('hotspotName') }}Hotspot WiFi name: <span class="hotspot-name bold"></span></li>
+							<li><i class="icon-signal"></i> {{ _('hotspotName') }}: <span class="hotspot-name bold"></span></li>
 							<li><i class="icon-link"></i> {{variantData['productName']}} URL: http://<span class="astrobox-url bold"></span>.local</li>
 						</ul>
 						<div class="loading-button expand">
-							<a class="button success radius submit-action expand" href="#internet"><small>{{ _('next') }}Next:</small> <b>{{ _('internetSetup') }}Internet Setup</b> <i class="icon-right-open"></i></a>
-							<span class="button success disabled radius loading expand"><i class="icon-rocket-spinner animate-spin"></i> {{ _('saving') }}Saving...</span>
+							<a class="button success radius submit-action expand" href="#internet"><small>{{ _('next') }}:</small> <b>{{ _('internetSetup') }}</b> <i class="icon-right-open"></i></a>
+							<span class="button success disabled radius loading expand"><i class="icon-rocket-spinner animate-spin"></i> {{ _('saving') }}...</span>
 						</div>
 					</form>
 				</div>
 				<div class="checking-state" align="center">
 					<i class="icon-rocket-spinner animate-spin"></i>
-					<h3 class="bold" align="center">{{ _('checkingName') }}Checking name...</h3>
+					<h3 class="bold" align="center">{{ _('checkingName') }}...</h3>
 				</div>
 				<div class="failed-state" align="center">
 					<i class="icon-cancel-circled failed"></i>
 					<h3 class="bold" align="center"></h3>
-					<button class="success radius">{{ _('retry') }}Retry</button>
+					<button class="success radius">{{ _('retry') }}</button>
 				</div>
 			</div>
 		</div>
 
 		<div id="step-internet" class="step hide">
-			<h1 class="bold">{{ _('internetSetupt') }}Internet Setup<div class="nub"></div></h1>
+			<h1 class="bold">{{ _('internetSetup') }}<div class="nub"></div></h1>
 			<div class="content">
 				<div class="success-state" align="center">
 					<img src="/img/setup/step_4_wifi-box.png" height="107"/>
-					<h3 class="bold" align="center">{{ _('success') }}Success!</h3>
+					<h3 class="bold" align="center">{{ _('success') }}</h3>
 					<p>
-						{{ _('your') }}Your {{variantData['productName']}} {{ _('isConnectedTo') }}is now connected to the internet.
+						{{ _('your') }} {{variantData['productName']}} {{ _('isConnectedTo') }}
 					</p>
 					<hr/>
 					<div class="row hotspot-off">
@@ -73,46 +73,46 @@
 						</div>
 						<div class="small-10 medium-11 columns">
 							<label for="hotspot-off">
-								<b>{{ _('turnHotspotOff') }}Turn hotspot off when a known network is found in the future.</b><br/>
-								<small>{{ _('thisCanbeChanged') }}(This can be changed later in the settings menu)</small>
+								<b>{{ _('turnHotspotOff') }}</b><br/>
+								<small>{{ _('thisCanbeChanged') }}</small>
 							</label>
 						</div>
 					</div>
-					<a class="button success radius expand" href="#astroprint"><small>{{ _('next') }}Next:</small> <b>{{ _('astroprintAccount') }}AstroPrint Account</b> <i class="icon-right-open"></i></a>
+					<a class="button success radius expand" href="#astroprint"><small>{{ _('next') }}:</small> <b>{{ _('astroprintAccount') }}</b> <i class="icon-right-open"></i></a>
 				</div>
 				<div class="checking-state" align="center">
 					<i class="icon-rocket-spinner animate-spin"></i>
-					<h3 class="bold" align="center">{{ _('checkingConnection') }}Checking connection...</h3>
+					<h3 class="bold" align="center">{{ _('checkingConnection') }}...</h3>
 				</div>
 				<div class="failed-state" align="center">
 					<i class="icon-cancel-circled failed"></i>
 					<h3 class="bold" align="center"></h3>
-					<button class="success radius expand">{{ _('retry') }}Retry</button>
+					<button class="success radius expand">{{ _('retry') }}</button>
 					<div align="right">
-						<a href="#connect-printer" class="skip-step">{{ _('skipInternet') }}Skip internet. Use {{variantData['productName']}} {{ _('offline') }}offline <i class="icon-right-open"></i></a>
+						<a href="#connect-printer" class="skip-step">{{ _('skipInternet') }} {{variantData['productName']}} {{ _('offline') }} <i class="icon-right-open"></i></a>
 					</div>
 				</div>
 				<div class="settings-state">
-					<h2 class="bold" align="center">{{ _('chooseWifiNetwork') }}Choose your WiFi Network</h2>
+					<h2 class="bold" align="center">{{ _('chooseWifiNetwork') }}</h2>
 					<div class="wifi-network-list"></div>
 					<div class="row">
 						<div class="loading-button expand">
 							<div class="small-12 medium-6 medium-push-6 columns">
-								<button class="disabled success radius connect expand bold">{{ _('connect') }}Connect</button>
+								<button class="disabled success radius connect expand bold">{{ _('connect') }}</button>
 							</div>
 							<div class="small-12 medium-6 medium-pull-6 columns">
-								<a href="#connect-printer" class="button secondary radius expand bold"><sup>*</sup>{{ _('skip') }}Skip</a>
+								<a href="#connect-printer" class="button secondary radius expand bold"><sup>*</sup>{{ _('skip') }}</a>
 							</div>
 							<div class="small-12 columns">
 								<span class="button disabled loading success radius expand">
-									<i class="icon-rocket-spinner animate-spin"></i> {{ _('mightBeWhile') }}Might be a while. Please be patient...
+									<i class="icon-rocket-spinner animate-spin"></i> {{ _('mightBeWhile') }}...
 								</span>
 							</div>
 						</div>
 					</div>
 					<p class="small">
-						<sup>*</sup> {{ _('withoutConnected') }}Without being connected to the internet, you can only
-						{{ _('useThe') }}use the {{variantData['productName']}} {{ _('whenNearIt') }}when you are near it.
+						<sup>*</sup> {{ _('withoutConnected') }}
+						{{ _('useThe') }} {{variantData['productName']}} {{ _('whenNearIt') }}
 					</p>
 				</div>
 			</div>
@@ -122,11 +122,11 @@
 					<% if (wifi.wep) { %>
 						<h2 class="bold" align="center">{{ _('wepSecDepre') }}WEP Security Deprecated</h2>
 						<p>
-							The <%= wifi.name %> {{ _('wepSecDepreDesc1-2') }}WiFi network seems to be configured to use WEP security.
+							The <%= wifi.name %> {{ _('wepSecDepreDesc1-3') }}
 						</p>
 						<p>
-							{{ _('wepSecDepreDesc2-2') }}WiFI WEP Security was <a href="https://en.wikipedia.org/wiki/Wired_Equivalent_Privacy" target="_info">deprecated in 2004</a>
-							and is <b>not considered safe</b>, please configure your WiFi network to use WPA or WPA2.
+							{{ _('wepSecDepreDesc2-3') }} <a href="https://en.wikipedia.org/wiki/Wired_Equivalent_Privacy" target="_info">{{ _('deprecated') }}</a>
+							{{ _('wepSecDepreDesc3-3') }}
 						</p>
 						<div class="row">
 							<div class="small-12 medium-6 columns medium-centered">
@@ -134,20 +134,20 @@
 							</div>
 						</div>
 					<% } else { %>
-						<h2 class="bold" align="center">{{ _('wifiPassword') }}WiFi Password</h2>
-						<p align="center">{{ _('enterPass') }}Enter the password for <span class="name bold"><%= wifi.name %></span>.</p>
+						<h2 class="bold" align="center">{{ _('wifiPassword') }}</h2>
+						<p align="center">{{ _('enterPass') }} <span class="name bold"><%= wifi.name %></span>.</p>
 						<form>
 							<input type="hidden" class="network-id-field" name="id" value="<%= wifi.id %>"/>
 							<input type="password" class="network-password-field" name="password"/>
 							<div class="row">
 								<div class="small-12 medium-6 columns">
-									<a class="button secondary radius cancel expand" href="#internet">{{ _('cancel') }}Cancel</a>
+									<a class="button secondary radius cancel expand" href="#internet">{{ _('cancel') }}</a>
 								</div>
 								<div class="small-12 medium-6 columns">
 									<div class="loading-button expand">
 										<input type="submit" class="button radius success connect" value="Connect"/>
 										<span class="loading button success disabled radius">
-											<i class="icon-rocket-spinner animate-spin"></i> {{ _('mightBeWhile') }}Might be while. Please be patient...
+											<i class="icon-rocket-spinner animate-spin"></i> {{ _('mightBeWhile') }}...
 										</span>
 									</div>
 								</div>
@@ -180,25 +180,25 @@
 		</div>
 
 		<div id="step-astroprint" class="step hide">
-			<h1 class="bold">{{ _('astroprintcomAccount') }}AstroPrint.com Account<div class="nub"></div></h1>
+			<h1 class="bold">{{ _('astroprintcomAccount') }}<div class="nub"></div></h1>
 			<div class="content">
 				<div class="checking-state" align="center">
 					<i class="icon-rocket-spinner animate-spin"></i>
-					<h3 class="bold" align="center">{{ _('checkingAstro') }}Checking AstroPrint.com...</h3>
+					<h3 class="bold" align="center">{{ _('checkingAstro') }}...</h3>
 				</div>
 				<div class="success-state" align="center">
 					<img src="/img/setup/step_5_rocket-launch.png" height="93"/>
 					<h4 class="bold" align="center">
 						<i class="icon-user ok"></i>
 						<span class="email"></span>
-						(<a class="logout" href="#">{{ _('logout') }}Logout</a>)
+						(<a class="logout" href="#">{{ _('logout') }}</a>)
 					</h4>
-					<a class="button success radius expand" href="#connect-printer"><small>{{ _('next') }}Next:</small> <b>{{ _('printerCon') }}Printer Connection</b> <i class="icon-right-open"></i></a>
+					<a class="button success radius expand" href="#connect-printer"><small>{{ _('next') }}:</small> <b>{{ _('printerCon') }}</b> <i class="icon-right-open"></i></a>
 				</div>
 				<div class="settings-state">
 					<img src="/img/setup/step_5_rocket-launch.png" height="93"/>
 					<p>
-						{{ _('thisAllowsSlice') }}This allows you to slice, store, and print through our cloud servers. Sign in below or <a target="_astroprint" href="http://www.astroprint.com/account/signup">{{ _('createNewAccount') }}create a new account</a>.
+						{{ _('thisAllowsSlice') }} <a target="_astroprint" href="http://www.astroprint.com/account/signup">{{ _('createNewAccount') }}</a>.
 					</p>
 					<form>
 						<label for="email">
@@ -211,7 +211,7 @@
 						</label>
 						<div align="center">
 							<div class="loading-button expand">
-								<button class="success radius submit-action expand" href="#connect-printer"><small>{{ _('next') }}Next:</small> <b>{{ _('printerConnection') }}Printer Connection</b> <i class="icon-right-open"></i></button>
+								<button class="success radius submit-action expand" href="#connect-printer"><small>{{ _('next') }}:</small> <b>{{ _('printerConnection') }}Printer Connection</b> <i class="icon-right-open"></i></button>
 								<span class="button success disabled radius loading expand"><i class="icon-rocket-spinner animate-spin"></i> {{ _('loggingIn') }}Logging in...</span>
 							</div>
 						</div>

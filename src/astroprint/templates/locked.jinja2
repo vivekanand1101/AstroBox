@@ -12,16 +12,16 @@
 		<div class="small-12 medium-10 large-7 columns small-centered">
 			<div class="locked-area">
 				<center><img src="/img/astrolock.png"/></center>
-				<h2 class="bold"><span class="highlight">{{astroboxName}}</span> {{ _('passProtected') }}is password protected.</h2>
-				{{ _('user') }}User: <span class="highlight">{{username}}</span><br/>
-				{{ _('enterPass') }}Enter your password for access:
+				<h2 class="bold"><span class="highlight">{{astroboxName}}</span> {{ _('passProtected') }}</h2>
+				{{ _('user') }} <span class="highlight">{{username}}</span><br/>
+				{{ _('enterPass') }}
 				<form id="login-form" action="/api/login" method="post">
 					<input type="hidden" name="user" value="{{username}}"/>
 					<input type="hidden" name="remember" value="true"/>
 					<input type="password" name="pass" class="radius"/>
 					<div class="loading-button expand">
-						<button class="button radius success"><b>{{ _('enter') }}Enter</b></button>
-						<span class="button radius disabled success loading bold"><i class="icon-rocket-spinner animate-spin"></i> {{ _('sending') }}Sending...</span>
+						<button class="button radius success"><b>{{ _('enter') }}</b></button>
+						<span class="button radius disabled success loading bold"><i class="icon-rocket-spinner animate-spin"></i> {{ _('sending') }}...</span>
 					</div>
 				</form>
 			</div>

@@ -8,16 +8,16 @@
 	<div class="hide-for-small-only medium-5  large-4 columns">
 		<div id="settings-side-bar">
 			<ul class="side-nav">
-				<li class="heading bold">{{ _('3dPrinter') }}3D Printer</li>
-				<li class="active printer-connection"><a href="#settings/printer-connection">{{ _('connection') }}Connection</a></li>
-				<li class="printer-profile dotted"><a href="#settings/printer-profile">{{ _('profile') }}Profile</a></li>
-				<li class="heading bold">{{ _('network') }}Network</li>
-				<li class="network-name"><a href="#settings/network-name">{{ _('name') }}Name</a></li>
-				<li class="internet-connection dotted"><a href="#settings/internet-connection">{{ _('internet') }}Internet</a></li>
-				<li class="wifi-hotspot dotted"><a href="#settings/wifi-hotspot">{{ _('hotspot') }}WiFi Hotspot</a></li>
-				<li class="heading bold">{{ _('software') }}Software</li>
-				<li class="software-update"><a href="#settings/software-update">{{ _('update') }}Update</a></li>
-				<li class="software-advanced dotted"><a href="#settings/software-advanced">{{ _('advanced') }}Advanced</a><li>
+				<li class="heading bold">{{ _('3dPrinter') }}</li>
+				<li class="active printer-connection"><a href="#settings/printer-connection">{{ _('connection') }}</a></li>
+				<li class="printer-profile dotted"><a href="#settings/printer-profile">{{ _('profile') }}</a></li>
+				<li class="heading bold">{{ _('network') }}</li>
+				<li class="network-name"><a href="#settings/network-name">{{ _('name') }}</a></li>
+				<li class="internet-connection dotted"><a href="#settings/internet-connection">{{ _('internet') }}</a></li>
+				<li class="wifi-hotspot dotted"><a href="#settings/wifi-hotspot">{{ _('hotspot') }}</a></li>
+				<li class="heading bold">{{ _('software') }}</li>
+				<li class="software-update"><a href="#settings/software-update">{{ _('update') }}</a></li>
+				<li class="software-advanced dotted"><a href="#settings/software-advanced">{{ _('advanced') }}</a><li>
 			</ul>
 		</div>
 	</div>
@@ -29,9 +29,9 @@
 		<div id="printer-connection" class="settings-page">
 			<div class="row connection-status">
 				<div class="small-12">
-					<span class="connecting"><i class="icon-rocket-spinner animate-spin"></i> {{ _('connecting') }}Connecting...</span>
-					<span class="failed"><i class="icon-attention"></i> {{ _('noConnection') }}No connection to printer.</span>
-					<span class="connected"><i class="icon-3d-printer"></i> {{ _('connectedPrinter') }}Connected to printer.</span>
+					<span class="connecting"><i class="icon-rocket-spinner animate-spin"></i> {{ _('connecting') }}...</span>
+					<span class="failed"><i class="icon-attention"></i> {{ _('noConnection') }}</span>
+					<span class="connected"><i class="icon-3d-printer"></i> {{ _('connectedPrinter') }}</span>
 				</div>
 			</div>
 			<form></form>
@@ -41,7 +41,7 @@
 			<div class="row">
 				<div class="small-12">
 					<label for="settings-serial-port" class="bold">
-						USB Device <small>(<a href="#" class="retry-ports"><i class="icon-refresh"></i> Re-scan</a>)</small>
+						{{ _('usbDevice') }} <small>(<a href="#" class="retry-ports"><i class="icon-refresh"></i> {{ _('rescan') }}</a>)</small>
 						<% if (settings.serial.portOptions.length > 0) { %>
 							<% if (settings.serial.portOptions.length > 1) { %>
 								<select id="settings-serial-port" name="port">
@@ -56,8 +56,8 @@
 							<% } %>
 						<% } else { %>
 							<p>
-							{{ _('noPrintDetecte') }}No printer detected. Is your printer plugged in?<br/>
-							<a href="#" class="retry-ports bold">Plug printer and retry &raquo; </a>
+							{{ _('noPrintDetecte') }}<br/>
+							<a href="#" class="retry-ports bold">{{ _('plugRetry') }} &raquo; </a>
 							</p>
 						<% } %>
 					</label>
@@ -79,15 +79,15 @@
 			<% if (settings.serial.portOptions.length > 0 && ( settings.serial.baudrateOptions.length > 0 || settings.driver == 's3g') )  { %>
 				<div align="center">
 					<div class="loading-button test-connection">
-						<button class="success radius">{{ _('testConnection') }}Test Connection</button>
-						<span class="button disabled radius success loading">{{ _('connecting') }}Connecting...</span>
+						<button class="success radius">{{ _('testConnection') }}</button>
+						<span class="button disabled radius success loading">{{ _('connecting') }}...</span>
 					</div>
 				</div>
 			<% } %>
 		</script>
 
 		<div class="show-for-small zebra">
-			<a href="#settings/printer-profile"><h1 class="bold" align="center">{{ _('3dPrinterProfile') }}3D Printer Profile</h1></a>
+			<a href="#settings/printer-profile"><h1 class="bold" align="center">{{ _('3dPrinterProfile') }}</h1></a>
 		</div>
 		<div id="printer-profile" class="settings-page hide">
 			<script type="text/template" id="printer-profile-settings-page-template">
@@ -95,14 +95,14 @@
 					<div class="small-12">
 						<form data-abide="ajax">
 							<label for="settings-printer-driver" class="bold">
-								{{ _('driver') }}Driver
+								{{ _('driver') }}
 								<select id="settings-printer-driver" name="driver">
 									<option value="marlin" <%= settings.driver == 'marlin' ? 'selected' : '' %>>GCODE - Marlin firmware</option>
 									<option value="s3g" <%= settings.driver == 's3g' ? 'selected' : '' %>> X3G - Sailfish / Makerbot firmware</option>
 								</select>
 							</label>
 							<label for="extruder-count" class="bold">
-								{{ _('noExtruders') }}No. of Extruders
+								{{ _('noExtruders') }}
 							</label>
 							<select id="extruder-count" name="extruder_count">
 								<option value='1'>1</option>
@@ -112,18 +112,18 @@
 							</select>
 							<div class="input-wrapper">
 								<label for="max-nozzle-temp" class="bold">
-									{{ _('maxNozzTemp') }}Max. Nozzle Temperature
+									{{ _('maxNozzTemp') }}
 								</label>
 								<div class="row collapse">
 									<div class="small-9 columns">
 										<input id="max-nozzle-temp" name="max_nozzle_temp" type="text" value="<%= settings.max_nozzle_temp %>" required pattern="integer"/>
-										<small class="error">{{ _('invNozzTemp') }}Invalid Nozzle Temperature.</small>
+										<small class="error">{{ _('invNozzTemp') }}.</small>
 									</div>
 									<div class="small-3 columns"><span class="postfix">&deg;C</div>
 								</div>
 							</div>
 							<label for="heated-bed" class="bold">
-								{{ _('heatedBed') }}Heated Bed
+								{{ _('heatedBed') }}
 							</label>
 							<div class="switch radius">
 							  <input id="heated-bed" name="heated_bed" type="checkbox" <% if (settings.heated_bed) { %> value="yes" checked<% } %>>
@@ -131,26 +131,26 @@
 							</div>
 							<div class="input-wrapper max_bed_temp<% if (!settings.heated_bed) { %> hide<% } %>">
 								<label for="max-bed-temp" class="bold">
-									{{ _('maxBedTemp') }}Max. Bed Temperature
+									{{ _('maxBedTemp') }}
 								</label>
 								<div class="row collapse">
 									<div class="small-9 columns">
 										<input id="max-bed-temp" name="max_bed_temp" type="text" value="<%= settings.max_bed_temp %>" required pattern="integer"/>
-										<small class="error">{{ _('invBedTemp') }}Invalid Bed Temperature.</small>
+										<small class="error">{{ _('invBedTemp') }}</small>
 									</div>
 									<div class="small-3 columns"><span class="postfix">&deg;C</div>
 								</div>
 							</div>
 							<div class="input-wrapper cancel-gcode<% if (settings.driver == 's3g') { %> hide<% } %>">
 								<label for="cancel-gcode" class="bold">
-									{{ _('cancelGcode') }}Cancel GCODE
+									{{ _('cancelGcode') }}
 								</label>
 								<textarea id="cancel-gcode" name="cancel_gcode" placeholder="G28 X Y"><%=settings.cancel_gcode.join('\n')%></textarea>
 							</div>
 							<hr/>
 							<div class="loading-button">
-								<button class="success radius">{{ _('saveProfile') }}Save Profile</button>
-								<span class="loading button radius success disabled"><i class="icon-rocket-spinner animate-spin"></i> {{ _('saving') }}Saving...</span>
+								<button class="success radius">{{ _('saveProfile') }}</button>
+								<span class="loading button radius success disabled"><i class="icon-rocket-spinner animate-spin"></i> {{ _('saving') }}...</span>
 							</div>
 						</form>
 					</div>
@@ -159,7 +159,7 @@
 		</div>
 
 		<div class="show-for-small zebra">
-			<a href="#settings/network-name"><h1 class="bold" align="center">{{ _('networkName') }}Network Name</h1></a>
+			<a href="#settings/network-name"><h1 class="bold" align="center">{{ _('networkName') }}</h1></a>
 		</div>
 		<div id="network-name" class="settings-page hide"></div>
 		<script type="text/template" id="network-name-settings-page-template">
@@ -168,22 +168,22 @@
 					<form data-abide="ajax">
 						<div class="input-wrapper">
 							<label for="network-name" class="bold">
-								{{ _('networkName') }}Network Name
+								{{ _('networkName') }}
 							</label>
 							<input id="network-name" name="name" type="text" value="<%= settings.name %>" required pattern="hostname" autocomplete="off"/>
-							<small class="error">{{ _('invDeviceName') }}Invalid Device Name. Use letters, numbers or - only.</small>
+							<small class="error">{{ _('invDeviceName') }}</small>
 						</div>
 						<p>
-							{{ _('fewImportThings') }}A few important things to remember:
+							{{ _('fewImportThings') }}:
 						</p>
 						<ul class="preview">
-							<li><i class="icon-signal"></i> {{ _('hotstopWifi') }}Hotspot WiFi name: <span class="network-name bold"><%= settings.name %></span></li>
+							<li><i class="icon-signal"></i> {{ _('hotstopWifi') }}: <span class="network-name bold"><%= settings.name %></span></li>
 							<li><i class="icon-link"></i> {{variantData['productName']}} URL: http://<span class="network-name bold"><%= settings.name %></span>.local</li>
 						</ul>
 						<hr/>
 						<div class="loading-button">
-							<button class="success radius">{{ _('save') }}Save</button>
-							<span class="loading button radius success disabled"><i class="icon-rocket-spinner animate-spin"></i> {{ _('saving') }}Saving...</span>
+							<button class="success radius">{{ _('save') }}</button>
+							<span class="loading button radius success disabled"><i class="icon-rocket-spinner animate-spin"></i> {{ _('saving') }}...</span>
 						</div>
 					</form>
 				</div>
@@ -191,16 +191,16 @@
 		</script>
 
 		<div class="show-for-small zebra">
-			<a href="#settings/internet-connection"><h1 class="bold" align="center">Internet Connection</h1></a>
+			<a href="#settings/internet-connection"><h1 class="bold" align="center">{{ _('internetConnection') }}</h1></a>
 		</div>
 
 		<div id="internet-connection" class="settings-page hide"></div>
 		<div id="wifi-network-list-modal" class="reveal-modal medium radius" data-reveal align="center">
-			<h2 class="bold">{{ _('selectWifi') }}Select a WiFi Network</h2>
+			<h2 class="bold">{{ _('selectWifi') }}</h2>
 			<div class="modal-content"></div>
 			<div class="modal-actions row">
 				<div class="small-12 medium-6 medium-centered columns">
-					<button class="secondary radius expand" onclick="$('#wifi-network-list-modal').foundation('reveal', 'close')">{{ _('cancel') }}Cancel</button>
+					<button class="secondary radius expand" onclick="$('#wifi-network-list-modal').foundation('reveal', 'close')">{{ _('cancel') }}</button>
 				</div>
 			</div>
 			<a class="close-reveal-modal">&#215;</a>
@@ -209,25 +209,25 @@
 		<div id="wifi-network-password-modal" class="reveal-modal medium radius" data-reveal>
 			<script type="text/template" id="wifi-network-password-modal-template">
 				<% if (wifi.wep) { %>
-					<h2 class="bold" align="center">{{ _('wepSecDepre') }}WEP Security Deprecated</h2>
+					<h2 class="bold" align="center">{{ _('wepSecDepre') }}</h2>
 					<div class="modal-body">
 						<p>
-							{{ _('the') }}The <%= wifi.name %> {{ _('wepSecDepreDesc1-2') }}WiFi network seems to be configured to use WEP security.
+							{{ _('the') }} <%= wifi.name %> {{ _('wepSecDepreDesc1-2') }}
 						</p>
 						<p>
-							{{ _('wepSecDepreDesc2-2') }}WiFI WEP Security was <a href="https://en.wikipedia.org/wiki/Wired_Equivalent_Privacy" target="_info">deprecated in 2004</a>
-							and is <b>not considered safe</b>, please configure your WiFi network to use WPA or WPA2.
+							{{ _('wepSecDepreDesc2-2') }} <a href="https://en.wikipedia.org/wiki/Wired_Equivalent_Privacy" target="_info">{{ _('deprecated') }}</a>
+							{{ _('wepSecDepreDesc3-3') }}
 						</p>
 					</div>
 					<div class="modal-actions row">
 						<div class="small-12 medium-6 medium-centered columns">
-							<button class="secondary radius cancel expand" onclick="$('#wifi-network-password-modal').foundation('reveal', 'close')">{{ _('close') }}Close</button>
+							<button class="secondary radius cancel expand" onclick="$('#wifi-network-password-modal').foundation('reveal', 'close')">{{ _('close') }}</button>
 						</div<
 					</div>
 				<% } else { %>
-					<h2 class="bold" align="center">{{ _('wifiPassword') }}WiFi Password</h2>
+					<h2 class="bold" align="center">{{ _('wifiPassword') }}</h2>
 					<div class="modal-body">
-						<p align="center">{{ _('enterPass') }}Enter the password for <span class="name bold"><%= wifi.name %></span>.</p>
+						<p align="center">{{ _('enterPassFor') }} <span class="name bold"><%= wifi.name %></span>.</p>
 						<form>
 							<input type="hidden" class="network-id-field" name="id" value="<%= wifi.id %>">
 							<input type="password" class="network-password-field" name="password"/>
@@ -235,13 +235,13 @@
 					</div>
 					<div class="modal-actions row">
 						<div class="small-12 medium-6 columns">
-							<button class="secondary radius cancel expand" onclick="$('#wifi-network-password-modal').foundation('reveal', 'close')">{{ _('cancel') }}Cancel</button>
+							<button class="secondary radius cancel expand" onclick="$('#wifi-network-password-modal').foundation('reveal', 'close')">{{ _('cancel') }}</button>
 						</div>
 						<div class="small-12 medium-6 columns">
 							<div class="loading-button expand">
-								<button class="radius success connect">{{ _('connect') }}Connect</button>
+								<button class="radius success connect">{{ _('connect') }}</button>
 								<span class="loading button success disabled radius">
-									<i class="icon-rocket-spinner animate-spin"></i> {{ _('mightBeWhile') }}Might be a while. Please be patient...
+									<i class="icon-rocket-spinner animate-spin"></i> {{ _('mightBeWhile') }}...
 								</span>
 							</div>
 						</div>
@@ -254,18 +254,18 @@
 			<div class="connection">
 				<% if (settings.networks.wired) { %>
 					<h3 class="bold">{{ _('wiredConnection') }}Wired Connection</h3>
-					<i class="icon-exchange"></i> {{ _('connected') }}Connected.
-					<div class="ip-address">{{ _('ipAdress') }}IP Address: <b><%= settings.networks.wired.ip %></b></div>
+					<i class="icon-exchange"></i> {{ _('connected') }}.
+					<div class="ip-address">{{ _('ipAdress') }}: <b><%= settings.networks.wired.ip %></b></div>
 				<% } %>
 			</div>
 			<% if (settings.networks.manual) { %>
-				<h3 class="bold">{{ _('manuallyConfigured') }}Manually Configured</h3>
+				<h3 class="bold">{{ _('manuallyConfigured') }}</h3>
 				<div>Interface: <b><%= settings.networks.manual.interface %></b></div>
-				<div class="ip-address">{{ _('ipAddress') }}IP Address: <b><%= settings.networks.manual.ip %></b></div>
+				<div class="ip-address">{{ _('ipAddress') }}: <b><%= settings.networks.manual.ip %></b></div>
 			<% } %>
 			<% if (settings.hasWifi) { %>
 				<div class="connection">
-					<h3 class="bold">{{ _('wirelessConnection') }}Wireless Connection</h3>
+					<h3 class="bold">{{ _('wirelessConnection') }}</h3>
 					<% if (settings.networks.wireless) { %>
 						<% if (settings.networks.wireless.signal < 33) { %>
 							<i class="icon-wifi-signal-low"></i>
@@ -280,9 +280,9 @@
 						Not Connected.
 					<% } %>
 					<div class="loading-button list-networks">
-						<button class="radius small">{{ _('scanWifi') }}Scan WiFi networks</button>
+						<button class="radius small">{{ _('scanWifi') }}</button>
 						<span class="loading button disabled radius small">
-							<i class="icon-rocket-spinner animate-spin"></i> {{ _('lookingNetworks') }}Looking for Networks...
+							<i class="icon-rocket-spinner animate-spin"></i> {{ _('lookingNetworks') }}...
 						</span>
 					</div>
 				</div>
@@ -305,12 +305,12 @@
 					<td class="network-name"><%= n.name %></td>
 					<td>
 						<% if (n.active) { %>
-							<div class="active-network"><i class="icon-exchange"></i> {{ _('connected') }}Connected</div>
+							<div class="active-network"><i class="icon-exchange"></i> {{ _('connected') }}</div>
 						<% } else { %>
 							<div class="loading-button">
-								<button class="radius success tiny" data-id="<%= idx %>">{{ _('connect') }}Connect</button>
+								<button class="radius success tiny" data-id="<%= idx %>">{{ _('connect') }}</button>
 								<span class="loading button disabled success tiny radius">
-									<i class="icon-rocket-spinner animate-spin"></i> {{ _('pleaseBePatient') }}Please be patient...
+									<i class="icon-rocket-spinner animate-spin"></i> {{ _('pleaseBePatient') }}...
 								</span>
 							</div>
 						<% } %>
@@ -321,28 +321,28 @@
 		</script>
 
 		<div class="show-for-small zebra">
-			<a href="#settings/wifi-hotspot"><h1 class="bold" align="center">{{ _('hotspot') }}WiFi Hotspot</h1></a>
+			<a href="#settings/wifi-hotspot"><h1 class="bold" align="center">{{ _('hotspot') }}</h1></a>
 		</div>
 		<div id="wifi-hotspot" class="settings-page hide"></div>
 		<script type="text/template" id="wifi-hotspot-settings-page-template">
 			<% if (settings.hotspot === false) { %>
 				{{ _('hotspotNot') }}Creating a Hotspot is not supported on this device.
 			<% } else { %>
-				<h3 class="bold">{{ _('localHotspot') }}Local Hotspot</h3>
+				<h3 class="bold">{{ _('localHotspot') }}</h3>
 				<div>
 					<% if (settings.hotspot.active) { %>
-						<h4>Running a hotspot on <b><%= settings.hotspot.name %></b></h4>
+						<h4>{{ _('runningHotspot') }} <b><%= settings.hotspot.name %></b></h4>
 						<div class="loading-button stop-hotspot">
-							<button class="radius">{{ _('stopHotspot') }}Stop hotspot</button>
+							<button class="radius">{{ _('stopHotspot') }}</button>
 							<span class="loading button disabled radius">
-								<i class="icon-rocket-spinner animate-spin"></i> {{ _('stopingpHotspot') }}Stopping Hotspot...
+								<i class="icon-rocket-spinner animate-spin"></i> {{ _('stopingpHotspot') }}...
 							</span>
 						</div>
 					<% } else { %>
 						<div class="loading-button start-hotspot">
-							<button class="radius">{{ _('startHotspot') }}Start hotspot</button>
+							<button class="radius">{{ _('startHotspot') }}</button>
 							<span class="loading button disabled radius">
-								<i class="icon-rocket-spinner animate-spin"></i> {{ _('startingpHotspot') }}Starting Hotspot...
+								<i class="icon-rocket-spinner animate-spin"></i> {{ _('startingpHotspot') }}...
 							</span>
 						</div>
 					<% } %>
@@ -352,7 +352,7 @@
 						</div>
 						<div class="small-10 large-11 columns">
 							<label for="hotspot-off">
-								<b>{{ _('turnHotspotOff') }}Turn hotspot off when a known network is found in the future.</b>
+								<b>{{ _('turnHotspotOff') }}</b>
 							</label>
 						</div>
 					</div>
@@ -361,18 +361,18 @@
 		</script>
 
 		<div class="show-for-small zebra">
-			<a href="#settings/software-update"><h1 class="bold" align="center">{{ _('softwareUpdate') }}Software Update</h1></a>
+			<a href="#settings/software-update"><h1 class="bold" align="center">{{ _('softwareUpdate') }}</h1></a>
 		</div>
 		<div id="software-update" class="settings-page hide" align="center">
 			<h4 align="center">
-				<b>{{version}}</b> {{ _('installed') }}Installed.<br/>
+				<b>{{version}}</b> {{ _('installed') }}<br/>
 				{% if commit %}
 				<small>({{commit}})</small>
 				{% endif %}
 			</h4>
 			<div class="loading-button check">
-				<button class="success radius">{{ _('checkUpdates') }}Check for updates</button>
-				<span class="button success radius loading"><i class="icon-rocket-spinner animate-spin"></i> {{ _('checking') }}Checking...</span>
+				<button class="success radius">{{ _('checkUpdates') }}</button>
+				<span class="button success radius loading"><i class="icon-rocket-spinner animate-spin"></i> {{ _('checking') }}...</span>
 			</div>
 		</div>
 		<div id="software-update-modal" class="reveal-modal medium radius" data-reveal>
@@ -381,23 +381,23 @@
 		</div>
 		<script type="text/template" id="software-update-modal-content">
 			<h2 class="bold">
-				<% if (data.update_available && !data.is_current) { %> Update <% } else { %> No Updates <% } %> {{ _('avaiable') }}Available
+				<% if (data.update_available && !data.is_current) { %> Update <% } else { %> No Updates <% } %> {{ _('avaiable') }}
 			</h2>
 			<% if (data.update_available) { %>
 				<div class="modal-body">
 					<p>
 					<% if (data.is_current) { %>
-						{{ _('currentInstalled') }}Currently installed: <b><%= data.release.major+'.'+data.release.minor+'('+data.release.build+')'%></b>
+						{{ _('currentInstalled') }}: <b><%= data.release.major+'.'+data.release.minor+'('+data.release.build+')'%></b>
 					<% } else { %>
-						{{ _('version') }}Version: <big class="bold"><%= data.release.major+'.'+data.release.minor+'('+data.release.build+')'%></big>
-						<br/>{{ _('published') }}Published: <b><%= data.release.date ? date_format(new Date(data.release.date)) : 'Not Published.' %></b>
+						{{ _('version') }}: <big class="bold"><%= data.release.major+'.'+data.release.minor+'('+data.release.build+')'%></big>
+						<br/>{{ _('published') }}: <b><%= data.release.date ? date_format(new Date(data.release.date)) : 'Not Published.' %></b>
 					<% } %>
 					<% if (data.release.force_setup) { %>
-						<br/><i class="icon-attention"></i> {{ _('needWizard') }}You would need to complete the setup wizard after installing this release.
+						<br/><i class="icon-attention"></i> {{ _('needWizard') }}
 					<% } %>
 					</p>
 					<p>
-						<b>{{ _('releaseNotes') }}Release Notes:</b><br/>
+						<b>{{ _('releaseNotes') }}:</b><br/>
 						<%= data.release.release_notes %>
 					</p>
 				</div>
@@ -405,26 +405,26 @@
 			<div class="modal-actions row">
 				<% if (data.update_available) { %>
 					<div class="small-12 medium-6 columns">
-						<button class="secondary radius cancel expand">{{ _('cancel') }}Cancel</button>
+						<button class="secondary radius cancel expand">{{ _('cancel') }}</button>
 					</div>
 					<div class="small-12 medium-6 columns">
 						<div class="loading-button expand">
 							<button class="success radius go"><% if (data.is_current) { %>Re-install<% } else { %>Update<% } %></button>
 							<span class="button disabled success radius loading">
-									<i class="icon-rocket-spinner animate-spin"></i> {{ _('initiating') }}Initiating...<span>
+									<i class="icon-rocket-spinner animate-spin"></i> {{ _('initiating') }}...<span>
 							</span>
 						</div>
 					</div>
 				<% } else { %>
 					<div class="columns">
-						<button class="secondary radius cancel expand">{{ _('close') }}Close</button>
+						<button class="secondary radius cancel expand">{{ _('close') }}</button>
 					</div>
 				<% } %>
 			</div>
 		</script>
 
 		<div class="show-for-small zebra software">
-			<a href="#settings/software-advanced"><h1 class="bold" align="center">{{ _('advancedSettings') }}Advanced Settings</h1></a>
+			<a href="#settings/software-advanced"><h1 class="bold" align="center">{{ _('advancedSettings') }}</h1></a>
 		</div>
 
 		<div id="software-advanced" class="settings-page hide" align="center"></div>
@@ -432,12 +432,12 @@
 			<h4 class="bold">API Key</h4>
 			<div class="apiKey"><%= data.apiKey %></div>
 			<hr/>
-			<h4 class="bold">{{ _('factorySettings') }}Factory Settings</h4>
-			<button class="alert radius" data-reveal-id="restore-confirm-modal">{{ _('restoreFactory') }}Restore Factory Settings</button>
+			<h4 class="bold">{{ _('factorySettings') }}</h4>
+			<button class="alert radius" data-reveal-id="restore-confirm-modal">{{ _('restoreFactory') }}</button>
 			<hr/>
-			<h4 class="bold">{{ _('logs') }}Logs</h4>
-			<button class="secondary radius" data-reveal-id="send-logs-modal">{{ _('sendLogs') }}Send logs to AstroPrint</button><br/>
-			{{ _('sizeOfLogs') }}Size of logs directory: <span class="size bold"><%= size_format(data.sizeLogs) %></span> <button class="secondary radius tiny" data-reveal-id="delete-logs-modal">{{ _('clear') }}Clear</button>
+			<h4 class="bold">{{ _('logs') }}</h4>
+			<button class="secondary radius" data-reveal-id="send-logs-modal">{{ _('sendLogs') }}</button><br/>
+			{{ _('sizeOfLogs') }}: <span class="size bold"><%= size_format(data.sizeLogs) %></span> <button class="secondary radius tiny" data-reveal-id="delete-logs-modal">{{ _('clear') }}</button>
 			<div class="row serial-container">
 				<div class="small-2 large-1 columns">
 					<input id="serial-logs" type="checkbox" <% if (data.serialActivated) { %> value="yes" checked <% } %>/>
@@ -445,34 +445,33 @@
 				<div class="small-10 large-11 columns">
 					<label for="serial-off">
 						<b>
-							{{ _('turnOnLogs') }}Turn on serial logs.
+							{{ _('turnOnLogs') }}
 						</b>
-						<i class="icon-attention"></i>{{ _('turnOnLogsDesc') }}You should only use this while helping solve a
-							communication problem with your printer. This generates a large amount of data.
+						<i class="icon-attention"></i>{{ _('turnOnLogsDesc') }}
 					</label>
 				</div>
 			</div>
 		</script>
 
 		<div id="restore-confirm-modal" class="reveal-modal medium radius" data-reveal>
-			<h2 class="bold">{{ _('aysure') }}Are you sure?</h2>
+			<h2 class="bold">{{ _('aysure') }}</h2>
 			<div class="modal-body">
-				<p>{{ _('thisWillDeleteSettings') }}This will delete all your settings and files from this {{variantData['productName']}}.</p>
+				<p>{{ _('thisWillDeleteSettings') }} {{variantData['productName']}}.</p>
 				<p>
 					<label for="confirmation">
-						<b>{{ _('writeReset') }}Write "RESET" to confirm</b>
+						<b>{{ _('writeReset') }}</b>
 						<input type="text"/>
 					</label>
 				</p>
 			</div>
 			<div class="modal-actions row">
 				<div class="small-12 medium-6 columns">
-					<button class="secondary radius expand">{{ _('cancel') }}Cancel</button>
+					<button class="secondary radius expand">{{ _('cancel') }}</button>
 				</div>
 				<div class="small-12 medium-6 columns">
 					<div class="loading-button expand">
-						<button class="alert radius">{{ _('reset') }}Reset</button>
-						<span class="button disabled alert radius loading"><i class="icon-rocket-spinner animate-spin"></i> {{ _('reseting') }}Resetting...</span>
+						<button class="alert radius">{{ _('reset') }}</button>
+						<span class="button disabled alert radius loading"><i class="icon-rocket-spinner animate-spin"></i> {{ _('reseting') }}...</span>
 					</div>
 				</div>
 			</div>
@@ -480,12 +479,12 @@
 		</div>
 
 		<div id="send-logs-modal" class="reveal-modal medium radius" data-reveal>
-			<h2 class="bold">{{ _('sendLogs') }}Send logs to AstroPrint</h2>
+			<h2 class="bold">{{ _('sendLogs') }}</h2>
 			<div class="modal-body">
-				<p>{{ _('sendLogsDesc') }}This sends us your device logs so that help you analyze your problem.</p>
+				<p>{{ _('sendLogsDesc') }}</p>
 				<p>
 					<label>
-						{{ _('supportTicket') }}Do you have a support ticket? If not, consider <a href="https://astroprint.zendesk.com" target="_support">{{ _('creatingOne') }}creating one</a>.
+						{{ _('supportTicket') }} <a href="https://astroprint.zendesk.com" target="_support">{{ _('creatingOne') }}</a>.
 						<input type="text" name="ticket" placeholder="Enter support ticket # or leave empty"/>
 					</label>
 					<textarea name="message" placeholder="Let us know what's going on (optional)"></textarea>
@@ -493,12 +492,12 @@
 			</div>
 			<div class="modal-actions row">
 				<div class="small-12 medium-6 columns">
-					<button class="secondary radius expand">{{ _('cancel') }}Cancel</button>
+					<button class="secondary radius expand">{{ _('cancel') }}</button>
 				</div>
 				<div class="small-12 medium-6 columns">
 					<div class="loading-button expand">
-						<button class="success radius">{{ _('sendLogs') }}Send Logs</button>
-						<span class="button disabled success radius loading"><i class="icon-rocket-spinner animate-spin"></i> {{ _('sending') }}Sending...</span>
+						<button class="success radius">{{ _('sendLogsv2') }}</button>
+						<span class="button disabled success radius loading"><i class="icon-rocket-spinner animate-spin"></i> {{ _('sending') }}...</span>
 					</div>
 				</div>
 			</div>
@@ -506,24 +505,23 @@
 		</div>
 
 		<div id="delete-logs-modal" class="reveal-modal medium radius" data-reveal>
-			<h2 class="bold">{{ _('deleteAstroLogs') }}Delete AstroPrint logs</h2>
+			<h2 class="bold">{{ _('deleteAstroLogs') }}</h2>
 			<div class="modal-body">
 				<p>
-					T{{ _('deleteAstroLogsDesc') }}his will delete all your past AstroPrint logs. It will help save space but might
-					prevent us from researching a past problem you might have had.
+					T{{ _('deleteAstroLogsDesc') }}
 				</p>
 				<p>
-					{{ _('aysureDelLogs') }}Are you sure you want to delete all logs?
+					{{ _('aysureDelLogs') }}
 				</p>
 			</div>
 			<div class="modal-actions row">
 				<div class="small-12 medium-6 columns">
-					<button class="secondary radius expand">{{ _('cancel') }}Cancel</button>
+					<button class="secondary radius expand">{{ _('cancel') }}</button>
 				</div>
 				<div class="small-12 medium-6 columns">
 					<div class="loading-button expand">
-						<button class="alert radius">{{ _('deleteLogs') }}Delete Logs</button>
-						<span class="button disabled alert radius loading"><i class="icon-rocket-spinner animate-spin"></i> {{ _('deleting') }}Deleting...</span>
+						<button class="alert radius">{{ _('deleteLogs') }}</button>
+						<span class="button disabled alert radius loading"><i class="icon-rocket-spinner animate-spin"></i> {{ _('deleting') }}...</span>
 					</div>
 				</div>
 			</div>
