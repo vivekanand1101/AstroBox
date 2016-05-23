@@ -12,6 +12,16 @@ $.ajaxSetup({
 	}
 });
 
+// Initialize i18n
+$(function() {
+	LOCALE = 'en';
+	var catalog = window["BABEL_TO_LOAD_" + LOCALE];
+	if (catalog === undefined) {
+			catalog = {messages: undefined, plural_expr: undefined, locale: undefined, domain: undefined}
+	}
+	babel.Translations.load(catalog).install();
+});
+
 var AppMenu = Backbone.View.extend({
 	el: '#main-menu',
 	turnOffModal: null,
@@ -81,7 +91,7 @@ var AstroBoxApp = Backbone.View.extend({
 		if (!this.rebootModal) {
 			this.rebootModal = new RebootConfirmationModal();
 		}
-		
+
 		this.rebootModal.open();
 	},
 	reportPrintingChange: function(s, value) {

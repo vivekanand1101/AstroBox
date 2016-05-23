@@ -15,7 +15,7 @@ var LoginModal = Backbone.View.extend({
     {
 		this.button = this.$el.find('.loading-button');
 	},
-	onFormValidated: function(e) 
+	onFormValidated: function(e)
     {
 		var errorContainer = this.$el.find('.alert-box');
 		errorContainer.hide();
@@ -30,14 +30,14 @@ var LoginModal = Backbone.View.extend({
             	email: this.$el.find('input[name=email]').val(),
             	password: this.$el.find('input[name=password]').val()
             },
-            success: function() { 
+            success: function() {
             	location.reload();
             },
-            error: function(xhr) { 
+            error: function(xhr) {
                 if (xhr.status == 503) {
                     errorContainer.text('Your device is not connected to AstroPrint.com').show();
                 } else {
-                    errorContainer.text('Invalid Email/Password').show();
+                    errorContainer.text(gettext('invalidEMail')).show();
                 }
                 self.button.removeClass('loading');
             }

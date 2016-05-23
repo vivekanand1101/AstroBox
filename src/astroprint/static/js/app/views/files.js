@@ -14,24 +14,24 @@ var PrintFileInfoDialog = Backbone.View.extend({
 		'click .actions a.print': 'onPrintClicked',
 		'click .actions a.download': 'onDownloadClicked'
 	},
-	initialize: function(params) 
+	initialize: function(params)
 	{
 		this.file_list_view = params.file_list_view;
 	},
-	render: function() 
+	render: function()
 	{
-		this.$el.find('.dlg-content').html(this.template({ 
+		this.$el.find('.dlg-content').html(this.template({
         	p: this.print_file_view.print_file.toJSON(),
         	time_format: app.utils.timeFormat
         }));
 	},
-	open: function(print_file_view) 
+	open: function(print_file_view)
 	{
 		this.print_file_view = print_file_view;
 		this.render();
 		this.$el.foundation('reveal', 'open');
 	},
-	onDeleteClicked: function(e) 
+	onDeleteClicked: function(e)
 	{
 		e.preventDefault();
 
@@ -47,7 +47,7 @@ var PrintFileInfoDialog = Backbone.View.extend({
 	            url: '/api/files/local/'+filename,
 	            type: "DELETE",
 	            success: _.bind(function() {
-	            	//Update model 
+	            	//Update model
             		if (print_file.get('local_only')) {
             			this.file_list_view.file_list.remove(print_file);
             		} else {
@@ -67,12 +67,12 @@ var PrintFileInfoDialog = Backbone.View.extend({
 	        });
 	    }
 	},
-	onPrintClicked: function(e) 
+	onPrintClicked: function(e)
 	{
 		this.print_file_view.printClicked(e);
 		this.$el.foundation('reveal', 'close');
 	},
-	onDownloadClicked: function(e) 
+	onDownloadClicked: function(e)
 	{
 		this.print_file_view.downloadClicked(e);
 		this.$el.foundation('reveal', 'close');
@@ -194,7 +194,7 @@ var PrintFileView = Backbone.View.extend({
 			'click a.dw-cancel': 'cancelDownloadClicked'
 		});
 	},
-	infoClicked: function(evt) 
+	infoClicked: function(evt)
 	{
 		if (evt) evt.preventDefault();
 
@@ -303,7 +303,7 @@ var PrintFilesListView = Backbone.View.extend({
 	refresh_threshold: 1000, //don't allow refreshes faster than this (in ms)
 	last_refresh: 0,
 	events: {
-		'click .list-header button.sync': 'forceSync' 
+		'click .list-header button.sync': 'forceSync'
 	},
 	initialize: function(options) {
 		this.file_list = new PrintFileCollection();
@@ -319,8 +319,8 @@ var PrintFilesListView = Backbone.View.extend({
 
 		this.refresh(options.forceSync, options.syncCompleted);
 	},
-	render: function() 
-	{ 
+	render: function()
+	{
 		var list = this.$('.design-list-container');
 		var selectedStorage = this.storage_control_view.selected;
 
@@ -356,7 +356,7 @@ var PrintFilesListView = Backbone.View.extend({
 			);
 	    }
     },
-	refresh: function(syncCloud, doneCb) 
+	refresh: function(syncCloud, doneCb)
 	{
 		var now = new Date().getTime();
 
@@ -406,7 +406,7 @@ var PrintFilesListView = Backbone.View.extend({
 			}
 		}
 	},
-	downloadProgress: function(data) 
+	downloadProgress: function(data)
 	{
 		var print_file_view = _.find(this.print_file_views, function(v) {
 			return v.print_file.get('id') == data.id;
@@ -515,7 +515,7 @@ var FilesView = Backbone.View.extend({
 	events: {
 		'show': 'onShow'
 	},
-	initialize: function(options) 
+	initialize: function(options)
 	{
 		this.uploadView = new UploadView({el: this.$el.find('.file-upload-view')});
 		this.printFilesListView = new PrintFilesListView({
@@ -526,7 +526,7 @@ var FilesView = Backbone.View.extend({
 
 		this.listenTo(app.printerProfile, 'change:driver', this.onDriverChanged);
 	},
-	refreshPrintFiles: function() 
+	refreshPrintFiles: function()
 	{
 		this.printFilesListView.refresh(true);
 	},

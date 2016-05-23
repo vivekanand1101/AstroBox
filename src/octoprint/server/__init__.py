@@ -14,7 +14,7 @@ from flask.ext.principal import Principal, Permission, RoleNeed, identity_loaded
 from flask.ext.compress import Compress
 from flask.ext.assets import Environment
 # Import Babel
-from flask.ext.babel import Babel, gettext, ngettext, lazy_gettext
+from flask.ext.babel import Babel, gettext, ngettext
 from babel import Locale
 # end Babel
 from watchdog.observers import Observer
@@ -187,6 +187,34 @@ def discoveryXml():
 @app.route("/robots.txt")
 def robotsTxt():
 	return send_from_directory(app.static_folder, "robots.txt")
+
+# i18n Controller
+#@app.route("/i18n/<string:locale>/<string:domain>.js")
+@app.route("/login.js")
+
+#@util.flask.conditional(lambda: _check_etag_and_lastmodified_for_i18n(), NOT_MODIFIED)
+#@util.flask.etagged(lambda _: _compute_etag_for_i18n(request.view_args["locale"], request.view_args["domain"]))
+#@util.flask.lastmodified(lambda _: _compute_date_for_i18n(request.view_args["locale"], request.view_args["domain"]))
+def localeJs(locale, domain):
+	print 'Read localeJs from __init__.py'
+	messages = dict()
+	plural_expr = None
+
+	if get_locale() != "en":
+		print 'Read get_locale is not en'
+		messages, plural_expr = _get_translations(get_locale(), domain)
+
+	catalog = dict(
+		messages=messages,
+		plural_expr=plural_expr,
+		locale=get_locale(),
+		domain=domain
+	)
+
+	from flask import Response
+	return Response(render_template("i18n.js.jinja2", catalog=catalog), content_type="application/x-javascript; charset=utf-8")
+print 'Read route login.js'
+# end i18n Controller
 
 @app.route("/favicon.ico")
 def favion():
