@@ -6,10 +6,12 @@
 
 $.ajaxSetup({
     cache: false,
-    headers: { 
+    headers: {
     	"X-Api-Key": UI_API_KEY
     }
 });
+
+/******************/
 
 var SoftwareUpdateProgress = Backbone.View.extend({
 	el: '#updating-view',
@@ -110,7 +112,7 @@ var SoftwareUpdateProgress = Backbone.View.extend({
         var loadingBtn = $(e).closest('.loading-button');
         loadingBtn.addClass('loading');
         $.ajax({
-            url: API_BASEURL + 'settings/software/update', 
+            url: API_BASEURL + 'settings/software/update',
             type: 'POST',
             dataType: 'json',
             contentType: 'application/json',

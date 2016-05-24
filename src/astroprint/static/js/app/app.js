@@ -12,9 +12,9 @@ $.ajaxSetup({
 	}
 });
 
-// Initialize i18n
+// Load Translation Catalog
 $(function() {
-	LOCALE = 'en';
+	LOCALE = localeUser;
 	var catalog = window["BABEL_TO_LOAD_" + LOCALE];
 	if (catalog === undefined) {
 			catalog = {messages: undefined, plural_expr: undefined, locale: undefined, domain: undefined}
@@ -22,6 +22,7 @@ $(function() {
 	babel.Translations.load(catalog).install();
 });
 
+/******************/
 var AppMenu = Backbone.View.extend({
 	el: '#main-menu',
 	turnOffModal: null,

@@ -78,7 +78,6 @@ VERSION = None
 babel = Babel(app)
 @babel.localeselector
 def get_locale():
-	print babel.list_translations()
 	langBrowser = str(request.accept_languages).split("-")[0]
 	langsSupported = ['en','es']
 	if langBrowser in langsSupported:
@@ -108,7 +107,7 @@ def index():
 	print "== function index =="
 	print "list_translations babel:"
 	print babel.list_translations()
-	print gettext('dashboard')
+	print "== end function index =="
 	s = settings()
 	loggedUsername = s.get(["cloudSlicer", "loggedUser"])
 
@@ -125,7 +124,8 @@ def index():
 			variantData= variantManager().data,
 			astroboxName= networkManager().getHostname(),
 			checkSoftware= swm.shouldCheckForNew,
-			settings=s
+			settings=s,
+			locale= get_locale()
 		)
 
 	elif softwareManager.updatingRelease or softwareManager.forceUpdateInfo:
@@ -137,7 +137,8 @@ def index():
 			lastCompletionPercent= softwareManager.lastCompletionPercent,
 			lastMessage= softwareManager.lastMessage,
 			variantData= variantManager().data,
-			astroboxName= networkManager().getHostname()
+			astroboxName= networkManager().getHostname(),
+			locale= get_locale()
 		)
 
 	elif loggedUsername and (current_user is None or not current_user.is_authenticated() or current_user.get_id() != loggedUsername):
@@ -149,7 +150,8 @@ def index():
 			username= loggedUsername,
 			uiApiKey= UI_API_KEY,
 			astroboxName= networkManager().getHostname(),
-			variantData= variantManager().data
+			variantData= variantManager().data,
+			locale= get_locale()
 		)
 
 	else:
@@ -175,7 +177,8 @@ def index():
 			astroboxName= nm.getHostname(),
 			variantData= variantManager().data,
 			checkSoftware= swm.shouldCheckForNew,
-			serialLogActive= s.getBoolean(['serial', 'log'])
+			serialLogActive= s.getBoolean(['serial', 'log']),
+			locale= get_locale()
 		)
 
 @app.route("/discovery.xml")
@@ -188,33 +191,204 @@ def discoveryXml():
 def robotsTxt():
 	return send_from_directory(app.static_folder, "robots.txt")
 
-# i18n Controller
-#@app.route("/i18n/<string:locale>/<string:domain>.js")
-@app.route("/login.js")
+# ================================================================================================================================= >
 
-#@util.flask.conditional(lambda: _check_etag_and_lastmodified_for_i18n(), NOT_MODIFIED)
-#@util.flask.etagged(lambda _: _compute_etag_for_i18n(request.view_args["locale"], request.view_args["domain"]))
-#@util.flask.lastmodified(lambda _: _compute_date_for_i18n(request.view_args["locale"], request.view_args["domain"]))
-def localeJs(locale, domain):
-	print 'Read localeJs from __init__.py'
+#translation
+
+#@app.route("/<string:name>/<path:filename>")
+#@app.route("/")
+#def plugin_assets(name, filename):
+	#return redirect(url_for("plugin." + name + ".static", filename=filename))
+
+def _compute_etag_for_index(files=None, lastmodified=None):
+	if files is None:
+		files = _files_for_index()
+	if lastmodified is None:
+		lastmodified = _compute_date(files)
+	if lastmodified and not isinstance(lastmodified, basestring):
+		from werkzeug.http import http_date
+		lastmodified = http_date(lastmodified)
+
+	from octoprint import __version__
+	from octoprint.server import UI_API_KEY
+
+	import hashlib
+	hash = hashlib.sha1()
+	hash.update(__version__)
+	hash.update(UI_API_KEY)
+	hash.update(",".join(sorted(files)))
+	if lastmodified:
+		hash.update(lastmodified)
+	return hash.hexdigest()
+
+def _compute_etag_for_i18n(locale, domain, files=None, lastmodified=None):
+	if files is None:
+		files = _get_all_translationfiles(locale, domain)
+	if lastmodified is None:
+		lastmodified = _compute_date(files)
+	if lastmodified and not isinstance(lastmodified, basestring):
+		from werkzeug.http import http_date
+		lastmodified = http_date(lastmodified)
+
+	import hashlib
+	hash = hashlib.sha1()
+	hash.update(",".join(sorted(files)))
+	if lastmodified:
+		hash.update(lastmodified)
+	return hash.hexdigest()
+
+def _compute_date_for_i18n(locale, domain):
+	return _compute_date(_get_all_translationfiles(locale, domain))
+
+def _compute_date_for_index():
+	return _compute_date(_files_for_index())
+
+def _validate_cache_for_index(cached):
+	no_cache_headers = util.flask.cache_check_headers()
+	refresh_flag = "_refresh" in request.values
+	etag_different = _compute_etag_for_index() != cached.get_etag()[0]
+
+	return no_cache_headers or refresh_flag or etag_different
+
+def _files_for_index():
+	"""
+	Collects all paths of files that the index page depends on.
+
+	The relevant files are:
+
+	  * all jinja2 templates: they might be used within the index page, so
+	    any changes here change the rendering outcome
+	  * all defined assets: if one of them changes, the webassets bundle will
+	    be regenerated and hence the URL included in the cached page won't be
+	    valid anymore
+	  * all translation files used for our current locale: if any of those change
+	    we also need to re-render
+	"""
+
+	templates = _get_all_templates()
+	assets = _get_all_assets()
+	translations = _get_all_translationfiles(g.locale.language if g.locale else "en", "messages")
+	return sorted(set(templates + assets + translations))
+
+def _compute_date(files):
+	from datetime import datetime
+	timestamps = map(lambda path: os.stat(path).st_mtime, files)
+	max_timestamp = max(*timestamps) if timestamps else None
+	if max_timestamp:
+		# we set the micros to 0 since microseconds are not speced for HTTP
+		max_timestamp = datetime.fromtimestamp(max_timestamp).replace(microsecond=0)
+	return max_timestamp
+
+def _check_etag_and_lastmodified_for_index():
+	files = _files_for_index()
+	lastmodified = _compute_date(files)
+	lastmodified_ok = util.flask.check_lastmodified(lastmodified)
+	etag_ok = util.flask.check_etag(_compute_etag_for_index(files, lastmodified))
+	return etag_ok and lastmodified_ok
+
+def _check_etag_and_lastmodified_for_i18n():
+	locale = request.view_args["locale"]
+	domain = request.view_args["domain"]
+
+	etag_ok = util.flask.check_etag(_compute_etag_for_i18n(request.view_args["locale"], request.view_args["domain"]))
+
+	lastmodified = _compute_date_for_i18n(locale, domain)
+	lastmodified_ok = lastmodified is None or util.flask.check_lastmodified(lastmodified)
+
+	return etag_ok and lastmodified_ok
+
+def _get_all_templates():
+	from octoprint.util.jinja import get_all_template_paths
+	return get_all_template_paths(app.jinja_loader)
+
+def _get_all_assets():
+	from octoprint.util.jinja import get_all_asset_paths
+	return get_all_asset_paths(app.jinja_env.assets_environment)
+
+def _get_all_translationfiles(locale, domain):
+	from flask import _request_ctx_stack
+
+	def get_po_path(basedir, locale, domain):
+		path = os.path.join(basedir, locale)
+		if not os.path.isdir(path):
+			return None
+
+		path = os.path.join(path, "LC_MESSAGES", "{domain}.po".format(**locals()))
+		if not os.path.isfile(path):
+			return None
+
+		return path
+
+	po_files = []
+
+	#user_base_path = os.path.join(settings().getBaseFolder("translations"))
+	#user_plugin_path = os.path.join(user_base_path, "_plugins")
+
+	# core translations
+	ctx = _request_ctx_stack.top
+	base_path = os.path.join(ctx.app.root_path, "translations")
+
+	dirs = [base_path]
+	for dirname in dirs:
+		po_file = get_po_path(dirname, locale, domain)
+		if po_file:
+			po_files.append(po_file)
+			break
+
+	return po_files
+
+def _get_translations(locale, domain):
+	from babel.messages.pofile import read_po
+	from octoprint.util import dict_merge
+
 	messages = dict()
 	plural_expr = None
 
-	if get_locale() != "en":
-		print 'Read get_locale is not en'
-		messages, plural_expr = _get_translations(get_locale(), domain)
+	def messages_from_po(path, locale, domain):
+		messages = dict()
+		with file(path) as f:
+			catalog = read_po(f, locale=locale, domain=domain)
+
+			for message in catalog:
+				message_id = message.id
+				if isinstance(message_id, (list, tuple)):
+					message_id = message_id[0]
+				messages[message_id] = message.string
+
+		return messages, catalog.plural_expr
+
+	po_files = _get_all_translationfiles(locale, domain)
+	for po_file in po_files:
+		po_messages, plural_expr = messages_from_po(po_file, locale, domain)
+		if po_messages is not None:
+			messages = dict_merge(messages, po_messages)
+
+	return messages, plural_expr
+
+# i18n Controller
+@app.route("/i18n/<string:domain>.js")
+#@util.flask.conditional(lambda: _check_etag_and_lastmodified_for_i18n(), NOT_MODIFIED)
+#@util.flask.etagged(lambda _: _compute_etag_for_i18n(request.view_args["locale"], request.view_args["domain"]))
+#@util.flask.lastmodified(lambda _: _compute_date_for_i18n(request.view_args["locale"], request.view_args["domain"]))
+def localeJs(domain):
+	messages = dict()
+	plural_expr = None
+	# delete this if use real domain names
+	domain = 'messages'
+
+	#if get_locale() != "en":
+	#	print 'Read get_locale is not en'
+	messages, plural_expr = _get_translations(get_locale(), domain)
 
 	catalog = dict(
 		messages=messages,
-		plural_expr=plural_expr,
-		locale=get_locale(),
-		domain=domain
-	)
+		locale=get_locale()
+		)
 
 	from flask import Response
 	return Response(render_template("i18n.js.jinja2", catalog=catalog), content_type="application/x-javascript; charset=utf-8")
-print 'Read route login.js'
-# end i18n Controller
+
+# ================================================================================================================================= o
 
 @app.route("/favicon.ico")
 def favion():

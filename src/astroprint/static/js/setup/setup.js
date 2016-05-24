@@ -7,9 +7,19 @@
 $.ajaxSetup({
     type: 'POST',
     cache: false,
-    headers: { 
+    headers: {
     	"X-Api-Key": UI_API_KEY
     }
+});
+
+// Load Translation Catalog
+$(function() {
+	LOCALE = localeUser;
+	var catalog = window["BABEL_TO_LOAD_" + LOCALE];
+	if (catalog === undefined) {
+			catalog = {messages: undefined, plural_expr: undefined, locale: undefined, domain: undefined}
+	}
+	babel.Translations.load(catalog).install();
 });
 
 /******************/
@@ -20,7 +30,7 @@ var StepView = Backbone.View.extend({
 		"submit form": "_onSubmit",
 		"click .submit-action": "_onSubmitClicked"
 	},
-	initialize: function(params) 
+	initialize: function(params)
 	{
 		this.setup_view = params.setup_view;
 	},
@@ -98,7 +108,7 @@ var StepName = StepView.extend({
 		this.$el.find('.hotspot-name').text(name);
 		this.$el.find('.astrobox-url').text(name);
 	},
-	onNameChanged: function(e) 
+	onNameChanged: function(e)
 	{
 		var name = $(e.target).val();
 
@@ -179,7 +189,7 @@ var StepInternet = StepView.extend({
 						return -el.signal
 					});
 
-					list.html(this.networkListTemplate({ 
+					list.html(this.networkListTemplate({
 						networks: this.networks
 					}));
 
@@ -255,7 +265,7 @@ var StepInternet = StepView.extend({
 		loadingBtn.addClass('loading');
 
 		$.ajax({
-			url: API_BASEURL + 'setup/internet', 
+			url: API_BASEURL + 'setup/internet',
 			type: 'POST',
 			contentType: 'application/json',
 			dataType: 'json',
@@ -266,7 +276,7 @@ var StepInternet = StepView.extend({
 
 				var connectionCb = null;
 
-				//Start Timeout 
+				//Start Timeout
 				var connectionTimeout = setTimeout(function(){
 					connectionCb.call(this, {status: 'failed', reason: 'timeout'});
 				}, 70000); //1 minute
@@ -306,7 +316,7 @@ var StepInternet = StepView.extend({
 							loadingBtn.removeClass('loading');
 							clearTimeout(connectionTimeout);
 							if (callback) callback(true);
-					} 
+					}
 				};
 
 				setup_view.eventManager.on('astrobox:InternetConnectingStatus', connectionCb, this);
@@ -334,7 +344,7 @@ var WiFiNetworkPasswordDialog = Backbone.View.extend({
 	},
 	parent: null,
 	template: _.template($('#wifi-network-password-modal-template').html()),
-	initialize: function(params) 
+	initialize: function(params)
 	{
 		this.parent = params.parent;
 	},
@@ -342,7 +352,7 @@ var WiFiNetworkPasswordDialog = Backbone.View.extend({
 	{
 		this.$el.html( this.template({wifi: wifiInfo}) );
 	},
-	open: function(wifiInfo) 
+	open: function(wifiInfo)
 	{
 		this.render(wifiInfo)
 		this.$el.foundation('reveal', 'open', {
@@ -353,7 +363,7 @@ var WiFiNetworkPasswordDialog = Backbone.View.extend({
 			this.$el.find('.network-password-field').focus();
 		}, this));
 	},
-	connectClicked: function(e) 
+	connectClicked: function(e)
 	{
 		e.preventDefault();
 
@@ -364,7 +374,7 @@ var WiFiNetworkPasswordDialog = Backbone.View.extend({
 		if (password) {
 			loadingBtn.addClass('loading');
 			this.parent.doConnect(
-				{id: form.find('.network-id-field').val(), password: password}, 
+				{id: form.find('.network-id-field').val(), password: password},
 				_.bind(function(error) { //callback
 					loadingBtn.removeClass('loading');
 					form.find('.network-password-field').val('');
@@ -375,7 +385,7 @@ var WiFiNetworkPasswordDialog = Backbone.View.extend({
 			);
 		}
 	},
-	cancelClicked: function(e) 
+	cancelClicked: function(e)
 	{
 		e.preventDefault();
 		this.$el.foundation('reveal', 'close');
@@ -453,7 +463,7 @@ var StepAstroprint = StepView.extend({
 			error: _.bind(function(xhr) {
 				noty({text: "Error logging you out", timeout: 3000});
 			}, this)
-		});		
+		});
 	}
 });
 
@@ -463,7 +473,7 @@ var StepAstroprint = StepView.extend({
 
 var StepConnectPrinter = StepView.extend({
 	el: "#step-connect-printer",
-	constructor: function() 
+	constructor: function()
 	{
 		StepView.apply(this, arguments);
 	}
@@ -482,7 +492,7 @@ var StepPrinter = StepView.extend({
 	},
 	render: function(settings)
 	{
-		this.$('form').html(this.template({ 
+		this.$('form').html(this.template({
 			settings: settings
 		}));
 	},
@@ -495,7 +505,7 @@ var StepPrinter = StepView.extend({
 			success: _.bind(function() {
 				//We monitor the connection here for status updates
 				var socket = new SockJS(SOCKJS_URI);
-				socket.onmessage = _.bind(function(e){ 
+				socket.onmessage = _.bind(function(e){
 					if (e.type == "message" && e.data.current) {
 						var flags = e.data.current.state.flags;
 						if (flags.operational) {
@@ -562,7 +572,7 @@ var StepPrinter = StepView.extend({
 			this.$el.find('.skip-step').hide();
 		} else {
 			this.$el.find('.loading-button').removeClass('loading');
-			this.$el.find('.skip-step').show();			
+			this.$el.find('.skip-step').show();
 		}
 	},
 	retryPortsClicked: function(e)
@@ -607,7 +617,7 @@ var StepPrinter = StepView.extend({
 
 var StepShare = StepView.extend({
 	el: "#step-share",
-	constructor: function() 
+	constructor: function()
 	{
 		this.events["click .share-button.facebook"] = "onFacebookClicked";
 		this.events["click .share-button.twitter"] = "onTwitterClicked";
@@ -694,7 +704,7 @@ var SetupView = Backbone.View.extend({
             console.log("Reconnect trial #" + this._autoReconnectTrial + ", waiting " + timeout + "s");
             setTimeout(_.bind(this.reconnect, this), timeout * 1000);
             this._autoReconnectTrial++;
-        } 
+        }
     },
     _onMessage: function(e) {
     	if (e.data && e.data['event']) {
@@ -731,7 +741,7 @@ var SetupRouter = Backbone.Router.extend({
 	{
 		this.setup_view = params.setup_view;
 	},
-	setStep: function(step) 
+	setStep: function(step)
 	{
 		this.setup_view.setStep(step || 'welcome');
 	},

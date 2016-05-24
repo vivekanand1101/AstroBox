@@ -1,10 +1,23 @@
 $.ajaxSetup({
     type: 'POST',
     cache: false,
-    headers: { 
+    headers: {
     	"X-Api-Key": UI_API_KEY
     }
 });
+
+// Load Translation Catalog
+$(function() {
+	LOCALE = localeUser;
+	var catalog = window["BABEL_TO_LOAD_" + LOCALE];
+	if (catalog === undefined) {
+			catalog = {messages: undefined, plural_expr: undefined, locale: undefined, domain: undefined}
+	}
+	babel.Translations.load(catalog).install();
+});
+
+/******************/
+
 
 LoginForm = Backbone.View.extend({
 	el: '#login-form',

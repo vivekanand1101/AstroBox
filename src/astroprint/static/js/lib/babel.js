@@ -39,8 +39,6 @@
  }
  */
 var babel = new function() {
-  console.log('Read babel function');
-
 
   var defaultPluralExpr = function(n) { return n == 1 ? 0 : 1; };
   var formatRegex = /%?%(?:\(([^\)]+)\))?([disr])/g;
@@ -49,7 +47,6 @@ var babel = new function() {
    * A translations object implementing the gettext interface
    */
   var Translations = this.Translations = function(locale, domain) {
-    console.log('Read Translations var');
     this.messages = {};
     this.locale = locale || 'unknown';
     this.domain = domain || 'messages';
@@ -61,7 +58,6 @@ var babel = new function() {
    * See the babel-module comment for more details.
    */
   Translations.load = function(catalog) {
-    console.log('Read Translations function');
     var rv = new Translations();
     rv.load(catalog);
     return rv;
@@ -72,7 +68,6 @@ var babel = new function() {
      * translate a single string.
      */
     gettext: function(string) {
-      console.log('Read gettext function');
       var translated = this.messages[string];
       if (typeof translated == 'undefined')
         return string;
@@ -94,8 +89,6 @@ var babel = new function() {
      * three new methods on the window object: _, gettext and ngettext
      */
     install: function() {
-      console.log('Read install function');
-
       var self = this;
       window.gettext = function(string) {
         return self.gettext(string);
@@ -111,7 +104,6 @@ var babel = new function() {
      * then creating a new one.
      */
     load: function(catalog) {
-      console.log('Read load function');
 
       if (catalog.messages)
         this.update(catalog.messages);

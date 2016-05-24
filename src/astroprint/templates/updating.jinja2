@@ -11,35 +11,35 @@
 <div id="updating-view" class="row">
 	{% if showForceUpdate %}
 		<div class="small-12 medium-11 large-8 medium-centered large-centered columns info">
-			<h1 class="bold" align="center">{{ _('systemUpdate') }}System Update</h1>
+			<h1 class="bold" align="center">{{ _('systemUpdate') }}</h1>
 			<p>
-				<i class="icon-attention"></i> {{ _('softwareOutDate') }}Your software is currently out of date and needs to be
-				updated in order to continue using your {{variantData['productName']}}.
+				<i class="icon-attention"></i> {{ _('softwareOutDate') }}
+				 {{variantData['productName']}}.
 			</p>
-			<p><b>{{ _('version') }}Version</b>: {{ releaseInfo['major'] }}.{{ releaseInfo['minor'] }}({{ releaseInfo['build'] }})</p>
-			<p><b>{{ _('releaseDate') }}Release Date</b>: {% if releaseInfo['date'] -%} {{ releaseInfo['date'].strftime('%b %d, %Y') }} {%- else -%} {{ _('noPublished') }}No published {%- endif %}</p>
+			<p><b>{{ _('version') }}</b>: {{ releaseInfo['major'] }}.{{ releaseInfo['minor'] }}({{ releaseInfo['build'] }})</p>
+			<p><b>{{ _('releaseDate') }}</b>: {% if releaseInfo['date'] -%} {{ releaseInfo['date'].strftime('%b %d, %Y') }} {%- else -%} {{ _('noPublished') }} {%- endif %}</p>
 			<p>
-				<b>{{ _('releaseNotes') }}Release Notes:</b>
+				<b>{{ _('releaseNotes') }}:</b>
 				<div class="release-notes">
 					{{ releaseInfo['release_notes'] }}
 				</div>
 			</p>
 			<center>
 				<div class="loading-button">
-					<button class="success radius bold">{{ _('installNow') }}Install Now</button>
+					<button class="success radius bold">{{ _('installNow') }}</button>
 					<span class="loading button success disabled radius">
-						<i class="icon-rocket-spinner animate-spin"></i> {{ _('initiating') }}Initiating...
+						<i class="icon-rocket-spinner animate-spin"></i> {{ _('initiating') }}...
 					</span>
 				</div>
 			</center>
 		</div>
 	{% endif %}
 	<div class="small-12 columns progress-info {%- if showForceUpdate %} hide {%- endif %}">
-		<h1 class="bold" align="center">{{ _('softwareUpdateProgress') }}Software Update in Progress</h1>
+		<h1 class="bold" align="center">{{ _('softwareUpdateProgress') }}</h1>
 		<div class="progress success round">
 		  <span class="meter" style="width:0%"></span>
 		</div>
-		<h3 align="center" class="message">{{ _('downloadingRelease') }}Downloading release...</h3>
+		<h3 align="center" class="message">{{ _('downloadingRelease') }}...</h3>
 		<center>
 			<div class="progress-animation">
 				<img class="progress-img" src="/img/progress-animation-4.5.gif"/>
@@ -49,20 +49,19 @@
 		</center>
 	</div>
 	<div class="small-12 medium-11 medium-centered large-8 large-centered columns error hide">
-		<h1 class="bold" align="center">{{ _('systemUpdateFailed') }}System Update Failed</h1>
+		<h1 class="bold" align="center">{{ _('systemUpdateFailed') }}</h1>
 		<p>
-			<i class="icon-attention"></i> {{ _('systemUpdateFailedDesc1-2') }}An error occured and your {{variantData['productName']}} {{ _('systemUpdateFailedDesc2-2') }}was unable to
-			complete the update.
+			<i class="icon-attention"></i> {{ _('systemUpdateFailedDesc1-2') }} {{variantData['productName']}} {{ _('systemUpdateFailedDesc2-2') }}
 		</p>
 		<div class="row">
 			<div class="small-12 medium-6 columns">
-				<button class="expand radius secondary bold close">{{ _('close') }}Close</button>
+				<button class="expand radius secondary bold close">{{ _('close') }}</button>
 			</div>
 			<div class="small-12 medium-6 columns">
 				<div class="loading-button expand">
-					<button class="expand radius success bold retry">{{ _('retry') }}Retry</button>
+					<button class="expand radius success bold retry">{{ _('retry') }}</button>
 					<span class="loading button success expand disabled radius">
-						<i class="icon-rocket-spinner animate-spin"></i> {{ _('initiating') }}Initiating...
+						<i class="icon-rocket-spinner animate-spin"></i> {{ _('initiating') }}...
 					</span>
 				</div>
 			</div>

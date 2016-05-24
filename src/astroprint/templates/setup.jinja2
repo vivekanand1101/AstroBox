@@ -120,7 +120,7 @@
 			<div id="wifi-network-password-modal" class="reveal-modal medium radius" data-reveal>
 				<script type="text/template" id="wifi-network-password-modal-template">
 					<% if (wifi.wep) { %>
-						<h2 class="bold" align="center">{{ _('wepSecDepre') }}WEP Security Deprecated</h2>
+						<h2 class="bold" align="center">{{ _('wepSecDepre') }}</h2>
 						<p>
 							The <%= wifi.name %> {{ _('wepSecDepreDesc1-3') }}
 						</p>
@@ -202,69 +202,69 @@
 					</p>
 					<form>
 						<label for="email">
-							<i class="icon-user"></i> <b>{{ _('email') }}Email</b> (<a target="_astroprint" href="https://www.astroprint.com/account/signup">{{ _('dontHaveAccount') }}don't have account?</a>)
+							<i class="icon-user"></i> <b>{{ _('email') }}</b> (<a target="_astroprint" href="https://www.astroprint.com/account/signup">{{ _('dontHaveAccount') }}</a>)
 							<input type="email" id="email" class="radius" name="email"/>
 						</label>
 						<label for="password">
-							<i class="icon-lock"></i> <b>{{ _('password') }}Password</b> (<a target="_astroprint" href="https://www.astroprint.com/account/forgot">{{ _('forgot') }}forgot?</a>)
+							<i class="icon-lock"></i> <b>{{ _('password') }}</b> (<a target="_astroprint" href="https://www.astroprint.com/account/forgot">{{ _('forgot') }}</a>)
 							<input type="password" id="password" class="radius" name="password"/>
 						</label>
 						<div align="center">
 							<div class="loading-button expand">
-								<button class="success radius submit-action expand" href="#connect-printer"><small>{{ _('next') }}:</small> <b>{{ _('printerConnection') }}Printer Connection</b> <i class="icon-right-open"></i></button>
-								<span class="button success disabled radius loading expand"><i class="icon-rocket-spinner animate-spin"></i> {{ _('loggingIn') }}Logging in...</span>
+								<button class="success radius submit-action expand" href="#connect-printer"><small>{{ _('next') }}:</small> <b>{{ _('printerConnection') }}</b> <i class="icon-right-open"></i></button>
+								<span class="button success disabled radius loading expand"><i class="icon-rocket-spinner animate-spin"></i> {{ _('loggingIn') }}...</span>
 							</div>
 						</div>
 					</form>
 					<div align="right">
-						<a href="#connect-printer" class="skip-step">{{ _('skipAstroprint') }}Skip AstroPrint Account <i class="icon-right-open"></i></a>
+						<a href="#connect-printer" class="skip-step">{{ _('skipAstroprint') }}<i class="icon-right-open"></i></a>
 					</div>
 				</div>
 			</div>
 		</div>
 
 		<div id="step-connect-printer" class="step hide">
-			<h1 class="bold">{{ _('connectYourPrinter') }}Connect Your Printer<div class="nub"></div></h1>
+			<h1 class="bold">{{ _('connectYourPrinter') }}<div class="nub"></div></h1>
 			<div class="content">
 				<img src="/img/setup/step_6_connect-box.png" height="90"/>
 				<p align="center">
-					{{ _('plugYourPrinterUsb1-2') }}Plug your printer's USB in the {{variantData['productName']}} {{ _('plugYourPrinterUsb2-2') }}and click continue when done.
+					{{ _('plugYourPrinterUsb1-2') }}{{variantData['productName']}} {{ _('plugYourPrinterUsb2-2') }}
 				</p>
-				<a href="#printer" class="button success radius share-button bold expand">{{ _('continue') }}Continue</a>
+				<a href="#printer" class="button success radius share-button bold expand">{{ _('continue') }}</a>
 				<div align="right">
-					<a class="skip-step" href="#share">{{ _('skipAndConfigure') }}Skip and Configure Later <i class="icon-right-open"></i></a>
+					<a class="skip-step" href="#share">{{ _('skipAndConfigure') }}<i class="icon-right-open"></i></a>
 				</div>
 			</div>
 		</div>
 
 		<div id="step-printer" class="step hide">
-			<h1 class="bold">{{ _('connectYourPrinter') }}Connect Your Printer<div class="nub"></div></h1>
+			<h1 class="bold">{{ _('connectYourPrinter') }}<div class="nub"></div></h1>
 			<div class="content">
 				<img src="/img/setup/step_6.2_connected-box.png" height="76"/>
 				<div class="checking-state" align="center">
 					<i class="icon-rocket-spinner animate-spin"></i>
-					<h3 class="bold" align="center">{{ _('checkingPrinterSettings') }}Checking Printer Settings...</h3>
+					<h3 class="bold" align="center">{{ _('checkingPrinterSettings') }}...</h3>
 				</div>
 				<div class="settings-state">
 					<p>
-						{{ _('selectYourConnection') }}Select your connection settings.
+						{{ _('selectYourConnection') }}
 					</p>
 					<form></form>
 					<div align="right">
-						<a href="#share" class="skip-step">{{ _('skipPrinterConnection') }}Skip Printer Connection <i class="icon-right-open"></i></a>
+						<a href="#share" class="skip-step">{{ _('skipPrinterConnection') }}<i class="icon-right-open"></i></a>
 					</div>
 				</div>
 			</div>
 			<script type="text/template" id="step-printer-template">
 				<label for="settings-printer-driver" class="bold">
-					Driver
+					{{ _('driver') }}Driver
 					<select id="settings-printer-driver" name="driver">
 						<option value="marlin" <%= settings.driver == 'marlin' ? 'selected' : '' %>>GCODE - Marlin firmware</option>
 						<option value="s3g" <%= settings.driver == 's3g' ? 'selected' : '' %>> X3G - Sailfish / Makerbot firmware</option>
 					</select>
 				</label>
 				<label for="settings-serial-port" class="bold">
-					USB Device
+					{{ _('usbDevice') }}
 					<% if (settings.portOptions.length > 0) { %>
 						<% if (settings.portOptions.length > 1) { %>
 							<select id="settings-serial-port" name="port">
@@ -279,8 +279,8 @@
 						<% } %>
 					<% } else { %>
 						<p>
-						No printer detected. Is your printer plugged in?<br/>
-						<a href="#" class="retry-ports bold">Plug printer and retry &raquo; </a>
+						{{ _('noPrintDetecte') }}<br/>
+						<a href="#" class="retry-ports bold">{{ _('plugRetry') }} &raquo; </a>
 						</p>
 					<% } %>
 				</label>
@@ -296,8 +296,8 @@
 				<% if (settings.portOptions.length > 0 && ( settings.baudrateOptions.length > 0 || settings.driver == 's3g')) { %>
 					<div align="center">
 						<div class="loading-button expand">
-							<button class="button success radius submit-action expand bold" href="#share">{{ _('connect') }}Connect</button>
-							<span class="button success disabled radius loading expand"><i class="icon-rocket-spinner animate-spin"></i> {{ _('connecting') }}Connecting...</span>
+							<button class="button success radius submit-action expand bold" href="#share">{{ _('connect') }}</button>
+							<span class="button success disabled radius loading expand"><i class="icon-rocket-spinner animate-spin"></i> {{ _('connecting') }}...</span>
 						</div>
 					</div>
 				<% } %>
@@ -305,7 +305,7 @@
 		</div>
 
 		<div id="step-share" class="step hide">
-			<h1 class="bold">{{ _('youreDone') }}You're done!<div class="nub"></div></h1>
+			<h1 class="bold">{{ _('youreDone') }}<div class="nub"></div></h1>
 			<div class="content">
 				<img src="/img/setup/final_step_astroprint_logo.png" height=""/>
 				<p>{{variantData['congratsMsg']}}</p>
@@ -318,8 +318,8 @@
 					</div>
 				</div>
 				<div class="loading-button expand">
-					<a class="button radius success bold setup-done expand" href="#">{{ _('startPrinting') }}Start Printing <i class="icon-right-open"></i></a>
-					<span class="button disabled success bold expand loading"><i class="icon-rocket-spinner animate-spin"></i> {{ _('launching') }}Launching</span>
+					<a class="button radius success bold setup-done expand" href="#">{{ _('startPrinting') }}<i class="icon-right-open"></i></a>
+					<span class="button disabled success bold expand loading"><i class="icon-rocket-spinner animate-spin"></i> {{ _('launching') }}</span>
 				</div>
 			</div>
 		</div>
@@ -335,8 +335,10 @@
 		var API_BASEURL = BASEURL + "api/";
 		var SOCKJS_URI = window.location.protocol.slice(0, -1) + "://" + (window.document ? window.document.domain : window.location.hostname) + ":" + window.location.port + "/sockjs";
 		var PRODUCT_NAME = "{{variantData['productName']}}";
-		var shareOptions = {{ variantData['share'] | tojson | safe }}
+		var shareOptions = {{ variantData['share'] | tojson | safe }};
+		var localeUser = {{ locale | tojson }};
 	</script>
+	<script type="text/javascript" src="/i18n/setup.js"></script>
 	{% assets filters="closure_js", output="js/gen/setup.js",
 		"js/lib/jquery.js","js/lib/babel.js", "js/lib/underscore.js", "js/lib/backbone.js", "js/lib/sockjs.js", "js/lib/fastclick.js", "js/lib/foundation/foundation.js", "js/lib/foundation/foundation.abide.js", "js/lib/foundation/foundation.reveal.js",
 		"js/lib/jquery.noty.js", "js/lib/jquery.noty.top.js", "js/lib/sockjs.js",
