@@ -14,7 +14,7 @@ from flask.ext.principal import Principal, Permission, RoleNeed, identity_loaded
 from flask.ext.compress import Compress
 from flask.ext.assets import Environment
 # Import Babel
-from flask.ext.babel import Babel, gettext, ngettext
+from flask.ext.babel import Babel, gettext
 from babel import Locale
 # end Babel
 from watchdog.observers import Observer
@@ -104,10 +104,7 @@ def box_identify():
 
 @app.route("/")
 def index():
-	print "== function index =="
-	print "list_translations babel:"
-	print babel.list_translations()
-	print "== end function index =="
+
 	s = settings()
 	loggedUsername = s.get(["cloudSlicer", "loggedUser"])
 

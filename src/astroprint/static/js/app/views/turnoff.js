@@ -11,7 +11,7 @@ var TurnoffConfirmationModal = Backbone.View.extend({
 		'click button.alert': 'onConfirm',
 		'click button.secondary': 'close'
 	},
-	onConfirm: function() 
+	onConfirm: function()
 	{
 		this.$el.foundation('reveal', 'close');
 		if (!this.turnoffView) {
@@ -44,7 +44,7 @@ var TurnoffView = Backbone.View.extend({
             }, this),
             error: _.bind(function() {
             	this.$el.find('.icon-off').removeClass('blink-animation');
-            	noty({text: "There was an error starting turn off sequence.", timeout: 5000});
+            	noty({text: gettext('errorStartingOff'), timeout: 5000});
             }, this)
         });
 	}

@@ -21,6 +21,11 @@ from astroprint.network.manager import networkManager
 from astroprint.printer.manager import printerManager
 from astroprint.printerprofile import printerProfileManager
 
+# Import Babel
+from flask.ext.babel import Babel, gettext
+from babel import Locale
+# end Babel
+
 def not_setup_only(func):
 	"""
 	If you decorate a view with this, it will ensure that the calls only run on
@@ -32,7 +37,7 @@ def not_setup_only(func):
 		if settings().getBoolean(["server", "firstRun"]):
 			return func(*args, **kwargs)
 		else:
-			return make_response("AstroBox is already setup", 403)
+			return make_response(gettext('astroAlreadySetup'), 403)
 	return decorated_view
 
 @api.route('/setup/name', methods=['GET'])
@@ -46,13 +51,13 @@ def save_name():
 	name = request.values.get('name', None)
 
 	if not name or not re.search(r"^[a-zA-Z0-9\-_]+$", name):
-		return make_response('Invalid Name', 400)
+		return make_response(gettext('invalidName'), 400)
 	else:
 		if platform == "linux" or platform == "linux2":
 			if networkManager().setHostname(name):
 				return jsonify()
 			else:
-				return (500, "There was an error saving the hostname")
+				return (500, gettext('errorSavingHost'))
 		else:
 			return NO_CONTENT
 
@@ -69,7 +74,7 @@ def check_internet():
 		if networks:
 			return jsonify(networks = networks, connected = False)
 		else:
-			return make_response("Unable to get WiFi networks", 500)
+			return make_response(gettext('unableToGetWifi'), 500)
 
 @api.route('/setup/internet', methods=['POST'])
 @not_setup_only
@@ -81,7 +86,7 @@ def connect_internet():
 		if result:
 			return jsonify(result)
 		else:
-			return ("Network %s not found" % data['id'], 404)
+			return (gettext('networkSNotFound') % data['id'], 404)
 
 	return ("Invalid Request", 400)
 
@@ -128,9 +133,9 @@ def login_astroprint():
 				return make_response("OK", 200)
 
 		except AstroPrintCloudNoConnectionException:
-			return make_response("Your device is not connected to AstroPrint.com", 503)
+			return make_response(gettext('deviceNotConnectedAstro'), 503)
 
-	return make_response('Invalid Credentials', 400)
+	return make_response(gettext('invalidCredentials'), 400)
 
 @api.route('/setup/printer', methods=['GET'])
 @not_setup_only
@@ -148,7 +153,7 @@ def connection_settings():
 
 		return jsonify(response)
 
-	return make_response("Connection options not available", 400)
+	return make_response(gettext('connectionOptionsNotAvaiable'), 400)
 
 @api.route('/setup/printer', methods=['POST'])
 @not_setup_only
@@ -174,7 +179,7 @@ def save_connection_settings():
 
 		return make_response("OK", 200)
 
-	return make_response('Invalid Connection Settings', 400)
+	return make_response(gettext('invalidConnecionSet'), 400)
 
 @api.route('/setup/printer/profile', methods=['POST'])
 @not_setup_only
@@ -191,7 +196,7 @@ def save_printer_profile_settings():
 
 		return make_response("OK", 200)
 
-	return make_response('Invalid Connection Settings', 400)
+	return make_response(gettext('invalidConnecionSet'), 400)
 
 @api.route('/setup/done', methods=['POST'])
 @not_setup_only

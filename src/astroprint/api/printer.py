@@ -16,6 +16,11 @@ from octoprint.server.api import api
 
 from astroprint.printer.manager import printerManager
 
+# Import Babel
+from flask.ext.babel import Babel, gettext
+from babel import Locale
+# end Babel
+
 #~~ Printer
 
 
@@ -24,7 +29,7 @@ def printerState():
 	pm = printerManager()
 
 	if not pm.isOperational():
-		return make_response("Printer is not operational", 409)
+		return make_response(gettext('printerNotOperational'), 409)
 
 	# process excludes
 	excludes = []
@@ -60,7 +65,7 @@ def printerToolCommand():
 	pm = printerManager()
 
 	if not pm.isOperational():
-		return make_response("Printer is not operational", 409)
+		return make_response(gettext('printerNotOperational'), 409)
 
 	valid_commands = {
 		"select": ["tool"],
@@ -78,9 +83,9 @@ def printerToolCommand():
 	if command == "select":
 		tool = data["tool"]
 		if re.match(validation_regex, tool) is None:
-			return make_response("Invalid tool: %s" % tool, 400)
+			return make_response(gettext('invalidToolS') % tool, 400)
 		if not tool.startswith("tool"):
-			return make_response("Invalid tool for selection: %s" % tool, 400)
+			return make_response(gettext('invalidToolSelectionS') % tool, 400)
 
 		pm.changeTool(tool)
 
@@ -92,9 +97,9 @@ def printerToolCommand():
 		validated_values = {}
 		for tool, value in targets.iteritems():
 			if re.match(validation_regex, tool) is None:
-				return make_response("Invalid target for setting temperature: %s" % tool, 400)
+				return make_response(gettext('invalidSettingTemp') % tool, 400)
 			if not isinstance(value, (int, long, float)):
-				return make_response("Not a number for %s: %r" % (tool, value), 400)
+				return make_response(gettext('notNumberSR') % (tool, value), 400)
 			validated_values[tool] = value
 
 		# perform the actual temperature commands
@@ -105,11 +110,11 @@ def printerToolCommand():
 	elif command == "extrude":
 		if pm.isPrinting():
 			# do not extrude when a print job is running
-			return make_response("Printer is currently printing", 409)
+			return make_response(gettext('printerCurrentlyPrinting'), 409)
 
 		amount = data["amount"]
 		if not isinstance(amount, (int, long, float)):
-			return make_response("Not a number for extrusion amount: %r" % amount, 400)
+			return make_response(gettext('notNumberExtAmountR') % amount, 400)
 		pm.extrude(None, amount)
 
 	return NO_CONTENT
@@ -136,7 +141,7 @@ def printerBedCommand():
 	pm = printerManager()
 
 	if not pm.isOperational():
-		return make_response("Printer is not operational", 409)
+		return make_response(gettext('printerNotOperational'), 409)
 
 	valid_commands = {
 		"target": ["target"],
@@ -152,7 +157,7 @@ def printerBedCommand():
 
 		# make sure the target is a number
 		if not isinstance(target, (int, long, float)):
-			return make_response("Not a number: %r" % target, 400)
+			return make_response(gettext('notNumberR') % target, 400)
 
 		# perform the actual temperature command
 		pm.setTemperature("bed", target)
@@ -177,7 +182,7 @@ def printerFanCommand():
 	pm = printerManager()
 
 	if not pm.isOperational():
-		return make_response("Printer is not operational", 409)
+		return make_response(gettext('printerNotOperational'), 409)
 
 	valid_commands = {
 		"set": ["tool", "speed"]
@@ -202,7 +207,7 @@ def printerPrintheadCommand():
 
 	if not pm.isOperational() or pm.isPrinting():
 		# do not jog when a print job is running or we don't have a connection
-		return make_response("Printer is not operational or currently printing", 409)
+		return make_response(gettext('printerNotOperationalPrinting'), 409)
 
 	valid_commands = {
 		"jog": [],
@@ -221,7 +226,7 @@ def printerPrintheadCommand():
 			if axis in data:
 				value = data[axis]
 				if not isinstance(value, (int, long, float)):
-					return make_response("Not a number for axis %s: %r" % (axis, value), 400)
+					return make_response(gettext('notNumberSR') % (axis, value), 400)
 				validated_values[axis] = value
 
 		# execute the jog commands
@@ -234,7 +239,7 @@ def printerPrintheadCommand():
 		axes = data["axes"]
 		for axis in axes:
 			if not axis in valid_axes:
-				return make_response("Invalid axis: %s" % axis, 400)
+				return make_response(gettext('invalidAxisS') % axis, 400)
 			validated_values.append(axis)
 
 		# execute the home command
@@ -250,12 +255,12 @@ def printerPrintheadCommand():
 @restricted_access
 def printerSdCommand():
 	if not settings().getBoolean(["feature", "sdSupport"]):
-		return make_response("SD support is disabled", 404)
+		return make_response(gettext('sdSupportDisabled'), 404)
 
 	pm = printerManager()
 
 	if not pm.isOperational() or pm.isPrinting() or pm.isPaused():
-		return make_response("Printer is not operational or currently busy", 409)
+		return make_response(gettext('printerNotOperationalBusy'), 409)
 
 	valid_commands = {
 		"init": [],
@@ -279,7 +284,7 @@ def printerSdCommand():
 @api.route("/printer/sd", methods=["GET"])
 def printerSdState():
 	if not settings().getBoolean(["feature", "sdSupport"]):
-		return make_response("SD support is disabled", 404)
+		return make_response(gettext('sdSupportDisabled'), 404)
 
 	return jsonify(ready=printerManager().isSdReady())
 
@@ -293,10 +298,10 @@ def printerCommand():
 	pm = printerManager()
 
 	if not pm.isOperational():
-		return make_response("Printer is not operational", 409)
+		return make_response(gettext('printerNotOperationalPrinting'), 409)
 
 	if not "application/json" in request.headers["Content-Type"]:
-		return make_response("Expected content type JSON", 400)
+		return make_response(gettext('expectedJSON') 400)
 
 	data = request.json
 
@@ -333,7 +338,7 @@ def _getTemperatureData(filter):
 	pm = printerManager()
 
 	if not pm.isOperational():
-		return make_response("Printer is not operational", 409)
+		return make_response(gettext('printerNotOperational'), 409)
 
 	tempData = pm.getCurrentTemperatures()
 
@@ -360,7 +365,7 @@ def startCommBradcasting():
 	pm = printerManager()
 
 	if not pm.allowTerminal:
-		return make_response("Driver does not support terminal access", 400)
+		return make_response(gettext('driverNotSupportTerminal'), 400)
 
 	pm.broadcastTraffic += 1
 
@@ -374,7 +379,7 @@ def stopCommBradcasting():
 	pm = printerManager()
 
 	if not pm.allowTerminal:
-		return make_response("Driver does not support terminal access", 400)
+		return make_response(gettext('driverNotSupportTerminal'), 400)
 
 	#Protect against negative values
 	pm.broadcastTraffic = max(0, pm.broadcastTraffic - 1)
@@ -390,10 +395,10 @@ def sendComm():
 	pm = printerManager()
 
 	if not pm.allowTerminal:
-		return make_response("Driver does not support terminal access", 400)
+		return make_response(gettext('driverNotSupportTerminal'), 400)
 
 	if not pm.isOperational():
-		return make_response("No Printer connected", 404)
+		return make_response(gettext('noPrinterConnected'), 404)
 
 	command = request.form.get('command')
 
@@ -402,4 +407,4 @@ def sendComm():
 		return NO_CONTENT
 
 	else:
-		return make_response("Command is missing", 400)
+		return make_response(gettext('commandMissing'), 400)

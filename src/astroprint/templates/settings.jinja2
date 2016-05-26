@@ -212,10 +212,10 @@
 					<h2 class="bold" align="center">{{ _('wepSecDepre') }}</h2>
 					<div class="modal-body">
 						<p>
-							{{ _('the') }} <%= wifi.name %> {{ _('wepSecDepreDesc1-2') }}
+							{{ _('the') }} <%= wifi.name %> {{ _('wepSecDepreDesc1-3') }}
 						</p>
 						<p>
-							{{ _('wepSecDepreDesc2-2') }} <a href="https://en.wikipedia.org/wiki/Wired_Equivalent_Privacy" target="_info">{{ _('deprecated') }}</a>
+							{{ _('wepSecDepreDesc2-3') }} <a href="https://en.wikipedia.org/wiki/Wired_Equivalent_Privacy" target="_info">{{ _('deprecated') }}</a>
 							{{ _('wepSecDepreDesc3-3') }}
 						</p>
 					</div>
@@ -255,7 +255,7 @@
 				<% if (settings.networks.wired) { %>
 					<h3 class="bold">{{ _('wiredConnection') }}</h3>
 					<i class="icon-exchange"></i> {{ _('connected') }}.
-					<div class="ip-address">{{ _('ipAdress') }}: <b><%= settings.networks.wired.ip %></b></div>
+					<div class="ip-address">{{ _('ipAddress') }}: <b><%= settings.networks.wired.ip %></b></div>
 				<% } %>
 			</div>
 			<% if (settings.networks.manual) { %>
@@ -274,10 +274,10 @@
 						<% } else { %>
 							<i class="icon-wifi-signal-high"></i>
 						<% } %>
-						Connected to <b><%= settings.networks.wireless.name %></b>.
-						<div class="ip-address">{{ _('ipAddress') }}IP Address: <b><%= settings.networks.wireless.ip %></b></div>
+						{{ _('connectedTo') }} <b><%= settings.networks.wireless.name %></b>.
+						<div class="ip-address">{{ _('ipAddress') }}: <b><%= settings.networks.wireless.ip %></b></div>
 					<% } else { %>
-						Not Connected.
+						{{ _('notConnected') }}.
 					<% } %>
 					<div class="loading-button list-networks">
 						<button class="radius small">{{ _('scanWifi') }}</button>
@@ -326,7 +326,7 @@
 		<div id="wifi-hotspot" class="settings-page hide"></div>
 		<script type="text/template" id="wifi-hotspot-settings-page-template">
 			<% if (settings.hotspot === false) { %>
-				{{ _('hotspotNot') }}Creating a Hotspot is not supported on this device.
+				{{ _('hotspotNot') }}
 			<% } else { %>
 				<h3 class="bold">{{ _('localHotspot') }}</h3>
 				<div>
@@ -381,7 +381,7 @@
 		</div>
 		<script type="text/template" id="software-update-modal-content">
 			<h2 class="bold">
-				<% if (data.update_available && !data.is_current) { %> Update <% } else { %> No Updates <% } %> {{ _('avaiable') }}
+				<% if (data.update_available && !data.is_current) { %> {{ _('update') }} <% } else { %> {{ _('noUpdates') }} <% } %> {{ _('avaiable') }}
 			</h2>
 			<% if (data.update_available) { %>
 				<div class="modal-body">
@@ -508,7 +508,7 @@
 			<h2 class="bold">{{ _('deleteAstroLogs') }}</h2>
 			<div class="modal-body">
 				<p>
-					T{{ _('deleteAstroLogsDesc') }}
+					{{ _('deleteAstroLogsDesc') }}
 				</p>
 				<p>
 					{{ _('aysureDelLogs') }}

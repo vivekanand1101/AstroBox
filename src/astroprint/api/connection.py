@@ -13,6 +13,11 @@ from octoprint.server.api import api
 
 from astroprint.printer.manager import printerManager
 
+# Import Babel
+from flask.ext.babel import Babel, gettext
+from babel import Locale
+# end Babel
+
 
 
 @api.route("/connection", methods=["GET"])
@@ -54,13 +59,13 @@ def connectionCommand():
 		if "port" in data:
 			port = data["port"]
 			if port not in options["ports"]:
-				return make_response("Invalid port: %s" % port, 400)
+				return make_response(gettext('invalidPortS') % port, 400)
 
 		if "baudrate" in data:
 			baudrate = data["baudrate"]
 			baudrates = options["baudrates"]
 			if baudrates and baudrate not in baudrates:
-				return make_response("Invalid baudrate: %d" % baudrate, 400)
+				return make_response(gettext('invalidBaudrateS') % baudrate, 400)
 
 		if "save" in data and data["save"]:
 			s.set(["serial", "port"], port)
@@ -77,5 +82,3 @@ def connectionCommand():
 		pm.disconnect()
 
 	return NO_CONTENT
-
-

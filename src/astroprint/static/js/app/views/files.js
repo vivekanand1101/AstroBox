@@ -103,7 +103,7 @@ var FileUploadFiles = FileUploadCombined.extend({
 
 		this.progressBar.find('.meter').css('width', intPercent+'%');
 		if (!message) {
-			message = "Uploading ("+intPercent+"%)";
+			message = gettext("uploading")+" ("+intPercent+"%)";
 		}
 		this.progressBar.find('.progress-message span').text(message);
 	},
@@ -206,7 +206,7 @@ var PrintFileView = Backbone.View.extend({
 
         $.getJSON('/api/astroprint/print-files/'+this.print_file.get('id')+'/download')
 	        .fail(function(){
-	            noty({text: "Couldn't download the print file.", timeout: 3000});
+	            noty({text: gettext('couldntDownloadPrintFile'), timeout: 3000});
 	        })
 	},
 	cancelDownloadClicked: function(evt)
@@ -218,7 +218,7 @@ var PrintFileView = Backbone.View.extend({
 			method: 'DELETE'
 		})
 			.fail(function() {
-	            noty({text: "Unable to cancel download.", timeout: 3000});
+	            noty({text: gettext('unableToCancelDownload'), timeout: 3000});
 	        })
 	},
 	printClicked: function (evt)
@@ -249,7 +249,7 @@ var PrintFileView = Backbone.View.extend({
 	        	if (xhr.status == 409) {
 	        		error = xhr.responseText;
 	        	}
-	        	noty({text: error ? error : "There was an error starting the print", timeout: 3000});
+	        	noty({text: error ? error : gettext('errorStartingPrint'), timeout: 3000});
 	        	loadingBtn.removeClass('loading');
 	        })
 	    } else {
@@ -351,7 +351,7 @@ var PrintFilesListView = Backbone.View.extend({
 	    	list.html(
 		    	'<div class="empty panel radius" align="center">'+
 				'	<i class="icon-inbox empty-icon"></i>'+
-				'	<h3>Nothing here yet.</h3>'+
+				'	<h3>'+gettext('nothingHereYet')+'.</h3>'+
 				'</div>'
 			);
 	    }
@@ -390,7 +390,7 @@ var PrintFilesListView = Backbone.View.extend({
 				}, this);
 
 				var error = function() {
-					noty({text: "There was an error retrieving design list", timeout: 3000});
+					noty({text: gettext('errorRetrievingDesign'), timeout: 3000});
 					loadingBtn.removeClass('loading');
 
 					if (_.isFunction(doneCb)) {
@@ -463,7 +463,7 @@ var PrintFilesListView = Backbone.View.extend({
 				case 'error':
 				{
 					progressContainer.removeClass('downloading');
-					noty({text: "Couldn't download the print file.", timeout: 3000});
+					noty({text: gettext('couldntDownloadPrintFile'), timeout: 3000});
 					console.error('Error downloading file: '+data.reason);
 				}
 				break;

@@ -213,7 +213,7 @@ var PhotoView = Backbone.View.extend({
                 }
             })
             .fail(function(){
-                noty({text: "There was an error adjusting your print capture.", timeout: 3000});
+                noty({text: gettext('errorAdjustingPrintCapture'), timeout: 3000});
             });
         }
     }
@@ -289,10 +289,10 @@ var PrintingView = Backbone.View.extend({
         var controlBtn = this.$el.find('button.controls');
 
         if (this.paused) {
-            pauseBtn.html('<i class="icon-play"></i> Resume Print');
+            pauseBtn.html('<i class="icon-play"></i> '+gettext('resumePrint'));
             controlBtn.show();
         } else {
-            pauseBtn.html('<i class="icon-pause"></i> Pause Print');
+            pauseBtn.html('<i class="icon-pause"></i> '+gettext('pausePrint'));
             controlBtn.hide();
         }
 
@@ -413,7 +413,7 @@ var CancelPrintDialog = Backbone.View.extend({
         loadingBtn.addClass('loading');
         this.parent._jobCommand('cancel', _.bind(function(data){
             if (data && _.has(data, 'error')) {
-                noty({text: "There was an error canceling your job.", timeout: 3000});
+                noty({text: gettext('errorCancelingJob'), timeout: 3000});
                 loadingBtn.removeClass('loading');
             } else {
                 //app.socketData.set({printing: false, paused: false});

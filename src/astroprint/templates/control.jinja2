@@ -85,7 +85,7 @@
 							<option value="50">50 mm</option>
 							<option value="100">100 mm</option>
 							<option value="200">200 mm</option>
-							<option value="other">{{ _('other') }}Other...</option>
+							<option value="other">{{ _('other') }}...</option>
 						</select>
 						<div class="row collapse other hide">
 							<div class="small-8 columns">
@@ -105,7 +105,7 @@
 	<div class="temp-control-cont {{class}}">
 		<span class="current-temp-top bold">- -</span>
 		<div class="temp-bar">
-			<label class="bold">{{label}}</label>
+			<label class="bold">{{ _(label) }}</label>
 			<div class="current-temp">
 				<div class="triangle_left"></div>
 				<div class="triangle_right"></div>
@@ -127,7 +127,7 @@
 			</div>
 			<div class="small-4 columns fan-control">
 				<div class="fan-control-push" align="center">
-					{{ _('currenTemp') }} (&deg;C)
+					{{ _('currentTemp') }} (&deg;C)
 				</div>
 				<h2 class="bold">{{ _('fans') }} <span class="fan_icon"></span></h2>
 				<button class="radius small success expand fan-on">{{ _('on') }}</button>

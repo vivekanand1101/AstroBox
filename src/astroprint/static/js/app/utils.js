@@ -3,12 +3,23 @@
  *
  *  Distributed under the GNU Affero General Public License http://www.gnu.org/licenses/agpl.html
  */
+ // Load Translation Catalog
+
+ 	LOCALE = localeUser;
+ 	var catalog = window["BABEL_TO_LOAD_" + LOCALE];
+ 	if (catalog === undefined) {
+ 			catalog = {messages: undefined, plural_expr: undefined, locale: undefined, domain: undefined}
+ 	}
+ 	babel.Translations.load(catalog).install();
+
+	/******************/
+
 
 var Utils = function() {
-	var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Nov', 'Oct', 'Dec'];
+	var months = [gettext('Jan'), gettext('Feb'), gettext('Mar'), gettext('Apr'), gettext('May'), gettext('Jun'), gettext('Jul'), gettext('Aug'), gettext('Sep'), gettext('Oct'), gettext('Nov'), gettext('Dec')];
 
 	return {
-		timeFormat: function(seconds) 
+		timeFormat: function(seconds)
 		{
 			if (isNaN(seconds)) {
 				return '-- : -- : --';
@@ -28,7 +39,7 @@ var Utils = function() {
 	    {
 	    	return months[date.getMonth()]+' '+date.getDate()+', '+date.getFullYear();
 	    },
-	    sizeFormat: function(fileSizeInBytes) 
+	    sizeFormat: function(fileSizeInBytes)
 	    {
 		   	var i = -1;
 		    var byteUnits = [' kB', ' MB', ' GB', ' TB', 'PB', 'EB', 'ZB', 'YB'];

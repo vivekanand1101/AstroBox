@@ -11,7 +11,7 @@ var RebootConfirmationModal = Backbone.View.extend({
 		'click button.alert': 'onConfirm',
 		'click button.secondary': 'close'
 	},
-	onConfirm: function() 
+	onConfirm: function()
 	{
 		this.$el.foundation('reveal', 'close');
 		if (!this.rebootView) {
@@ -43,7 +43,7 @@ var RebootView = Backbone.View.extend({
             }, this),
             error: _.bind(function() {
             	this.$el.find('.icon-refresh').removeClass('animate-spin');
-            	noty({text: "There was an error starting reboot sequence.", timeout: 5000});
+            	noty({text: gettext('errorStartReboot'), timeout: 5000});
             }, this)
         });
 	}

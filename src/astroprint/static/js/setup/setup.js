@@ -135,7 +135,7 @@ var StepName = StepView.extend({
 					if (xhr.status == 400) {
 						message = xhr.responseText;
 					} else {
-						message = "There was an error saving your name";
+						message = gettext("errorSavingName");
 					}
 					noty({text: message, timeout: 3000});
 				},
@@ -256,7 +256,7 @@ var StepInternet = StepView.extend({
 			dataType: 'json'
 		}).
 		fail(function(){
-			noty({text: "There was an error saving hotspot option.", timeout: 3000});
+			noty({text: gettext("errorSavingHotspot"), timeout: 3000});
 		})
 	},
 	doConnect: function(data, callback)
@@ -290,7 +290,7 @@ var StepInternet = StepView.extend({
 
 						case 'connected':
 							setup_view.eventManager.off('astrobox:InternetConnectingStatus', connectionCb, this);
-							noty({text: "Your "+PRODUCT_NAME+" is now connected to "+connectionInfo.info.name+".", type: "success", timeout: 3000});
+							noty({text: gettext("your")+PRODUCT_NAME+gettext("isNowConnected")+connectionInfo.info.name+".", type: "success", timeout: 3000});
 							loadingBtn.removeClass('loading');
 							if (callback) callback(false);
 							this.$el.removeClass('settings');
@@ -301,9 +301,9 @@ var StepInternet = StepView.extend({
 						case 'failed':
 							setup_view.eventManager.off('astrobox:InternetConnectingStatus', connectionCb, this);
 							if (connectionInfo.reason == 'no_secrets') {
-								noty({text: "Invalid password for "+data.name+".", timeout: 3000});
+								noty({text: gettext("invalidPass")+data.name+".", timeout: 3000});
 							} else {
-								noty({text: "Unable to connect to "+data.name+".", timeout: 3000});
+								noty({text: gettext("unableConnect")+data.name+".", timeout: 3000});
 							}
 							loadingBtn.removeClass('loading');
 							if (callback) callback(true);
@@ -312,7 +312,7 @@ var StepInternet = StepView.extend({
 
 						default:
 							setup_view.eventManager.off('astrobox:InternetConnectingStatus', connectionCb, this);
-							noty({text: "Unable to connect to "+data.name+".", timeout: 3000});
+							noty({text: gettext("unableConnect")+data.name+".", timeout: 3000});
 							loadingBtn.removeClass('loading');
 							clearTimeout(connectionTimeout);
 							if (callback) callback(true);
@@ -328,7 +328,7 @@ var StepInternet = StepView.extend({
 			}
 		}, this))
 		.fail(function(){
-			noty({text: "There was an error connecting.", timeout: 3000});
+			noty({text: gettext("errorConnecting"), timeout: 3000});
 			loadingBtn.removeClass('loading');
 			if (callback) callback(true);
 		})
@@ -440,7 +440,7 @@ var StepAstroprint = StepView.extend({
 				if (xhr.status == 400 || xhr.status == 401 || xhr.status == 503) {
 					message = xhr.responseText;
 				} else {
-					message = "There was an error logging you in";
+					message = gettext("errorLoggingIn");
 				}
 				noty({text: message, timeout: 3000});
 				this.$('#email').focus();
@@ -461,7 +461,7 @@ var StepAstroprint = StepView.extend({
 				this.$el.addClass('settings');
 			}, this),
 			error: _.bind(function(xhr) {
-				noty({text: "Error logging you out", timeout: 3000});
+				noty({text: gettext("errorLoggingOut"), timeout: 3000});
 			}, this)
 		});
 	}
@@ -513,7 +513,7 @@ var StepPrinter = StepView.extend({
 							this._setConnecting(false);
 							location.href = this.$el.find('.submit-action').attr('href');
 						} else if (flags.error) {
-							noty({text: 'There was an error connecting to the printer.', timeout: 3000});
+							noty({text: gettext("errorConnectingPrinter"), timeout: 3000});
 							socket.close();
 							this._setConnecting(false);
 						}
@@ -524,7 +524,7 @@ var StepPrinter = StepView.extend({
 				if (xhr.status == 400 || xhr.status == 401) {
 					message = xhr.responseText;
 				} else {
-					message = "There was an error connecting to your printer";
+					message = gettext("errorConnectingPrinter");
 				}
 				noty({text: message, timeout: 3000});
 				this._setConnecting(false);
@@ -547,7 +547,7 @@ var StepPrinter = StepView.extend({
 						'change #settings-printer-driver': 'driverChanged'
 					}));
 				} else {
-					noty({text: "Error reading printer connection settings", timeout: 3000});
+					noty({text: gettext("errorReadingPrinterConnection"), timeout: 3000});
 				}
 			}, this),
 			error: _.bind(function(xhr) {
@@ -555,7 +555,7 @@ var StepPrinter = StepView.extend({
 				if (xhr.status == 400) {
 					message = xhr.responseText;
 				} else {
-					message = "Error reading printer connection settings";
+					message = gettext("errorReadingPrinterConnection");
 				}
 				noty({text: message, timeout: 3000});
 
@@ -598,7 +598,7 @@ var StepPrinter = StepView.extend({
 				if (xhr.status == 400) {
 					message = xhr.responseText;
 				} else {
-					message = "Error saving printer connection settings";
+					message = gettext("errorSavingPrinterConnection");
 				}
 				noty({text: message, timeout: 3000});
 
@@ -646,7 +646,7 @@ var StepShare = StepView.extend({
 				location.href = "/";
 			},
 			error: function() {
-				noty({text: "There was an error saving your settings.", timeout: 3000});
+				noty({text: gettext("errorSavingSettings"), timeout: 3000});
 			}
 		});
 	}

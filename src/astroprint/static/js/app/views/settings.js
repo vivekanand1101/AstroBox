@@ -51,13 +51,13 @@ var PrinterConnectionView = SettingsPage.extend({
 			}
 		}, this))
 		.fail(function() {
-			noty({text: "There was an error getting serial settings.", timeout: 3000});
+			noty({text: gettext('errorGettingSerial'), timeout: 3000});
 			this.$('a.retry-ports i').removeClass('animate-spin');
 		})
 	},
-	render: function() 
+	render: function()
 	{
-		this.$('form').html(this.template({ 
+		this.$('form').html(this.template({
 			settings: this.settings
 		}));
 
@@ -100,7 +100,7 @@ var PrinterConnectionView = SettingsPage.extend({
 				})
 			})
 			.fail(function(){
-				noty({text: "There was an error testing connection settings.", timeout: 3000});
+				noty({text: gettext('errorTestingConnection'), timeout: 3000});
 			});
 		}
 	},
@@ -140,7 +140,7 @@ var PrinterProfileView = SettingsPage.extend({
 		this.render();
 	},
 	render: function() {
-		this.$el.html(this.template({ 
+		this.$el.html(this.template({
 			settings: this.settings.toJSON()
 		}));
 
@@ -175,7 +175,7 @@ var PrinterProfileView = SettingsPage.extend({
 			wrapper.addClass('hide');
 		} else {
 			wrapper.removeClass('hide');
-		}		
+		}
 	},
 	invalidForm: function(e)
 	{
@@ -183,7 +183,7 @@ var PrinterProfileView = SettingsPage.extend({
 			return;
 		}
 
-		noty({text: "Please check your errors", timeout: 3000});
+		noty({text: gettext('pleaseCheckErrors'), timeout: 3000});
 	},
 	validForm: function(e) {
 		if (e.namespace !== 'abide.fndtn') {
@@ -212,7 +212,7 @@ var PrinterProfileView = SettingsPage.extend({
 		this.settings.save(attrs, {
 			patch: true,
 			success: _.bind(function() {
-				noty({text: "Profile changes saved", timeout: 3000, type:"success"});
+				noty({text: gettext('profileChangesSaved'), timeout: 3000, type:"success"});
 				loadingBtn.removeClass('loading');
 				//Make sure we reload next time we load this tab
 				this.parent.subviews['printer-connection'].settings = null;
@@ -247,7 +247,7 @@ var NetworkNameView = SettingsPage.extend({
 				this.render();
 			}, this))
 			.fail(function() {
-				noty({text: "There was an error getting current network name.", timeout: 3000});
+				noty({text: gettext('errorGettingNetName'), timeout: 3000});
 			});
 		}
 	},
@@ -272,7 +272,7 @@ var NetworkNameView = SettingsPage.extend({
 			return;
 		}
 
-		noty({text: "Please check your errors", timeout: 3000});
+		noty({text: gettext('pleaseCheckErrors'), timeout: 3000});
 	},
 	validForm: function(e) {
 		if (e.namespace !== 'abide.fndtn') {
@@ -292,21 +292,21 @@ var NetworkNameView = SettingsPage.extend({
 
 
 		$.ajax({
-			url: API_BASEURL + 'settings/network/name', 
+			url: API_BASEURL + 'settings/network/name',
 			type: 'POST',
 			contentType: 'application/json',
 			dataType: 'json',
 			data: JSON.stringify(attrs)
 		})
 			.done(_.bind(function(data) {
-				noty({text: "Network name changed. Use it next time you reboot", timeout: 3000, type:"success"});
+				noty({text: gettext('netNameChanged'), timeout: 3000, type:"success"});
 				//Make sure we reload next time we load this tab
 				this.settings = data
 				this.render();
 				this.parent.subviews['network-name'].settings = null;
 			}, this))
 			.fail(function() {
-				noty({text: "Failed to save network name", timeout: 3000});
+				noty({text: gettext('failedToSaveNetName'), timeout: 3000});
 			})
 			.always(function(){
 				loadingBtn.removeClass('loading');
@@ -341,12 +341,12 @@ var InternetConnectionView = SettingsPage.extend({
 				this.render();
 			}, this))
 			.fail(function() {
-				noty({text: "There was an error getting WiFi settings.", timeout: 3000});
+				noty({text: gettext('errorGettingWifiSet'), timeout: 3000});
 			});
 		}
 	},
 	render: function() {
-		this.$el.html(this.template({ 
+		this.$el.html(this.template({
 			settings: this.settings
 		}));
 	},
@@ -354,7 +354,7 @@ var InternetConnectionView = SettingsPage.extend({
 		var promise = $.Deferred();
 
 		$.ajax({
-			url: API_BASEURL + 'settings/network/active', 
+			url: API_BASEURL + 'settings/network/active',
 			type: 'POST',
 			contentType: 'application/json',
 			dataType: 'json',
@@ -364,12 +364,12 @@ var InternetConnectionView = SettingsPage.extend({
 				if (data.name) {
 					var connectionCb = null;
 
-					//Start Timeout 
+					//Start Timeout
 					var connectionTimeout = setTimeout(function(){
 						connectionCb.call(this, {status: 'failed', reason: 'timeout'});
 					}, 70000); //1 minute
 
-					connectionCb = function(connectionInfo){						
+					connectionCb = function(connectionInfo){
 						switch (connectionInfo.status) {
 							case 'disconnected':
 							case 'connecting':
@@ -378,7 +378,7 @@ var InternetConnectionView = SettingsPage.extend({
 
 							case 'connected':
 								app.eventManager.off('astrobox:InternetConnectingStatus', connectionCb, this);
-								noty({text: "Your "+PRODUCT_NAME+" is now connected to "+data.name+".", type: "success", timeout: 3000});
+								noty({text: gettext('your')+PRODUCT_NAME+gettext('isNowConnected')+data.name+".", type: "success", timeout: 3000});
 								this.settings.networks['wireless'] = data;
 								this.render();
 								promise.resolve();
@@ -388,9 +388,9 @@ var InternetConnectionView = SettingsPage.extend({
 							case 'failed':
 								app.eventManager.off('astrobox:InternetConnectingStatus', connectionCb, this);
 								if (connectionInfo.reason == 'no_secrets') {
-									message = "Invalid password for "+data.name+".";
+									message = gettext('invalidPasswordFor')+data.name+".";
 								} else {
-									message = "Unable to connect to "+data.name+".";
+									message = gettext('unableToConnectTo')+data.name+".";
 								}
 								promise.reject(message);
 								clearTimeout(connectionTimeout);
@@ -398,9 +398,9 @@ var InternetConnectionView = SettingsPage.extend({
 
 							default:
 								app.eventManager.off('astrobox:InternetConnectingStatus', connectionCb, this);
-								promise.reject("Unable to connect to "+data.name+".");
+								promise.reject(gettext('unableToConnectTo')+data.name+".");
 								clearTimeout(connectionTimeout);
-						} 
+						}
 					};
 
 					app.eventManager.on('astrobox:InternetConnectingStatus', connectionCb, this);
@@ -411,7 +411,7 @@ var InternetConnectionView = SettingsPage.extend({
 				}
 			}, this))
 			.fail(_.bind(function(){
-				noty({text: "There was an error saving setting.", timeout: 3000});
+				noty({text: gettext('errorSavingSettings'), timeout: 3000});
 				promise.reject();
 			}, this));
 
@@ -437,7 +437,7 @@ var InternetConnectionView = SettingsPage.extend({
 			}, this)
 		).
 		fail(function(){
-			noty({text: "There was an error retrieving networks.", timeout:3000});
+			noty({text: gettext('errorRetrievingNet'), timeout:3000});
 		}).
 		complete(function(){
 			el.removeClass('loading');
@@ -464,7 +464,7 @@ var WiFiNetworkPasswordDialog = Backbone.View.extend({
 		this.render(wifiInfo);
 		this.$el.foundation('reveal', 'open', {
 			close_on_background_click: false,
-			close_on_esc: false	
+			close_on_esc: false
 		});
 		this.$el.one('opened', _.bind(function() {
 			this.$el.find('.network-password-field').focus();
@@ -477,7 +477,7 @@ var WiFiNetworkPasswordDialog = Backbone.View.extend({
 		form.submit();
 	},
 	connect: function(e) {
-		e.preventDefault() 
+		e.preventDefault()
 		var form = $(e.currentTarget);
 
 		var id = form.find('.network-id-field').val();
@@ -521,7 +521,7 @@ var WiFiNetworksDialog = Backbone.View.extend({
 
 		this.networks = networks;
 
-		content.html(this.networksTemplate({ 
+		content.html(this.networksTemplate({
 			networks: this.networks
 		}));
 
@@ -533,7 +533,7 @@ var WiFiNetworksDialog = Backbone.View.extend({
 		e.preventDefault();
 
 		var button = $(e.target);
-	
+
 		if (!this.passwordDlg) {
 			this.passwordDlg = new WiFiNetworkPasswordDialog({parent: this.parent});
 		}
@@ -583,7 +583,7 @@ var WifiHotspotView = SettingsPage.extend({
 				this.render();
 			}, this))
 			.fail(function() {
-				noty({text: "There was an error getting WiFi Hotspot settings.", timeout: 3000});
+				noty({text: gettext('errorGettingHotspotSet'), timeout: 3000});
 			});
 		}
 	},
@@ -601,7 +601,7 @@ var WifiHotspotView = SettingsPage.extend({
 			url: API_BASEURL + "settings/network/hotspot",
 			type: "POST",
 			success: _.bind(function(data, code, xhr) {
-				noty({text: 'Your '+PRODUCT_NAME+' has created a hotspot. Connect to <b>'+this.settings.hotspot.name+'</b>.', type: 'success', timeout:3000});
+				noty({text: gettext('your')+PRODUCT_NAME+gettext('createdHotspot')+'<b>'+this.settings.hotspot.name+'</b>.', type: 'success', timeout:3000});
 				this.settings.hotspot.active = true;
 				this.render();
 			}, this),
@@ -622,7 +622,7 @@ var WifiHotspotView = SettingsPage.extend({
 			url: API_BASEURL + "settings/network/hotspot",
 			type: "DELETE",
 			success: _.bind(function(data, code, xhr) {
-				noty({text: 'The hotspot has been stopped', type: 'success', timeout:3000});
+				noty({text: gettext('hotspotStopped'), type: 'success', timeout:3000});
 				this.settings.hotspot.active = false;
 				this.render();
 			}, this),
@@ -652,7 +652,7 @@ var WifiHotspotView = SettingsPage.extend({
 				this.settings.hotspot.hotspotOnlyOffline = checked;
 			}, this))
 			.fail(function(){
-				noty({text: "There was an error saving hotspot option.", timeout: 3000});
+				noty({text: gettext('errorSavingHotspotOpt'), timeout: 3000});
 			});
 	}
 });
@@ -672,7 +672,7 @@ var SoftwareUpdateView = SettingsPage.extend({
 		var loadingBtn = this.$el.find('.loading-button.check');
 		loadingBtn.addClass('loading');
 		$.ajax({
-			url: API_BASEURL + 'settings/software/check', 
+			url: API_BASEURL + 'settings/software/check',
 			type: 'GET',
 			dataType: 'json',
 			success: _.bind(function(data) {
@@ -686,7 +686,7 @@ var SoftwareUpdateView = SettingsPage.extend({
 				if (xhr.status == 400) {
 					noty({text: xhr.responseText, timeout: 3000});
 				} else {
-					noty({text: "There was a problem checking for new software.", timeout: 3000});
+					noty({text: gettext('problemCheckingSoft'), timeout: 3000});
 				}
 			},
 			complete: function() {
@@ -726,7 +726,7 @@ var SoftwareUpdateDialog = Backbone.View.extend({
 		var loadingBtn = this.$el.find('.loading-button');
 		loadingBtn.addClass('loading');
 		$.ajax({
-			url: API_BASEURL + 'settings/software/update', 
+			url: API_BASEURL + 'settings/software/update',
 			type: 'POST',
 			dataType: 'json',
 			contentType: 'application/json',
@@ -741,7 +741,7 @@ var SoftwareUpdateDialog = Backbone.View.extend({
 				if (xhr.status == 400) {
 					noty({text: xhr.responseText, timeout: 3000});
 				} else {
-					noty({text: "There was a problem updating to the new version.", timeout: 3000});
+					noty({text: gettext('problemUpdatingVersion'), timeout: 3000});
 				}
 				loadingBtn.removeClass('loading');
 			}
@@ -781,16 +781,16 @@ var SoftwareAdvancedView = SettingsPage.extend({
 				this.render();
 			}, this))
 			.fail(function() {
-				noty({text: "There was an error getting software advanced settings.", timeout: 3000});
+				noty({text: gettext('errorGettingSoftSet'), timeout: 3000});
 			});
 		}
 	},
 	render: function()
 	{
-		this.$el.html(this.template({ 
+		this.$el.html(this.template({
 			data: this.settings,
 			size_format: app.utils.sizeFormat
-		}));		
+		}));
 	},
 	serialLogChanged: function(e)
 	{
@@ -814,7 +814,7 @@ var SoftwareAdvancedView = SettingsPage.extend({
 			}
 		})
 		.fail(function(){
-			noty({text: "There was an error changing serial logs.", timeout: 3000});
+			noty({text: gettext('errorChangingSerialLogs'), timeout: 3000});
 		});
 	}
 });
@@ -850,18 +850,18 @@ var SendLogDialog = Backbone.View.extend({
 
 		$.post(API_BASEURL + 'settings/software/logs', data)
 			.done(_.bind(function(){
-				noty({text: "Logs sent to AstroPrint!", type: 'success', timeout: 3000});
+				noty({text: gettext('logsSentAstro'), type: 'success', timeout: 3000});
 				this.$el.foundation('reveal', 'close');
 				this.$('input[name=ticket]').val('');
 				this.$('textarea[name=message]').val('');
 			},this))
 			.fail(function(){
-				noty({text: "There was a problem sending your logs.", timeout: 3000});
+				noty({text: gettext('problemSendingLogs'), timeout: 3000});
 			})
 			.always(function(){
 				button.removeClass('loading');
 			});
-	}	
+	}
 });
 
 var ClearLogsDialog = Backbone.View.extend({
@@ -869,7 +869,7 @@ var ClearLogsDialog = Backbone.View.extend({
 	events: {
 		'click button.secondary': 'doClose',
 		'click button.alert': 'doDelete',
-		'open.fndtn.reveal': 'onOpen'		
+		'open.fndtn.reveal': 'onOpen'
 	},
 	parent: null,
 	initialize: function(options)
@@ -884,7 +884,7 @@ var ClearLogsDialog = Backbone.View.extend({
 	{
 		this.$('.loading-button').addClass('loading');
 		$.ajax({
-			url: API_BASEURL + 'settings/software/logs', 
+			url: API_BASEURL + 'settings/software/logs',
 			type: 'DELETE',
 			contentType: 'application/json',
 			dataType: 'json',
@@ -894,7 +894,7 @@ var ClearLogsDialog = Backbone.View.extend({
 				this.doClose()
 			}, this),
 			error: function(){
-				noty({text: "There was a problem clearing your logs.", timeout: 3000});
+				noty({text: gettext('problemClearingLogs'), timeout: 3000});
 			},
 			complete: _.bind(function() {
 				this.$('.loading-button').removeClass('loading');
@@ -923,7 +923,7 @@ var ResetConfirmDialog = Backbone.View.extend({
 		if (this.$('input').val() == 'RESET') {
 			this.$('.loading-button').addClass('loading');
 			$.ajax({
-				url: API_BASEURL + 'settings/software/settings', 
+				url: API_BASEURL + 'settings/software/settings',
 				type: 'DELETE',
 				contentType: 'application/json',
 				dataType: 'json',
@@ -935,7 +935,7 @@ var ResetConfirmDialog = Backbone.View.extend({
 					this.$('.loading-button').removeClass('loading');
 				}, this)
 			})
-		} 
+		}
 	}
 });
 

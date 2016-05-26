@@ -7,14 +7,12 @@ $.ajaxSetup({
 });
 
 // Load Translation Catalog
-$(function() {
 	LOCALE = localeUser;
 	var catalog = window["BABEL_TO_LOAD_" + LOCALE];
 	if (catalog === undefined) {
 			catalog = {messages: undefined, plural_expr: undefined, locale: undefined, domain: undefined}
 	}
 	babel.Translations.load(catalog).install();
-});
 
 /******************/
 
@@ -92,7 +90,7 @@ LoginForm = Backbone.View.extend({
 			location.reload();
 		})
 		.fail(function(){
-			noty({text: "Invalid Password", timeout: 3000});
+			noty({text: gettext("invalidPassword"), timeout: 3000});
 			loadingBtn.removeClass('loading');
 		});
 

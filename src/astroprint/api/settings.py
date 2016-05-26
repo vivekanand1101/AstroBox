@@ -15,6 +15,11 @@ from astroprint.network.manager import networkManager
 from octoprint.server import restricted_access, admin_permission, softwareManager, UI_API_KEY
 from octoprint.server.api import api
 
+# Import Babel
+from flask.ext.babel import Babel, gettext
+from babel import Locale
+# end Babel
+
 @api.route("/settings/printer", methods=["GET", "POST"])
 def handlePrinterSettings():
 	s = settings()
@@ -65,7 +70,7 @@ def getWifiNetworks():
 	if networks:
 		return jsonify(networks = networks)
 	else:
-		return jsonify({'message': "Unable to get WiFi networks"})
+		return jsonify({'message': gettext('unableToGetWifi')})
 
 @api.route("/settings/network", methods=["GET"])
 @restricted_access
@@ -87,7 +92,7 @@ def setWifiNetwork():
 		if result:
 			return jsonify(result)
 		else:
-			return ("Network %s not found" % data['id'], 404)
+			return (gettext('netSNotFound') % data['id'], 404)
 
 	return ("Invalid Request", 400)
 
@@ -101,7 +106,7 @@ def handleWifiHotspot():
 			'hotspot': {
 				'active': nm.isHotspotActive(),
 				'name': nm.getHostname(),
-				'hotspotOnlyOffline': settings().getBoolean(['wifi', 'hotspotOnlyOffline'])	
+				'hotspotOnlyOffline': settings().getBoolean(['wifi', 'hotspotOnlyOffline'])
 			} if nm.isHotspotable() else False
 		})
 
@@ -141,7 +146,7 @@ def getAdvancedSoftwareSettings():
 
 	return jsonify(
 		apiKey= UI_API_KEY,
-		serialActivated= s.getBoolean(['serial', 'log']), 
+		serialActivated= s.getBoolean(['serial', 'log']),
 		sizeLogs= sum([os.path.getsize(os.path.join(logsDir, f)) for f in os.listdir(logsDir)])
 	)
 
@@ -204,7 +209,7 @@ def checkSoftwareVersion():
 		s.save()
 		return jsonify(softwareInfo);
 	else:
-		return ("There was an error checking for new software.", 400)
+		return (gettext('errorCheckingSoft'), 400)
 
 @api.route("/settings/software/update", methods=['POST'])
 @restricted_access
@@ -212,7 +217,7 @@ def updateSoftwareVersion():
 	if softwareManager.updateSoftwareVersion(request.get_json()):
 		return jsonify();
 	else:
-		return ("There was an error initiating update.", 400)
+		return (gettext('errorIniUpdate'), 400)
 
 @api.route("/settings/software/restart", methods=['POST'])
 @restricted_access
@@ -220,7 +225,7 @@ def restartServer():
 	if softwareManager.restartServer():
 		return jsonify();
 	else:
-		return ("There was an error trying to restart the server.", 400)
+		return (gettext('errorRestartServer'), 400)
 
 @api.route("/settings/software/logs", methods=['POST'])
 @restricted_access
@@ -228,7 +233,7 @@ def sendLogs():
 	if softwareManager.sendLogs(request.values.get('ticket', None), request.values.get('message', None)):
 		return jsonify();
 	else:
-		return ("There was an error trying to send your logs.", 500)
+		return (gettext('errorSendLogs'), 500)
 
 @api.route("/settings/software/logs/serial", methods=['PUT'])
 @restricted_access
@@ -243,7 +248,7 @@ def changeSerialLogs():
 		printerManager().setSerialDebugLogging(data['active'])
 
 		return jsonify();
-	
+
 	else:
 		return ("Wrong data sent in.", 400)
 
@@ -253,4 +258,4 @@ def clearLogs():
 	if softwareManager.clearLogs():
 		return jsonify();
 	else:
-		return ("There was an error trying to clear your logs.", 500)
+		return (gettext('errorClearLogs'), 500)

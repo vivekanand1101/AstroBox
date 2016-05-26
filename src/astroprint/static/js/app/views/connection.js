@@ -4,6 +4,17 @@
  *  Distributed under the GNU Affero General Public License http://www.gnu.org/licenses/agpl.html
  */
 
+ // Load Translation Catalog
+
+ 	LOCALE = localeUser;
+ 	var catalog = window["BABEL_TO_LOAD_" + LOCALE];
+ 	if (catalog === undefined) {
+ 			catalog = {messages: undefined, plural_expr: undefined, locale: undefined, domain: undefined}
+ 	}
+ 	babel.Translations.load(catalog).install();
+
+ /******************/
+
 var ConnectionView = Backbone.View.extend({
 	el: '#connection-view',
 	events: {
@@ -22,7 +33,7 @@ var ConnectionView = Backbone.View.extend({
 		this.socketData = opts.socket;
 		this.listenTo(this.socketData, "change:box_reachable", this.onReachableChanged);
 	},
-	connect: function(clicked) 
+	connect: function(clicked)
 	{
 		var self = this;
 
@@ -61,17 +72,17 @@ var ConnectionView = Backbone.View.extend({
 								self.setPrinterConnection('failed');
 								if (clicked) {
 									app.router.navigate('settings/printer-connection', {trigger: true, replace: true});
-									noty({text: 'Check Connection Settings.', type:"information", timeout: 3000});
+									noty({text: gettext('checkingConnectionSet'), type:"information", timeout: 3000});
 								}
 							}
 						});
 					} else {
 						if (clicked) {
 							app.router.navigate('settings/printer-connection', {trigger: true, replace: true});
-							noty({text: 'Check Connection Settings.', type:"information", timeout: 3000});
+							noty({text: gettext('checkingConnectionSet'), type:"information", timeout: 3000});
 						}
 					}
-					
+
 				} else if (response.current.state != 'Connecting') {
 					if (response.current.state == 'Printing' || response.current.state == 'Paused') {
 						app.showPrinting();
@@ -84,7 +95,7 @@ var ConnectionView = Backbone.View.extend({
 			}
 		});
 	},
-	disconnect: function() 
+	disconnect: function()
 	{
 		$.ajax({
 			url: API_BASEURL + "connection",
@@ -95,9 +106,9 @@ var ConnectionView = Backbone.View.extend({
 			success: function(response) {
 				self.$el.removeClass('connected');
 			}
-		});	
+		});
 	},
-	setServerConnection: function(className) 
+	setServerConnection: function(className)
 	{
 		var element = this.$el.find('i.server');
 		var titleText = '';
@@ -106,21 +117,21 @@ var ConnectionView = Backbone.View.extend({
 
 		switch(className) {
 			case 'blink-animation':
-				titleText = 'Connecting to <b>'+ASTROBOX_NAME+'</b>...';
+				titleText = gettext('connectingTo')+' <b>'+ASTROBOX_NAME+'</b>...';
 				break;
 
 			case 'connected':
-				titleText = 'Connected to <b>'+ASTROBOX_NAME+'</b>';
+				titleText = gettext('connectedTo')+' <b>'+ASTROBOX_NAME+'</b>';
 				break;
 
 			case 'failed':
-				titleText = '<b>'+ASTROBOX_NAME+'</b> is unreachable';
+				titleText = '<b>'+ASTROBOX_NAME+'</b> '+gettext('isUnreachable');
 				break;
 		}
 
 		element.data('title', titleText);
 	},
-	setPrinterConnection: function(className) 
+	setPrinterConnection: function(className)
 	{
 		var element = this.$el.find('i.printer');
 		var titleText = '';
@@ -129,21 +140,21 @@ var ConnectionView = Backbone.View.extend({
 
 		switch(className) {
 			case 'blink-animation':
-				titleText = 'Connecting to printer...';
+				titleText = gettext('connectingToPrinter');
 				break;
 
 			case 'connected':
-				titleText = 'Connected to printer';
+				titleText = gettext('connectedToPrinter');
 				break;
 
 			case 'failed':
-				titleText = 'The printer is not connected';
+				titleText = gettext('printerNotConnected');
 				break;
 		}
 
 		element.data('title', titleText);
 	},
-	setAstroprintConnection: function(className) 
+	setAstroprintConnection: function(className)
 	{
 		var element = this.$el.find('i.astroprint')
 		var titleText = '';
@@ -152,21 +163,21 @@ var ConnectionView = Backbone.View.extend({
 
 		switch(className) {
 			case 'blink-animation':
-				titleText = 'Connecting to the astroprint.com...';
+				titleText = gettext('connectingAstroPrintcom');
 				break;
 
 			case 'connected':
-				titleText = 'Connected to astroprint.com';
+				titleText = gettext('connectedAstroPrintcom');
 				break;
 
 			case 'failed':
-				titleText = 'Not connected to astroprint.com';
+				titleText = gettext('notConnectedAstroPrintcom');
 				break;
 		}
 
 		element.data('title', titleText);
 	},
-	printerTapped: function(e) 
+	printerTapped: function(e)
 	{
 		e.stopPropagation();
 
@@ -174,7 +185,7 @@ var ConnectionView = Backbone.View.extend({
 			this.connect(true);
 		}
 	},
-	serverTapped: function(e) 
+	serverTapped: function(e)
 	{
 		e.stopPropagation();
 
@@ -183,7 +194,7 @@ var ConnectionView = Backbone.View.extend({
 			this.connect();
 		}
 	},
-	astroprintTapped: function(e) 
+	astroprintTapped: function(e)
 	{
 		e.stopPropagation();
 
@@ -220,7 +231,7 @@ var ConnectionView = Backbone.View.extend({
 			break;
 		}
 	},
-	onMouseOver: function(e) 
+	onMouseOver: function(e)
 	{
 		if ($('html').hasClass('touch')) return;
 
@@ -247,7 +258,7 @@ var ConnectionView = Backbone.View.extend({
 
 		this.tooltip.find('.pip').css('border-color', 'transparent transparent '+target.css('color')+' transparent');
 	},
-	onMouseOut: function(e) 
+	onMouseOut: function(e)
 	{
 		this.tooltip.addClass('hide');
 		this.tooltip.find('.text').html('');

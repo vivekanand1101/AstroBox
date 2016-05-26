@@ -86,7 +86,7 @@ var OutputView = Backbone.View.extend({
   {
     switch(type) {
       case 's': // sent to printer
-        text = '<div class="sent bold'+(failed ? ' failed' : '')+'"><i class="icon-'+(failed ? 'attention' : 'angle-right')+'""></i>'+text+(failed ? ' <small>(failed to sent)</small>':'')+'</div>';
+        text = '<div class="sent bold'+(failed ? ' failed' : '')+'"><i class="icon-'+(failed ? 'attention' : 'angle-right')+'""></i>'+text+(failed ? ' <small>('+gettext('failedToSent')+')</small>':'')+'</div>';
       break;
 
       case 'r': // received from printer

@@ -16,6 +16,11 @@ from octoprint.server.api import api
 from astroprint.printer.manager import printerManager
 from astroprint.printfiles import FileDestinations
 
+# Import Babel
+from flask.ext.babel import Babel, gettext
+from babel import Locale
+# end Babel
+
 #~~ GCODE file handling
 
 
@@ -29,7 +34,7 @@ def readPrintFiles():
 @api.route("/files/<string:origin>", methods=["GET"])
 def readPrintFilesForOrigin(origin):
 	if origin not in [FileDestinations.LOCAL, FileDestinations.SDCARD]:
-		return make_response("Unknown origin: %s" % origin, 404)
+		return make_response(gettext('unknownOriginS') % origin, 404)
 
 	files = _getFileList(origin)
 
@@ -91,13 +96,13 @@ def uploadPrintFile(target):
 	printer = printerManager()
 
 	if not target in [FileDestinations.LOCAL, FileDestinations.SDCARD]:
-		return make_response("Unknown target: %s" % target, 404)
+		return make_response(gettext('unknownTargetS') % target, 404)
 
 	if not "file" in request.files.keys():
-		return make_response("No file included", 400)
+		return make_response(gettext('noFileIncluded'), 400)
 
 	if target == FileDestinations.SDCARD and not settings().getBoolean(["feature", "sdSupport"]):
-		return make_response("SD card support is disabled", 404)
+		return make_response(gettext('sdCardSupportDisabled'), 404)
 
 	file = request.files["file"]
 	sd = target == FileDestinations.SDCARD
@@ -107,9 +112,9 @@ def uploadPrintFile(target):
 	if sd:
 		# validate that all preconditions for SD upload are met before attempting it
 		if not (printer.isOperational() and not (printer.isPrinting() or printer.isPaused())):
-			return make_response("Can not upload to SD card, printer is either not operational or already busy", 409)
+			return make_response(gettext('canUploadPrinterBusy'), 409)
 		if not printer.isSdReady():
-			return make_response("Can not upload to SD card, not yet initialized", 409)
+			return make_response(gettext('canUploadNotInit'), 409)
 
 	# determine current job
 	currentFilename = None
@@ -124,11 +129,11 @@ def uploadPrintFile(target):
 	# determine future filename of file to be uploaded, abort if it can't be uploaded
 	futureFilename = printer.fileManager.getFutureFilename(file)
 	if futureFilename is None or (not settings().getBoolean(["cura", "enabled"]) and not printer.fileManager.isValidFilename(futureFilename)):
-		return make_response("Can not upload file %s, wrong format?" % file.filename, 415)
+		return make_response(gettext('canUploadWrongFormat') % file.filename, 415)
 
 	# prohibit overwriting currently selected file while it's being printed
 	if futureFilename == currentFilename and target == currentOrigin and printer.isPrinting() or printer.isPaused():
-		return make_response("Trying to overwrite file that is currently being printed: %s" % currentFilename, 409)
+		return make_response(gettext('overwriteFilePrinted') % currentFilename, 409)
 
 	def fileProcessingFinished(filename, absFilename, destination):
 		"""
@@ -157,7 +162,7 @@ def uploadPrintFile(target):
 
 	filename, done = printer.fileManager.addFile(file, target, fileProcessingFinished)
 	if filename is None:
-		return make_response("Could not upload the file %s" % file.filename, 500)
+		return make_response(gettext('couldntUpload') % file.filename, 500)
 
 	sdFilename = None
 	if isinstance(filename, tuple):
@@ -214,7 +219,7 @@ def printFileCommand(filename, target):
 		return make_response("Unknown target: %s" % target, 404)
 
 	if not _verifyFileExists(target, filename):
-		return make_response("File not found on '%s': %s" % (target, filename), 404)
+		return make_response(gettext("fileNotFound") % (target, filename), 404)
 
 	# valid file commands, dict mapping command name to mandatory parameters
 	valid_commands = {
@@ -242,7 +247,7 @@ def printFileCommand(filename, target):
 					time.sleep(1)
 
 				if not printer.isOperational():
-					return make_response("The printer is not responding, can't start printing", 409)
+					return make_response(gettext('printerNotResponding'), 409)
 
 			printAfterLoading = True
 
@@ -261,10 +266,10 @@ def printFileCommand(filename, target):
 @restricted_access
 def deletePrintFile(filename, target):
 	if not target in [FileDestinations.LOCAL, FileDestinations.SDCARD]:
-		return make_response("Unknown target: %s" % target, 404)
+		return make_response(gettext('unknownTargetS') % target, 404)
 
 	if not _verifyFileExists(target, filename):
-		return make_response("File not found on '%s': %s" % (target, filename), 404)
+		return make_response(gettext('fileNotFound') % (target, filename), 404)
 
 	sd = target == FileDestinations.SDCARD
 
@@ -279,7 +284,7 @@ def deletePrintFile(filename, target):
 
 	# prohibit deleting the file that is currently being printed
 	if currentFilename == filename and currentSd == sd and (printer.isPrinting() or printer.isPaused()):
-		make_response("Trying to delete file that is currently being printed: %s" % filename, 409)
+		make_response(gettext('tryingDeleteFilePrinted') % filename, 409)
 
 	# deselect the file if it's currently selected
 	if currentFilename is not None and filename == currentFilename:
@@ -292,4 +297,3 @@ def deletePrintFile(filename, target):
 		printer.fileManager.removeFile(filename)
 
 	return NO_CONTENT
-

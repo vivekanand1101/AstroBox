@@ -39,11 +39,11 @@ var FileUploadBase = Backbone.View.extend({
 		           	this.progress(2.0);
 		        	$(e.currentTarget).fileupload('send', data);
 		        } else {
-		        	this.failed('There was an error getting upload parameters (1).');
+		        	this.failed(gettext('errorGettingParam1'));
 		        	this.always();
 		        }
 		    }, this)).fail(_.bind(function(xhr){
-		    	this.failed('There was an error getting upload parameters (2).');
+		    	this.failed(gettext('errorGettingParam2'));
 		    	this.always();
 		    }, this));
 		} else {
@@ -63,10 +63,10 @@ var FileUploadBase = Backbone.View.extend({
         var uploadErrors = [];
         var acceptFileTypes = this.acceptFileTypes;
         if(data.originalFiles[0]['name'].length && !acceptFileTypes.test(data.originalFiles[0]['name'])) {
-            uploadErrors.push('Not a valid file');
+            uploadErrors.push(gettext('notValidFile'));
         }
         if(uploadErrors.length > 0) {
-        	this.failed("There was an error uploading: " + uploadErrors.join("<br/>"));
+        	this.failed(gettext('errorUploading') + uploadErrors.join("<br/>"));
         	this.always();
         	return false;
         } else {
@@ -96,7 +96,7 @@ var FileUploadBase = Backbone.View.extend({
 	},
 	onUploadFail: function(e, data)
 	{
-		this.failed("There was an error uploading your file: "+ data.errorThrown);
+		this.failed(gettext('errorUploadingFile')+ data.errorThrown);
 	},
 	onUploadAlways: function(e, data)
 	{
@@ -151,7 +151,7 @@ var FileUploadCombined = FileUploadBase.extend({
 
 			if (this.currentFileType == undefined) {
 				this.currentFileType = null;
-				this.failed('File Type ['+fileExt+'] not supported');
+				this.failed(gettext('fileType')+'['+fileExt+'] '+gettext('notSupported'));
 				return;
 			}
 
@@ -186,7 +186,7 @@ var FileUploadCombined = FileUploadBase.extend({
 
 	    	case 'print':
 	    		this.progress(100);
-	    		noty({text: "File uploaded successfully :)", type: 'success', timeout: 3000});
+	    		noty({text: gettext('fileUploadedSuccessfully'), type: 'success', timeout: 3000});
 					app.router.navigate('files', {trigger: true, replace:true});
 					app.router.filesView.refreshPrintFiles(true);
 					app.router.filesView.printFilesListView.storage_control_view.selectStorage('local');

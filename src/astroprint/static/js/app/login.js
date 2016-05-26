@@ -35,7 +35,7 @@ var LoginModal = Backbone.View.extend({
             },
             error: function(xhr) {
                 if (xhr.status == 503) {
-                    errorContainer.text('Your device is not connected to AstroPrint.com').show();
+                    errorContainer.text(gettext('deviceNotConnectedAstro')).show();
                 } else {
                     errorContainer.text(gettext('invalidEMail')).show();
                 }

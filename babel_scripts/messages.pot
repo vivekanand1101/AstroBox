@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-05-24 15:12+0200\n"
+"POT-Creation-Date: 2016-05-26 08:39+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +17,526 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
 
+#: ../src/astroprint/api/cloud.py:46 ../src/astroprint/api/setup.py:136
+#: ../src/astroprint/static/js/app/login.js:38
+msgid "deviceNotConnectedAstro"
+msgstr ""
+
+#: ../src/astroprint/api/cloud.py:161
+msgid "CouldnSaveFile"
+msgstr ""
+
+#: ../src/astroprint/api/connection.py:62
+msgid "invalidPortS"
+msgstr ""
+
+#: ../src/astroprint/api/connection.py:68
+msgid "invalidBaudrateS"
+msgstr ""
+
+#: ../src/astroprint/api/files.py:37
+msgid "unknownOriginS"
+msgstr ""
+
+#: ../src/astroprint/api/files.py:99 ../src/astroprint/api/files.py:269
+msgid "unknownTargetS"
+msgstr ""
+
+#: ../src/astroprint/api/files.py:102
+msgid "noFileIncluded"
+msgstr ""
+
+#: ../src/astroprint/api/files.py:105
+msgid "sdCardSupportDisabled"
+msgstr ""
+
+#: ../src/astroprint/api/files.py:115
+msgid "canUploadPrinterBusy"
+msgstr ""
+
+#: ../src/astroprint/api/files.py:117
+msgid "canUploadNotInit"
+msgstr ""
+
+#: ../src/astroprint/api/files.py:132
+msgid "canUploadWrongFormat"
+msgstr ""
+
+#: ../src/astroprint/api/files.py:136
+msgid "overwriteFilePrinted"
+msgstr ""
+
+#: ../src/astroprint/api/files.py:165
+msgid "couldntUpload"
+msgstr ""
+
+#: ../src/astroprint/api/files.py:222 ../src/astroprint/api/files.py:272
+msgid "fileNotFound"
+msgstr ""
+
+#: ../src/astroprint/api/files.py:250
+msgid "printerNotResponding"
+msgstr ""
+
+#: ../src/astroprint/api/files.py:287
+msgid "tryingDeleteFilePrinted"
+msgstr ""
+
+#: ../src/astroprint/api/printer.py:32 ../src/astroprint/api/printer.py:68
+#: ../src/astroprint/api/printer.py:144 ../src/astroprint/api/printer.py:185
+#: ../src/astroprint/api/printer.py:341
+msgid "printerNotOperational"
+msgstr ""
+
+#: ../src/astroprint/api/printer.py:86
+msgid "invalidToolS"
+msgstr ""
+
+#: ../src/astroprint/api/printer.py:88
+msgid "invalidToolSelectionS"
+msgstr ""
+
+#: ../src/astroprint/api/printer.py:100
+msgid "invalidSettingTemp"
+msgstr ""
+
+#: ../src/astroprint/api/printer.py:102 ../src/astroprint/api/printer.py:229
+msgid "notNumberSR"
+msgstr ""
+
+#: ../src/astroprint/api/printer.py:113
+msgid "printerCurrentlyPrinting"
+msgstr ""
+
+#: ../src/astroprint/api/printer.py:117
+msgid "notNumberExtAmountR"
+msgstr ""
+
+#: ../src/astroprint/api/printer.py:160
+msgid "notNumberR"
+msgstr ""
+
+#: ../src/astroprint/api/printer.py:210 ../src/astroprint/api/printer.py:301
+msgid "printerNotOperationalPrinting"
+msgstr ""
+
+#: ../src/astroprint/api/printer.py:242
+msgid "invalidAxisS"
+msgstr ""
+
+#: ../src/astroprint/api/printer.py:258 ../src/astroprint/api/printer.py:287
+msgid "sdSupportDisabled"
+msgstr ""
+
+#: ../src/astroprint/api/printer.py:263
+msgid "printerNotOperationalBusy"
+msgstr ""
+
+#: ../src/astroprint/api/printer.py:304
+msgid "expectedJSON"
+msgstr ""
+
+#: ../src/astroprint/api/printer.py:368 ../src/astroprint/api/printer.py:382
+#: ../src/astroprint/api/printer.py:398
+msgid "driverNotSupportTerminal"
+msgstr ""
+
+#: ../src/astroprint/api/printer.py:401
+msgid "noPrinterConnected"
+msgstr ""
+
+#: ../src/astroprint/api/printer.py:410
+msgid "commandMissing"
+msgstr ""
+
+#: ../src/astroprint/api/settings.py:73 ../src/astroprint/api/setup.py:77
+msgid "unableToGetWifi"
+msgstr ""
+
+#: ../src/astroprint/api/settings.py:95
+msgid "netSNotFound"
+msgstr ""
+
+#: ../src/astroprint/api/settings.py:212
+msgid "errorCheckingSoft"
+msgstr ""
+
+#: ../src/astroprint/api/settings.py:220
+msgid "errorIniUpdate"
+msgstr ""
+
+#: ../src/astroprint/api/settings.py:228
+msgid "errorRestartServer"
+msgstr ""
+
+#: ../src/astroprint/api/settings.py:236
+msgid "errorSendLogs"
+msgstr ""
+
+#: ../src/astroprint/api/settings.py:261
+msgid "errorClearLogs"
+msgstr ""
+
+#: ../src/astroprint/api/setup.py:40
+msgid "astroAlreadySetup"
+msgstr ""
+
+#: ../src/astroprint/api/setup.py:54
+msgid "invalidName"
+msgstr ""
+
+#: ../src/astroprint/api/setup.py:60
+msgid "errorSavingHost"
+msgstr ""
+
+#: ../src/astroprint/api/setup.py:89
+msgid "networkSNotFound"
+msgstr ""
+
+#: ../src/astroprint/api/setup.py:138
+msgid "invalidCredentials"
+msgstr ""
+
+#: ../src/astroprint/api/setup.py:156
+msgid "connectionOptionsNotAvaiable"
+msgstr ""
+
+#: ../src/astroprint/api/setup.py:182 ../src/astroprint/api/setup.py:199
+msgid "invalidConnecionSet"
+msgstr ""
+
 #: ../src/astroprint/static/js/app/login.js:40
 msgid "invalidEMail"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/utils.js:19
+msgid "Jan"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/utils.js:19
+msgid "Feb"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/utils.js:19
+msgid "Mar"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/utils.js:19
+msgid "Apr"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/utils.js:19
+msgid "May"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/utils.js:19
+msgid "Jun"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/utils.js:19
+msgid "Jul"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/utils.js:19
+msgid "Aug"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/utils.js:19
+msgid "Sep"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/utils.js:19
+msgid "Oct"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/utils.js:19
+msgid "Nov"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/utils.js:19
+msgid "Dec"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/connection.js:75
+#: ../src/astroprint/static/js/app/views/connection.js:82
+msgid "checkingConnectionSet"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/connection.js:120
+msgid "connectingTo"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/connection.js:124
+#: ../src/astroprint/templates/settings.jinja2:277
+msgid "connectedTo"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/connection.js:128
+msgid "isUnreachable"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/connection.js:143
+msgid "connectingToPrinter"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/connection.js:147
+msgid "connectedToPrinter"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/connection.js:151
+msgid "printerNotConnected"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/connection.js:166
+msgid "connectingAstroPrintcom"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/connection.js:170
+msgid "connectedAstroPrintcom"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/connection.js:174
+msgid "notConnectedAstroPrintcom"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/files.js:106
+msgid "uploading"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/files.js:209
+#: ../src/astroprint/static/js/app/views/files.js:466
+msgid "couldntDownloadPrintFile"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/files.js:221
+msgid "unableToCancelDownload"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/files.js:252
+msgid "errorStartingPrint"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/files.js:354
+msgid "nothingHereYet"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/files.js:393
+msgid "errorRetrievingDesign"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/printing.js:216
+msgid "errorAdjustingPrintCapture"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/printing.js:292
+msgid "resumePrint"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/printing.js:295
+#: ../src/astroprint/templates/printing.jinja2:92
+msgid "pausePrint"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/printing.js:416
+msgid "errorCancelingJob"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/reboot.js:46
+msgid "errorStartReboot"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:54
+msgid "errorGettingSerial"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:103
+msgid "errorTestingConnection"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:186
+#: ../src/astroprint/static/js/app/views/settings.js:275
+msgid "pleaseCheckErrors"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:215
+msgid "profileChangesSaved"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:250
+msgid "errorGettingNetName"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:302
+msgid "netNameChanged"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:309
+msgid "failedToSaveNetName"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:344
+msgid "errorGettingWifiSet"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:381
+#: ../src/astroprint/static/js/app/views/settings.js:604
+#: ../src/astroprint/static/js/setup/setup.js:293
+#: ../src/astroprint/templates/setup.jinja2:67
+msgid "your"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:381
+#: ../src/astroprint/static/js/setup/setup.js:293
+msgid "isNowConnected"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:391
+msgid "invalidPasswordFor"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:393
+#: ../src/astroprint/static/js/app/views/settings.js:401
+msgid "unableToConnectTo"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:414
+#: ../src/astroprint/static/js/setup/setup.js:649
+msgid "errorSavingSettings"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:440
+msgid "errorRetrievingNet"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:586
+msgid "errorGettingHotspotSet"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:604
+msgid "createdHotspot"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:625
+msgid "hotspotStopped"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:655
+msgid "errorSavingHotspotOpt"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:689
+msgid "problemCheckingSoft"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:744
+msgid "problemUpdatingVersion"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:784
+msgid "errorGettingSoftSet"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:817
+msgid "errorChangingSerialLogs"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:853
+msgid "logsSentAstro"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:859
+msgid "problemSendingLogs"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/settings.js:897
+msgid "problemClearingLogs"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/terminal.js:89
+msgid "failedToSent"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/views/turnoff.js:47
+msgid "errorStartingOff"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/widgets/uploader.js:42
+msgid "errorGettingParam1"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/widgets/uploader.js:46
+msgid "errorGettingParam2"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/widgets/uploader.js:66
+msgid "notValidFile"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/widgets/uploader.js:69
+msgid "errorUploading"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/widgets/uploader.js:99
+msgid "errorUploadingFile"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/widgets/uploader.js:154
+msgid "fileType"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/widgets/uploader.js:154
+msgid "notSupported"
+msgstr ""
+
+#: ../src/astroprint/static/js/app/widgets/uploader.js:189
+msgid "fileUploadedSuccessfully"
+msgstr ""
+
+#: ../src/astroprint/static/js/locked/locked.js:93
+msgid "invalidPassword"
+msgstr ""
+
+#: ../src/astroprint/static/js/setup/setup.js:138
+msgid "errorSavingName"
+msgstr ""
+
+#: ../src/astroprint/static/js/setup/setup.js:259
+msgid "errorSavingHotspot"
+msgstr ""
+
+#: ../src/astroprint/static/js/setup/setup.js:304
+msgid "invalidPass"
+msgstr ""
+
+#: ../src/astroprint/static/js/setup/setup.js:306
+#: ../src/astroprint/static/js/setup/setup.js:315
+msgid "unableConnect"
+msgstr ""
+
+#: ../src/astroprint/static/js/setup/setup.js:331
+msgid "errorConnecting"
+msgstr ""
+
+#: ../src/astroprint/static/js/setup/setup.js:443
+msgid "errorLoggingIn"
+msgstr ""
+
+#: ../src/astroprint/static/js/setup/setup.js:464
+msgid "errorLoggingOut"
+msgstr ""
+
+#: ../src/astroprint/static/js/setup/setup.js:516
+#: ../src/astroprint/static/js/setup/setup.js:527
+msgid "errorConnectingPrinter"
+msgstr ""
+
+#: ../src/astroprint/static/js/setup/setup.js:550
+#: ../src/astroprint/static/js/setup/setup.js:558
+msgid "errorReadingPrinterConnection"
+msgstr ""
+
+#: ../src/astroprint/static/js/setup/setup.js:601
+msgid "errorSavingPrinterConnection"
 msgstr ""
 
 #: ../src/astroprint/templates/app.jinja2:42
@@ -103,7 +621,8 @@ msgid "off"
 msgstr ""
 
 #: ../src/astroprint/templates/control.jinja2:130
-msgid "currenTemp"
+#: ../src/astroprint/templates/printing.jinja2:67
+msgid "currentTemp"
 msgstr ""
 
 #: ../src/astroprint/templates/control.jinja2:132
@@ -283,16 +802,8 @@ msgstr ""
 msgid "heatingUp"
 msgstr ""
 
-#: ../src/astroprint/templates/printing.jinja2:67
-msgid "currentTemp"
-msgstr ""
-
 #: ../src/astroprint/templates/printing.jinja2:84
 msgid "printerTemperature"
-msgstr ""
-
-#: ../src/astroprint/templates/printing.jinja2:92
-msgid "pausePrint"
 msgstr ""
 
 #: ../src/astroprint/templates/printing.jinja2:93
@@ -402,6 +913,7 @@ msgid "software"
 msgstr ""
 
 #: ../src/astroprint/templates/settings.jinja2:19
+#: ../src/astroprint/templates/settings.jinja2:384
 msgid "update"
 msgstr ""
 
@@ -528,15 +1040,18 @@ msgid "wepSecDepre"
 msgstr ""
 
 #: ../src/astroprint/templates/settings.jinja2:215
+#: ../src/astroprint/templates/setup.jinja2:125
 msgid "the"
 msgstr ""
 
 #: ../src/astroprint/templates/settings.jinja2:215
-msgid "wepSecDepreDesc1-2"
+#: ../src/astroprint/templates/setup.jinja2:125
+msgid "wepSecDepreDesc1-3"
 msgstr ""
 
 #: ../src/astroprint/templates/settings.jinja2:218
-msgid "wepSecDepreDesc2-2"
+#: ../src/astroprint/templates/setup.jinja2:128
+msgid "wepSecDepreDesc2-3"
 msgstr ""
 
 #: ../src/astroprint/templates/settings.jinja2:218
@@ -588,20 +1103,21 @@ msgid "connected"
 msgstr ""
 
 #: ../src/astroprint/templates/settings.jinja2:258
-msgid "ipAdress"
+#: ../src/astroprint/templates/settings.jinja2:264
+#: ../src/astroprint/templates/settings.jinja2:278
+msgid "ipAddress"
 msgstr ""
 
 #: ../src/astroprint/templates/settings.jinja2:262
 msgid "manuallyConfigured"
 msgstr ""
 
-#: ../src/astroprint/templates/settings.jinja2:264
-#: ../src/astroprint/templates/settings.jinja2:278
-msgid "ipAddress"
-msgstr ""
-
 #: ../src/astroprint/templates/settings.jinja2:268
 msgid "wirelessConnection"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:280
+msgid "notConnected"
 msgstr ""
 
 #: ../src/astroprint/templates/settings.jinja2:283
@@ -664,6 +1180,10 @@ msgstr ""
 #: ../src/astroprint/templates/settings.jinja2:375
 #: ../src/astroprint/templates/unreachable.jinja2:13
 msgid "checking"
+msgstr ""
+
+#: ../src/astroprint/templates/settings.jinja2:384
+msgid "noUpdates"
 msgstr ""
 
 #: ../src/astroprint/templates/settings.jinja2:384
@@ -839,10 +1359,6 @@ msgid "success"
 msgstr ""
 
 #: ../src/astroprint/templates/setup.jinja2:67
-msgid "your"
-msgstr ""
-
-#: ../src/astroprint/templates/setup.jinja2:67
 msgid "isConnectedTo"
 msgstr ""
 
@@ -884,14 +1400,6 @@ msgstr ""
 
 #: ../src/astroprint/templates/setup.jinja2:115
 msgid "whenNearIt"
-msgstr ""
-
-#: ../src/astroprint/templates/setup.jinja2:125
-msgid "wepSecDepreDesc1-3"
-msgstr ""
-
-#: ../src/astroprint/templates/setup.jinja2:128
-msgid "wepSecDepreDesc2-3"
 msgstr ""
 
 #: ../src/astroprint/templates/setup.jinja2:183
