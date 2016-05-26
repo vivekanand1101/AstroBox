@@ -82,8 +82,10 @@
 			'message': "{{ lastMessage or '' }}"
 		}
 	</script>
+	<script type="text/javascript" src="/static/js/lib/babel.js"></script>
+	<script type="text/javascript" src="/i18n/updating.js"></script>
 	{% assets filters="closure_js", output="js/gen/updating.js",
-		"js/lib/jquery.js","js/lib/babel.js", "js/lib/underscore.js", "js/lib/backbone.js", "js/lib/sockjs.js", "js/lib/fastclick.js", "js/updating/updating.js" -%}
+		"js/lib/jquery.js", "js/lib/underscore.js", "js/lib/backbone.js", "js/lib/sockjs.js", "js/lib/fastclick.js", "js/updating/updating.js" -%}
 			<script type="text/javascript" src="{{ ASSET_URL }}"></script>
 	{%- endassets %}
 	<script type="text/javascript">

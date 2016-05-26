@@ -4,17 +4,6 @@
  *  Distributed under the GNU Affero General Public License http://www.gnu.org/licenses/agpl.html
  */
 
- // Load Translation Catalog
-
- 	LOCALE = localeUser;
- 	var catalog = window["BABEL_TO_LOAD_" + LOCALE];
- 	if (catalog === undefined) {
- 			catalog = {messages: undefined, plural_expr: undefined, locale: undefined, domain: undefined}
- 	}
- 	babel.Translations.load(catalog).install();
-
- /******************/
-
 var ConnectionView = Backbone.View.extend({
 	el: '#connection-view',
 	events: {

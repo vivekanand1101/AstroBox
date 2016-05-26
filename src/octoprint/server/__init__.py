@@ -78,13 +78,18 @@ VERSION = None
 babel = Babel(app)
 @babel.localeselector
 def get_locale():
-	langBrowser = str(request.accept_languages).split("-")[0]
-	langsSupported = ['en','es']
-	if langBrowser in langsSupported:
-		return langBrowser
-	else :
-		return 'en'
+	s = settings()
+	languageUser = s.get(["language"])
 
+	if not languageUser:
+		langBrowser = str(request.accept_languages).split("-")[0]
+		langsSupported = ['en','es']
+		if langBrowser in langsSupported:
+			languageUser = langBrowser
+			s.set(["language"], languageUser)
+			s.save()
+
+	return languageUser or "en"
 
 @app.route('/astrobox/identify', methods=['GET'])
 def box_identify():
@@ -372,14 +377,14 @@ def localeJs(domain):
 	plural_expr = None
 	# delete this if use real domain names
 	domain = 'messages'
+	s = settings()
+	languageUser = s.get(["language"])
 
-	#if get_locale() != "en":
-	#	print 'Read get_locale is not en'
-	messages, plural_expr = _get_translations(get_locale(), domain)
+	messages, plural_expr = _get_translations(languageUser, domain)
 
 	catalog = dict(
 		messages=messages,
-		locale=get_locale()
+		locale=languageUser
 		)
 
 	from flask import Response

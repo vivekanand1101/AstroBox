@@ -173,7 +173,8 @@ default_settings = {
 		"variantFile": None,
 		"useUnreleased": False,
 		"lastCheck": None
-	}
+	},
+	"language": None
 }
 
 valid_boolean_trues = [True, "true", "yes", "y", "1"]

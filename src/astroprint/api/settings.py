@@ -138,6 +138,12 @@ def handleWifiHotspot():
 		else:
 			return (result, 500)
 
+@api.route("/settings/software/general", methods=["GET"])
+def getGeneralSoftwareSettings():
+	s = settings()
+	return jsonify(
+		language= s.get(['language'])
+	)
 @api.route("/settings/software/advanced", methods=["GET"])
 @restricted_access
 def getAdvancedSoftwareSettings():
@@ -147,7 +153,8 @@ def getAdvancedSoftwareSettings():
 	return jsonify(
 		apiKey= UI_API_KEY,
 		serialActivated= s.getBoolean(['serial', 'log']),
-		sizeLogs= sum([os.path.getsize(os.path.join(logsDir, f)) for f in os.listdir(logsDir)])
+		sizeLogs= sum([os.path.getsize(os.path.join(logsDir, f)) for f in os.listdir(logsDir)]),
+		language= s.get(['language'])
 	)
 
 @api.route("/settings/software/settings", methods=["DELETE"])
@@ -234,6 +241,18 @@ def sendLogs():
 		return jsonify();
 	else:
 		return (gettext('errorSendLogs'), 500)
+
+@api.route("/settings/software/language", methods=['PUT'])
+def changeLanguage():
+	data = request.json
+
+	if data and 'lang' in data:
+		s = settings()
+		s.set(['language'], data['lang'])
+		s.save()
+		return jsonify();
+	else:
+		return ("Wrong data sent in.", 400)
 
 @api.route("/settings/software/logs/serial", methods=['PUT'])
 @restricted_access
