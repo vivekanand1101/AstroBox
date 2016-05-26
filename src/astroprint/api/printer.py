@@ -301,7 +301,7 @@ def printerCommand():
 		return make_response(gettext('printerNotOperationalPrinting'), 409)
 
 	if not "application/json" in request.headers["Content-Type"]:
-		return make_response(gettext('expectedJSON') 400)
+		return make_response(gettext('expectedJSON'), 400)
 
 	data = request.json
 
