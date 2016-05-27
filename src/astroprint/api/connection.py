@@ -19,7 +19,6 @@ from babel import Locale
 # end Babel
 
 
-
 @api.route("/connection", methods=["GET"])
 def connectionState():
 	pm = printerManager()

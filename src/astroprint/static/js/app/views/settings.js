@@ -218,7 +218,7 @@ var PrinterProfileView = SettingsPage.extend({
 				this.parent.subviews['printer-connection'].settings = null;
 			}, this),
 			error: function() {
-				noty({text: "Failed to save printer profile change", timeout: 3000});
+				noty({text: "Failed to save printer profile changes", timeout: 3000});
 				loadingBtn.removeClass('loading');
 			}
 		});
@@ -311,6 +311,190 @@ var NetworkNameView = SettingsPage.extend({
 			.always(function(){
 				loadingBtn.removeClass('loading');
 			});
+	}
+});
+
+/*************************
+* Camera - Image/Video
+**************************/
+
+var CameraVideoStreamView = SettingsPage.extend({
+	el: '#video-stream',
+	template: _.template( $("#video-stream-settings-page-template").html() ),
+	settings: null,
+	settingsSizeDefault: '640x480',
+	cameraName: 'No camera plugged',
+	events: {
+		"invalid.fndtn.abide form": 'invalidForm',
+		"valid.fndtn.abide form": 'validForm',
+		"click #buttonRefresh": "refreshPluggedCamera"
+	},
+	show: function() {
+
+		var form = this.$('form');
+		var loadingBtn = form.find('.loading-button');
+
+		//Call Super
+		SettingsPage.prototype.show.apply(this);
+		if (!this.settings) {
+
+			$.getJSON(API_BASEURL + 'camera/connected')
+			.done(_.bind(function(response){
+
+				if(response.isCameraConnected){
+
+					this.cameraName = response.cameraName;
+
+					$.getJSON(API_BASEURL + 'settings/camera', null, _.bind(function(data) {
+						this.settings = data;
+
+						$.getJSON(API_BASEURL + 'camera/has-properties')
+						.done(_.bind(function(response){
+							if(response.hasCameraProperties){
+
+								$.getJSON(API_BASEURL + 'camera/is-resolution-supported',{ size: data.size })
+								.done(_.bind(function(response){
+									if(response.isResolutionSupported){
+										this.videoSettingsError = null;
+										this.render();
+									} else {
+										//setting default settings
+										this.settings.size = this.settingsSizeDefault;
+										//saving new settings <- default settings
+										$.ajax({
+											url: API_BASEURL + 'settings/camera',
+											type: 'POST',
+											contentType: 'application/json',
+											dataType: 'json',
+											data: JSON.stringify(this.settings)
+										});
+										noty({text: "Lowering your camera input resolution", type: 'warning', timeout: 3000});
+										this.videoSettingsError = null;
+										this.render();
+									}
+
+								},this))
+								.fail(function() {
+									noty({text: "There was an error reading your camera settings.", timeout: 3000});
+								})
+								.always(_.bind(function(){
+									loadingBtn.removeClass('loading');
+								},this));
+							} else {
+								this.videoSettingsError = 'Unable to communicate with your camera. Please, re-connect the camera and try again...';
+								this.render();
+							}
+						},this))
+						.fail(_.bind(function(){
+							this.videoSettingsError = 'Unable to communicate with your camera. Please, re-connect the camera and try again...';
+							this.render();
+						},this))
+					}, this))
+					.fail(function() {
+						noty({text: "There was an error getting Camera settings.", timeout: 3000});
+					});
+				} else {
+					this.videoSettingsError = null;
+					this.cameraName = null;
+					this.render();
+				}
+			},this));
+		} else {
+			this.render();
+		}
+	},
+	refreshPluggedCamera: function(){
+		this.$('#buttonRefresh').addClass('loading');
+
+		$.post(API_BASEURL + 'camera/refresh-plugged')
+		.done(_.bind(function(response){
+
+			if(response.isCameraPlugged){
+				this.settings = null;
+				this.cameraName = '';
+				this.show();
+			} else {
+				this.cameraName = false;
+				this.render();
+			}
+
+			this.$('#buttonRefresh').removeClass('loading');
+		},this));
+	},
+	render: function() {
+		this.$el.html(this.template({
+			settings: this.settings
+		}));
+
+		this.$el.foundation();
+
+		this.delegateEvents(this.events);
+	},
+	invalidForm: function(e)
+	{
+	    if (e.namespace !== 'abide.fndtn') {
+	        return;
+	    }
+
+		noty({text: "Please check your errors", timeout: 3000});
+	},
+	validForm: function(e) {
+	    if (e.namespace !== 'abide.fndtn') {
+	        return;
+	    }
+
+	    var form = this.$('form');
+	    var loadingBtn = form.find('.loading-button');
+		var attrs = {};
+
+		loadingBtn.addClass('loading');
+
+		form.find('input, select, textarea').each(function(idx, elem) {
+			var value = null;
+			var elem = $(elem);
+
+			if (elem.is('input[type="radio"], input[type="checkbox"]')) {
+				value = elem.is(':checked');
+			} else {
+				value = elem.val();
+			}
+
+			attrs[elem.attr('name')] = value;
+		});
+
+		$.getJSON(API_BASEURL + 'camera/is-resolution-supported',{ size: attrs.size })
+		.done(_.bind(function(response){
+			if(response.isResolutionSupported){
+				$.ajax({
+					url: API_BASEURL + 'settings/camera',
+					type: 'POST',
+					contentType: 'application/json',
+					dataType: 'json',
+					data: JSON.stringify(attrs)
+				})
+				.done(_.bind(function(data){
+					this.settings = data;
+					noty({text: "Camera changes saved", timeout: 3000, type:"success"});
+					//Make sure we reload next time we load this tab
+					this.render();
+					this.parent.subviews['video-stream'].settings = null;
+				},this))
+				.fail(function(){
+					noty({text: "There was a problem saving camera settings", timeout: 3000});
+				})
+				.always(_.bind(function(){
+					loadingBtn.removeClass('loading');
+				},this));
+			} else {
+				noty({text: "The resolution is not supported by your camera", timeout: 3000});
+			}
+		},this))
+		.fail(function(){
+			noty({text: "There was a problem saving camera settings", timeout: 3000});
+		})
+		.always(_.bind(function(){
+			loadingBtn.removeClass('loading');
+		},this));
 	}
 });
 
@@ -1026,6 +1210,7 @@ var SettingsView = Backbone.View.extend({
 			'printer-profile': new PrinterProfileView({parent: this}),
 			'network-name': new NetworkNameView({parent: this}),
 			'internet-connection': new InternetConnectionView({parent: this}),
+			'video-stream': new CameraVideoStreamView({parent: this}),
 			'wifi-hotspot': new WifiHotspotView({parent: this}),
 			'software-general': new SoftwareGeneralView({parent: this}),
 			'software-update': new SoftwareUpdateView({parent: this}),

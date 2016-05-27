@@ -68,6 +68,7 @@ from astroprint.software import softwareManager as swManager
 from astroprint.boxrouter import boxrouterManager
 from astroprint.network.manager import networkManager
 from astroprint.camera import cameraManager
+from astroprint.webrtc import webRtcManager
 from astroprint.printerprofile import printerProfileManager
 from astroprint.variant import variantManager
 from astroprint.discovery import DiscoveryManager
@@ -161,6 +162,7 @@ def index():
 		pm = printerManager()
 		nm = networkManager()
 		swm = swManager()
+		cm = cameraManager()
 
 		paused = pm.isPaused()
 		printing = pm.isPrinting()
@@ -174,14 +176,15 @@ def index():
 			printing= printing,
 			paused= paused,
 			online= online,
-			print_capture= cameraManager().timelapseInfo if printing or paused else None,
+			print_capture= cm.timelapseInfo if printing or paused else None,
 			printer_profile= printerProfileManager().data,
 			uiApiKey= UI_API_KEY,
 			astroboxName= nm.getHostname(),
 			variantData= variantManager().data,
 			checkSoftware= swm.shouldCheckForNew,
 			serialLogActive= s.getBoolean(['serial', 'log']),
-			locale= get_locale()
+			locale= get_locale(),
+			cameraManager= cm.name
 		)
 
 @app.route("/discovery.xml")
@@ -695,6 +698,7 @@ class Server():
 		discoveryManager = None
 		boxrouterManager().shutdown()
 		cameraManager().shutdown()
+		webRtcManager().shutdown()
 
 		from astroprint.network.manager import networkManagerShutdown
 		networkManagerShutdown()

@@ -11,6 +11,7 @@ from flask import request, abort, jsonify, make_response
 from octoprint.settings import settings
 from astroprint.printer.manager import printerManager
 from astroprint.network.manager import networkManager
+from astroprint.camera import cameraManager
 
 from octoprint.server import restricted_access, admin_permission, softwareManager, UI_API_KEY
 from octoprint.server.api import api
@@ -21,6 +22,7 @@ from babel import Locale
 # end Babel
 
 @api.route("/settings/printer", methods=["GET", "POST"])
+@restricted_access
 def handlePrinterSettings():
 	s = settings()
 	pm = printerManager()
@@ -139,11 +141,65 @@ def handleWifiHotspot():
 			return (result, 500)
 
 @api.route("/settings/software/general", methods=["GET"])
+@restricted_access
 def getGeneralSoftwareSettings():
 	s = settings()
 	return jsonify(
 		language= s.get(['language'])
 	)
+
+@api.route("/settings/software/language", methods=['PUT'])
+@restricted_access
+def changeLanguage():
+	data = request.json
+
+	if data and 'lang' in data:
+		s = settings()
+		s.set(['language'], data['lang'])
+		s.save()
+		return jsonify();
+	else:
+		return ("Wrong data sent in.", 400)
+
+@api.route("/settings/camera", methods=["GET", "POST"])
+@restricted_access
+def cameraSettings():
+	s = settings()
+	cm = cameraManager()
+
+	if request.method == 'POST':
+		if "application/json" in request.headers["Content-Type"]:
+			data = request.json
+
+			if "size" in data:
+				s.set(['camera', 'size'], data['size'])
+
+			if "encoding" in data:
+				s.set(['camera', 'encoding'], data['encoding'])
+
+			if "framerate" in data:
+				s.set(['camera', 'framerate'], data['framerate'])
+
+			if "format" in data:
+				s.set(['camera', 'format'], data['format'])
+			
+			s.save()
+
+			cm.settingsChanged({
+				'size': s.get(['camera', 'size']),
+				'encoding': s.get(['camera', 'encoding']),
+				'framerate': s.get(['camera', 'framerate']),
+				'format': s.get(['camera', 'format'])
+			})
+
+	return jsonify(
+		encoding= s.get(['camera', 'encoding']), 
+		size= s.get(['camera', 'size']),
+		framerate= s.get(['camera', 'framerate']),
+		format= s.get(['camera','format']),
+		structure= cm.settingsStructure()
+	)	
+
 @api.route("/settings/software/advanced", methods=["GET"])
 @restricted_access
 def getAdvancedSoftwareSettings():
@@ -241,18 +297,6 @@ def sendLogs():
 		return jsonify();
 	else:
 		return (gettext('errorSendLogs'), 500)
-
-@api.route("/settings/software/language", methods=['PUT'])
-def changeLanguage():
-	data = request.json
-
-	if data and 'lang' in data:
-		s = settings()
-		s.set(['language'], data['lang'])
-		s.save()
-		return jsonify();
-	else:
-		return ("Wrong data sent in.", 400)
 
 @api.route("/settings/software/logs/serial", methods=['PUT'])
 @restricted_access

@@ -52,7 +52,7 @@ var StepView = Backbone.View.extend({
 	{
 		this.$el.find('form').submit();
 		return false;
-	},
+	}
 });
 
 /**************
