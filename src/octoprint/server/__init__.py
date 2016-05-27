@@ -80,16 +80,17 @@ babel = Babel(app)
 def get_locale():
 	s = settings()
 	languageUser = s.get(["language"])
+	langDefault =  s.get(["babel","langDefault"])
+	langsSupported =  s.get(["babel","langsSupported"])
 
 	if not languageUser:
 		langBrowser = str(request.accept_languages).split("-")[0]
-		langsSupported = ['en','es']
 		if langBrowser in langsSupported:
 			languageUser = langBrowser
 			s.set(["language"], languageUser)
 			s.save()
 
-	return languageUser or "en"
+	return languageUser or langDefault
 
 @app.route('/astrobox/identify', methods=['GET'])
 def box_identify():
@@ -378,7 +379,7 @@ def localeJs(domain):
 	# delete this if use real domain names
 	domain = 'messages'
 	s = settings()
-	languageUser = s.get(["language"])
+	languageUser = get_locale()
 
 	messages, plural_expr = _get_translations(languageUser, domain)
 

@@ -174,7 +174,11 @@ default_settings = {
 		"useUnreleased": False,
 		"lastCheck": None
 	},
-	"language": None
+	"language": None,
+	"babel": {
+		"langDefault": 'en',
+		"langsSupported": ["en","es"]
+	}
 }
 
 valid_boolean_trues = [True, "true", "yes", "y", "1"]
