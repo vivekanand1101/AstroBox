@@ -6,7 +6,7 @@ var CameraView = CameraViewBase.extend({
 	   'hide':'onHide',
      'show':'onShow',
      'click .buttons .columns button': 'onCameraBtnClicked',
-     "change input[name='camera-mode']": 'cameraModeChanged'
+     "change #camera-mode-camera": 'cameraModeChanged'
   },
   manageVideoStreamingEvent: function(value)
   {
@@ -18,12 +18,12 @@ var CameraView = CameraViewBase.extend({
   {
     e.preventDefault();
 
-    $('.icon-3d-object').hide();
+    $('.camera-screen').hide();
     this.$('.loading-button').addClass('loading');
 
     this.buttonEvent()
       .fail(function(){
-        $('.icon-3d-object').show();
+        $('.camera-screen').show();
         noty({text: "Camera error.", timeout: 3000});
       })
       .always(_.bind(function(){

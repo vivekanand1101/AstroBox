@@ -1,8 +1,7 @@
 {% extends 'base.jinja2' %}
 
 {% block css %}
-	{% assets filters="scss", output="css/gen/setup.css",
-		"css/scss/setup.scss" %}
+	{% assets filters="scss", output="css/gen/setup.css", "css/scss/setup.scss" %}
 		<link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" />
 	{% endassets %}
 {% endblock %}
@@ -111,8 +110,7 @@
 						</div>
 					</div>
 					<p class="small">
-						<sup>*</sup> {{ _('withoutConnected') }}
-						{{ _('useThe') }} {{variantData['productName']}} {{ _('whenNearIt') }}
+						<sup>*</sup> {{ _('withoutConnected') | replace("%productName%", variantData['productName']) }}
 					</p>
 				</div>
 			</div>
@@ -121,13 +119,8 @@
 				<script type="text/template" id="wifi-network-password-modal-template">
 					<% if (wifi.wep) { %>
 						<h2 class="bold" align="center">{{ _('wepSecDepre') }}</h2>
-						<p>
-							{{ _('the') }} <%= wifi.name %> {{ _('wepSecDepreDesc1-3') }}
-						</p>
-						<p>
-							{{ _('wepSecDepreDesc2-3') }} <a href="https://en.wikipedia.org/wiki/Wired_Equivalent_Privacy" target="_info">{{ _('deprecated') }}</a>
-							{{ _('wepSecDepreDesc3-3') }}
-						</p>
+						<p>{{ _('wifiName', wifiName='<%= wifi.name %>') }}</p>
+						<p>{{ _('wepSecDepreDesc') }}</p>
 						<div class="row">
 							<div class="small-12 medium-6 columns medium-centered">
 								<a class="button secondary radius cancel expand" href="#internet">{{ _('close') }}Close</a>

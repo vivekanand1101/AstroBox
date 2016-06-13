@@ -108,7 +108,7 @@ var PhotoView = CameraViewBase.extend({
 	events: {
 		'click button.take-pic': 'onCameraBtnClicked',
 		'change .timelapse select': 'timelapseFreqChanged',
-		"change input[name='camera-mode']": 'cameraModeChanged',
+		"change #camera-mode-printing": 'cameraModeChanged',
 		'show': 'onShow'
 	},
 	parent: null,
@@ -157,7 +157,7 @@ var PhotoView = CameraViewBase.extend({
 	},
 	initialize: function(options) 
 	{
-
+		this.print_capture = app.socketData.get('print_capture');
 		this.parent = options.parent;
 		this.initCamera();
 
@@ -219,6 +219,8 @@ var PhotoView = CameraViewBase.extend({
 	},
 	cameraInitialized: function()
 	{
+		CameraViewBase.prototype.cameraInitialized.call(this);
+
 		app.eventManager.on('astrobox:videoStreamingEvent', this.manageVideoStreamingEvent, this);
 
 		this.listenTo(app.socketData, 'change:print_capture', this.onPrintCaptureChanged);
@@ -307,14 +309,14 @@ var PhotoView = CameraViewBase.extend({
 	},
 	onPrintCaptureChanged: function(s, value) 
 	{
+		this.print_capture = value;
 		if(this.cameraMode == 'photo'){
-			this.print_capture = value;
-			//this.render();
 			if(value && value.last_photo){
 			   var img = this.$('.camera-image');
 			   img.attr('src',value.last_photo);
 		   }
 		}
+		this.$('.timelapse select').val(value.freq);
 	},
 	onPrintingProgressChanged: function(s, value) 
 	{

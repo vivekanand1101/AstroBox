@@ -260,10 +260,10 @@
 						<i class="icon-attention"></i>
 						<label class="bold">No Camera Found</label>
 						<div id="buttonRefresh" class="loading-button still">
-												<div class="still-camera">
-									<button class="success radius spin">Scan for cameras</i></button>
-									<span class="button success radius loading disabled"><i class="icon-rocket-spinner animate-spin"></i></span>
-												</div>
+		                    <div class="still-camera">
+							    <button class="success radius spin">{{ _('scanForCameras') }}</i></button>
+							    <span class="button success radius loading disabled"><i class="icon-rocket-spinner animate-spin"></i></span>
+		                    </div>
 						</div>
 					</div>
 				<% } %>
@@ -323,13 +323,8 @@
 				<% if (wifi.wep) { %>
 					<h2 class="bold" align="center">{{ _('wepSecDepre') }}</h2>
 					<div class="modal-body">
-						<p>
-							{{ _('the') }} <%= wifi.name %> {{ _('wepSecDepreDesc1-3') }}
-						</p>
-						<p>
-							{{ _('wepSecDepreDesc2-3') }} <a href="https://en.wikipedia.org/wiki/Wired_Equivalent_Privacy" target="_info">{{ _('deprecated') }}</a>
-							{{ _('wepSecDepreDesc3-3') }}
-						</p>
+						<p>{{ _('wifiName', wifiName='<%= wifi.name %>') }}</p>
+						<p>{{ _('wepSecDepreDesc') }}</p>
 					</div>
 					<div class="modal-actions row">
 						<div class="small-12 medium-6 medium-centered columns">

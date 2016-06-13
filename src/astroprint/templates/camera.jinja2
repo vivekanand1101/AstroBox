@@ -20,24 +20,34 @@
 							<img class="sadmonkey" src="static/img/sadmonkey-2.png"/>
 						</div>
 						<div class="small-12 columns text-center">
-							<b>Oops!</b>, Looks like Streaming Video is incompatible with your browser. Download one of these great browsers and you'll be monitoring your 3D Printer with streaming video in no time!
+							<b>Oops!</b>, You are using <%= navigator.sayswho %>. 
+							<% if (navigator.sayswho.indexOf('Chrome') != -1) { %>
+								This browser can only stream video in VP8
+								encoding. You can change the video settings in Dashboard -> settings -> CAMERA: Image/Video -> Video Streaming Encoding, selecting VP8 instead of H264; You also can download
+							<% } else { %>
+
+								 Looks like Streaming Video is incompatible with your browser. Download
+
+							<% } %>
+
+							 one of these great browsers and you'll be monitoring your 3D Printer with streaming video in no time!
 							<ul class="small-block-grid-1 medium-block-grid-3 large-block-grid-3 browser-links">
 								<li>
 									<a href="https://www.google.com/chrome/" class="bold" target="_blank">
 										<img src="static/img/chrome-icon.png"/><br>
-										<b>Chrome</b><br>
+										<b>Chrome</b><br><b>only VP8 enconding</b><br>
 									</a>
 								</li>
 								<li>
 									<a href="https://www.mozilla.org/en-US/firefox/new/" class="bold" target="_blank">
 										<img src="static/img/firefox-icon.png"/><br>
-										<b>Firefox</b><br>
+										<b>Firefox</b><br><b>H264 and VP8 enconding</b><br>
 									</a>
 								</li>
 								<li>
 									<a href="http://www.opera.com/" class="bold" target="_blank">
 										<img src="static/img/opera-icon.png"/><br>
-										<b>Opera</b><br>
+										<b>Opera</b><br><b>only VP8 enconding</b><br>
 									</a>
 								</li>
 							</ul>
@@ -56,18 +66,22 @@
 						<% if(this.cameraMode == 'video') { %>
 							<div class="row video-container text-center">
 								<div class="video-off">
+									<div class="v-align">
 										<i class="icon-videocam-1"></i>
 										<h3 class="bold">Video Stream Off</h3>
+									</div>
 								</div>
 								<div class="video-preparing">
-									<i class="icon-rocket-spinner animate-spin"></i>
-									<h3 class="bold">Preparing Video...</h3>
+									<div class="v-align">
+										<i class="icon-rocket-spinner animate-spin"></i>
+										<h3 class="bold">Preparing Video...</h3>
+									</div>
 								</div>
 								<div id="videoScreen" class="video-on text-center">
 									<% if (this.managerName == "mjpeg") { %>
-										<img id="video-stream" class="cover-img-cont"/>
+										<img id="video-stream" class="cover-img-cont v-align"/>
 									<% } else { %>
-										<video id="video-stream" class="cover-img-cont" autoplay="">
+										<video id="video-stream" class="cover-img-cont v-align" autoplay="">
 											You browser doesn't support element <code>video</code>.
 										</video>
 									<% } %>
@@ -75,9 +89,12 @@
 							</div>
 						<% } else { %>
 							<div class="row video-container">
-									<div class="video-off text-center">
-										<i class="icon-3d-object"></i>
-										<img class="camera-image"/>
+									<div class="video-off">
+										<div class="v-align camera-screen">
+											<i class="icon-camera"></i>
+											<h3 class="bold">Still Pictures</h3>
+										</div>
+											<img class="camera-image v-align"/>
 									</div>
 							</div>
 						<% } %>
@@ -105,8 +122,8 @@
 								<i class="icon-videocam-1"></i>
 							</p>
 							<div class="switch radius">
-								<input id="camera-mode" name="camera-mode" type="checkbox" value="yes" <% if(this.cameraMode == 'video') { %> checked <% } %>>
-								<label for="camera-mode"></label>
+								<input id="camera-mode-camera" name="camera-mode" type="checkbox" value="yes" <% if(this.cameraMode == 'video') { %> checked <% } %>>
+								<label for="camera-mode-camera"></label>
 							</div>
 						</div>
 					</div>
@@ -118,7 +135,7 @@
 	<div class="panel text-center radius">
 		<i class="icon-camera"></i>
 		<h3 class="bold">No Camera Detected</h3>
-		<p>Attach a USB camera that supports linux to add the ability to monitor you prints. Take photos or stream live video to check up on your prints. If you connect to AstroPrint.com you get even check up on your print from anywhere on the internet.</p>
+		<p>Attach a USB camera that supports linux and start monitoring your prints. Take photos, create timelapses, or stream live video. Connect to your AstroPrint.com account and check on your print from anywhere.</p>
 	</div>
 <% } %>
 </script>

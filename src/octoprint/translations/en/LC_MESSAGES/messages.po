@@ -1059,32 +1059,13 @@ msgstr "Select a WiFi Network"
 msgid "wepSecDepre"
 msgstr "WEP Security Deprecated"
 
-#: ../src/astroprint/templates/settings.jinja2:216
-#: ../src/astroprint/templates/setup.jinja2:125
-msgid "the"
-msgstr "The"
+msgid "wifiName"
+msgstr "The %(wifiName)s WiFi network seems to be configured to use WEP security."
 
 #: ../src/astroprint/templates/settings.jinja2:216
 #: ../src/astroprint/templates/setup.jinja2:125
-msgid "wepSecDepreDesc1-3"
-msgstr "WiFi network seems to be configured to use WEP security."
-
-#: ../src/astroprint/templates/settings.jinja2:219
-#: ../src/astroprint/templates/setup.jinja2:128
-msgid "wepSecDepreDesc2-3"
-msgstr "WiFI WEP Security was"
-
-#: ../src/astroprint/templates/settings.jinja2:219
-#: ../src/astroprint/templates/setup.jinja2:128
-msgid "deprecated"
-msgstr "deprecated in 2004"
-
-#: ../src/astroprint/templates/settings.jinja2:220
-#: ../src/astroprint/templates/setup.jinja2:129
-msgid "wepSecDepreDesc3-3"
-msgstr ""
-"and is <b>not considered safe</b>, please configure your WiFi network to "
-"use WPA or WPA2."
+msgid "wepSecDepreDesc"
+msgstr "WiFI WEP Security was <a href="https://en.wikipedia.org/wiki/Wired_Equivalent_Privacy" target="_info">deprecated in 2004</a> and is <b>not considered safe</b>, please configure your WiFi network to use WPA or WPA2."
 
 #: ../src/astroprint/templates/settings.jinja2:225
 #: ../src/astroprint/templates/settings.jinja2:421
@@ -1422,7 +1403,7 @@ msgstr "Skip"
 
 #: ../src/astroprint/templates/setup.jinja2:114
 msgid "withoutConnected"
-msgstr "Without being connected to the internet, you can only"
+msgstr "Without being connected to the internet, you can only use the %productName% when you are near it."
 
 #: ../src/astroprint/templates/setup.jinja2:115
 msgid "useThe"

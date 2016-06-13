@@ -34,16 +34,19 @@ var CameraControlView = Backbone.View.extend({
 
 							this.render();
 						} else {
+							this.cameraAvailable = false;
 							this.videoStreamingError = 'Camera error: it is not posible to get the camera capabilities. Please, try to reconnect the camera and try again...';
 							this.render();
 						}
 				},this))
 				.fail(_.bind(function(response){
+					this.cameraAvailable = false;
 					noty({text: "Unable to communicate with the camera.", timeout: 3000});
 					this.stopStreaming();
 					this.setState('error');
 				},this));
 			} else { 
+				this.cameraAvailable = false;
 				this.render(); 
 			}
 		},this))
@@ -52,6 +55,7 @@ var CameraControlView = Backbone.View.extend({
 	{		
 		if(this.cameraMode == 'video'){
 			if(this.state == 'streaming'){
+				this.deactivateWindowHideListener();
 				return this.stopStreaming();
 			} else {
 				return this.startStreaming();
@@ -137,7 +141,6 @@ var CameraControlView = Backbone.View.extend({
 				},this), 15000);
 			} else {
 				if(this.browserNotVisibleManager == 'waiting'){
-					$(document).off("visibilitychange",onVisibilityChange);
 					this.browserNotVisibleManager = null;
 					this.startStreaming();
 				}
@@ -145,6 +148,9 @@ var CameraControlView = Backbone.View.extend({
 		},this);
 
 		$(document).on("visibilitychange", onVisibilityChange);
+	},
+	deactivateWindowHideListener: function(){
+		$(document).off("visibilitychange");
 	},
 
 	//Implement these
@@ -235,6 +241,9 @@ var CameraControlViewWebRTC = CameraControlView.extend({
   _socket: null,
   videoStreamingEvent: null,
   videoStreamingError: null,
+  originalFunctions: null,//this could be contained the original functions
+  //startStreaming, stopStreaming, and onHide for being putted back after changing
+  //settings if new settings ables to get video instead of old settings
   manageVideoStreamingEvent: function(value)
   {//override this for managing this error
 	this.videoStreamingError = value.message;
@@ -280,15 +289,33 @@ var CameraControlViewWebRTC = CameraControlView.extend({
 	}
 
 	if( !this.canStream){
+		
+		if( !this.originalFunctions) {
+			this.originalFunctions = new Object();
+			this.originalFunctions.startStreaming = this.startStreaming;
+			this.originalFunctions.stopStreaming = this.stopStreaming;
+			this.originalFunctions.onHide = this.onHide;
+			this.originalFunctions.initJanus = this.initJanus;
+		}
+
 		this.initJanus = null;
-		this.startStreaming = function(){ this.setState('nowebrtc'); };
-		this.stopStreaming = function(){ return true; };
+
+		this.startStreaming = function(){ this.setState('nowebrtc'); return $.Deferred().resolve(); };
+		this.stopStreaming = function(){ return $.Deferred().resolve(); };
 		this.onHide = function(){ return true; };
 		//this.setState('nowebrtc');
 		this.cameraMode = 'photo';
 	} else {
+
+		if( this.originalFunctions) {
+			this.startStreaming = this.originalFunctions.startStreaming;
+			this.stopStreaming = this.originalFunctions.stopStreaming;
+			this.onHide = this.originalFunctions.onHide;
+			this.initJanus = this.originalFunctions.initJanus;
+		}
+
 		this.serverUrl = "http://" + window.location.hostname + ":8088/janus";
-		startStreaming = this.startStreaming;
+		
 		this.initJanus();
 
 		// Initialize the library (all console debuggers enabled)
@@ -332,8 +359,12 @@ var CameraControlViewWebRTC = CameraControlView.extend({
 						}),
 						dataType: "json",
 						contentType: "application/json; charset=UTF-8",
-						data: JSON.stringify()
-					}).done(_.bind(function(response) {
+					})
+					.fail(_.bind(function(){
+						noty({text: "Unable to start WebRTC session.", timeout: 3000});
+						this.setState('error');
+					}, this))
+					.done(_.bind(function(response) {
 						this.streaming = true;
 
 						var streamingPlugIn = null;
@@ -360,7 +391,7 @@ var CameraControlViewWebRTC = CameraControlView.extend({
 										})
 									})
 									.done(_.bind(function(){
-										this.setState('ready');
+										//this.setState('ready');
 										janus.sessionId = null;
 									},this))
 									.always(_.bind(this.initJanus, this))
@@ -437,6 +468,8 @@ var CameraControlViewWebRTC = CameraControlView.extend({
 								
 								attachMediaStream(videoCont.get(0), stream);
 
+								app.eventManager.on('astrobox:videoStreamingEvent', this.manageVideoStreamingEvent, this);
+
 							},this),
 							oncleanup: function() {
 								Janus.log(" ::: Got a cleanup notification :::");
@@ -474,6 +507,7 @@ var CameraControlViewWebRTC = CameraControlView.extend({
   },
   stopStreaming: function()
   {
+  	this.setState('ready');
 	if (this.streaming) { 
 		var body = { "request": "stop" };
 		this.streamingPlugIn.send({"message": body});
@@ -483,7 +517,30 @@ var CameraControlViewWebRTC = CameraControlView.extend({
   }
 });
 
+var CameraControlViewMac = CameraControlView.extend({
+	canStream: true,
+	startStreaming: function()
+	{
+		var promise = $.Deferred();
+
+		this.setState('preparing');
+
+		setTimeout(_.bind(function(){
+			this.setState('streaming');
+			promise.resolve();
+		}, this), 1000);
+
+		return promise;
+	},
+	stopStreaming: function()
+	{
+		this.setState('ready');
+		return $.Deferred().resolve();
+	}
+});
+
 var CameraViewBase = {
   mjpeg: CameraControlViewMJPEG,
-  gstreamer: CameraControlViewWebRTC
+  gstreamer: CameraControlViewWebRTC,
+  mac: CameraControlViewMac
 }[CAMERA_MANAGER];
