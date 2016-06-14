@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-06-13 21:36+0200\n"
+"POT-Creation-Date: 2016-06-14 09:20+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -688,8 +688,9 @@ msgstr ""
 
 #: ../src/astroprint/templates/home.jinja2:40
 #: ../src/astroprint/templates/home.jinja2:47
-#: ../src/astroprint/templates/home.jinja2:66
-#: ../src/astroprint/templates/home.jinja2:73
+#: ../src/astroprint/templates/home.jinja2:61
+#: ../src/astroprint/templates/home.jinja2:68
+#: ../src/astroprint/templates/home.jinja2:75
 msgid "launch"
 msgstr ""
 
@@ -698,7 +699,7 @@ msgid "control"
 msgstr ""
 
 #: ../src/astroprint/templates/home.jinja2:54
-#: ../src/astroprint/templates/home.jinja2:80
+#: ../src/astroprint/templates/home.jinja2:82
 msgid "visit"
 msgstr ""
 
@@ -706,16 +707,20 @@ msgstr ""
 msgid "supplies"
 msgstr ""
 
-#: ../src/astroprint/templates/home.jinja2:68
+#: ../src/astroprint/templates/home.jinja2:63
+msgid "camera"
+msgstr ""
+
+#: ../src/astroprint/templates/home.jinja2:70
 #: ../src/astroprint/templates/settings.jinja2:3
 msgid "settings"
 msgstr ""
 
-#: ../src/astroprint/templates/home.jinja2:75
+#: ../src/astroprint/templates/home.jinja2:77
 msgid "gcTerminal"
 msgstr ""
 
-#: ../src/astroprint/templates/home.jinja2:82
+#: ../src/astroprint/templates/home.jinja2:84
 msgid "support"
 msgstr ""
 

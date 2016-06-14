@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-06-13 21:36+0200\n"
+"POT-Creation-Date: 2016-06-14 09:20+0200\n"
 "PO-Revision-Date: 2016-05-10 13:13+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -29,124 +29,126 @@ msgstr "No se pudo guardar el archivo"
 
 #: ../src/astroprint/api/connection.py:61
 msgid "invalidPortS"
-msgstr "Invalid port: %s"
+msgstr "Puerto inválido: %s"
 
 #: ../src/astroprint/api/files.py:37
 msgid "unknownOriginS"
-msgstr "Unknown origin: %s"
+msgstr "Origen desconocido: %s"
 
 #: ../src/astroprint/api/files.py:99 ../src/astroprint/api/files.py:269
 msgid "unknownTargetS"
-msgstr "Unknown target: %s"
+msgstr "Objetivo desconocido: %s"
 
 #: ../src/astroprint/api/files.py:102
 msgid "noFileIncluded"
-msgstr "No file included"
+msgstr "Ningún archivo incluido"
 
 #: ../src/astroprint/api/files.py:105
 msgid "sdCardSupportDisabled"
-msgstr "SD card support is disabled"
+msgstr "Soporte para tarjetas SD inhabilitado"
 
 #: ../src/astroprint/api/files.py:115
 msgid "canUploadPrinterBusy"
 msgstr ""
-"Can not upload to SD card, printer is either not operational or already "
-"busy"
+"No se puede subir a la tarjeta SD, la impresora no está operativa o está "
+"ocupada"
 
 #: ../src/astroprint/api/files.py:117
 msgid "canUploadNotInit"
-msgstr "Can not upload to SD card, not yet initialized"
+msgstr "No se puede subir a la trjeta SD, aún no se ha inicializado"
 
 #: ../src/astroprint/api/files.py:132
 msgid "canUploadWrongFormat"
-msgstr "Can not upload file %s, wrong format?"
+msgstr "No se puede subir el archivo %s ¿Formato incorrecto?"
 
 #: ../src/astroprint/api/files.py:136
 msgid "overwriteFilePrinted"
-msgstr "Trying to overwrite file that is currently being printed: %s"
+msgstr ""
+"Intentando sobreescribir un archivo que está actualmente siendo impreso: "
+"%s"
 
 #: ../src/astroprint/api/files.py:165
 msgid "couldntUpload"
-msgstr "Could not upload the file %s"
+msgstr "No se pudo subir el archivo %s"
 
 #: ../src/astroprint/api/files.py:222 ../src/astroprint/api/files.py:272
 msgid "fileNotFound"
-msgstr "File not found on '%s': %s"
+msgstr "No se ha encontrado un archivo en '%s': %s"
 
 #: ../src/astroprint/api/files.py:250
 msgid "printerNotResponding"
-msgstr "The printer is not responding, can't start printing"
+msgstr "La impresora no está respondiendo, no se puede empezar a imprimir"
 
 #: ../src/astroprint/api/files.py:287
 msgid "tryingDeleteFilePrinted"
-msgstr "Trying to delete file that is currently being printed: %s"
+msgstr "Intentar eliminar un archivo que está siendo actualmente impreso: %s"
 
 #: ../src/astroprint/api/printer.py:32 ../src/astroprint/api/printer.py:68
 #: ../src/astroprint/api/printer.py:144 ../src/astroprint/api/printer.py:185
 #: ../src/astroprint/api/printer.py:341
 msgid "printerNotOperational"
-msgstr "Printer is not operational"
+msgstr "La Impresora no está operativa"
 
 #: ../src/astroprint/api/printer.py:86
 msgid "invalidToolS"
-msgstr "Invalid tool: %s"
+msgstr "Herramienta inválida: %s"
 
 #: ../src/astroprint/api/printer.py:88
 msgid "invalidToolSelectionS"
-msgstr "Invalid tool for selection: %s"
+msgstr "Herramienta inválida para selección: %s"
 
 #: ../src/astroprint/api/printer.py:100
 msgid "invalidSettingTemp"
-msgstr "Invalid target for setting temperature: %s"
+msgstr "Objetivo inválido para configurar la temperatura: %s"
 
 #: ../src/astroprint/api/printer.py:102 ../src/astroprint/api/printer.py:229
 msgid "notNumberSR"
-msgstr "Not a number for %s: %r"
+msgstr "No hay un número en %s: %r"
 
 #: ../src/astroprint/api/printer.py:113
 msgid "printerCurrentlyPrinting"
-msgstr "Printer is currently printing"
+msgstr "La Impresora está actualmente imprimiendo"
 
 #: ../src/astroprint/api/printer.py:117
 msgid "notNumberExtAmountR"
-msgstr "Not a number for extrusion amount: %r"
+msgstr "No hay un número en la cantidad de extrusión: %r"
 
 #: ../src/astroprint/api/printer.py:160
 msgid "notNumberR"
-msgstr "Not a number: %r"
+msgstr "No es un número: %r"
 
 #: ../src/astroprint/api/printer.py:210 ../src/astroprint/api/printer.py:301
 msgid "printerNotOperationalPrinting"
-msgstr "Printer is not operational or currently printing"
+msgstr "La Impresora no está operativa o está actualmente imprimiendo"
 
 #: ../src/astroprint/api/printer.py:242
 msgid "invalidAxisS"
-msgstr "Invalid axis: %s"
+msgstr "Axis inválido: %s"
 
 #: ../src/astroprint/api/printer.py:258 ../src/astroprint/api/printer.py:287
 msgid "sdSupportDisabled"
-msgstr "SD support is disabled"
+msgstr "Soporte SD está inhabilitado"
 
 #: ../src/astroprint/api/printer.py:263
 msgid "printerNotOperationalBusy"
-msgstr "Printer is not operational or currently busy"
+msgstr "La Impresora no está operativa o está actualmente ocupada"
 
 #: ../src/astroprint/api/printer.py:304
 msgid "expectedJSON"
-msgstr "Expected content type JSON"
+msgstr "Se esperaba contenido JSON"
 
 #: ../src/astroprint/api/printer.py:368 ../src/astroprint/api/printer.py:382
 #: ../src/astroprint/api/printer.py:398
 msgid "driverNotSupportTerminal"
-msgstr "Driver does not support terminal access"
+msgstr "El driver no soporta acceso a terminal"
 
 #: ../src/astroprint/api/printer.py:401
 msgid "noPrinterConnected"
-msgstr "No Printer connected"
+msgstr "No hay Impresora conectada"
 
 #: ../src/astroprint/api/printer.py:410
 msgid "commandMissing"
-msgstr "Command is missing"
+msgstr "Comando incorrecto"
 
 #: ../src/astroprint/api/settings.py:75 ../src/astroprint/api/setup.py:77
 msgid "unableToGetWifi"
@@ -194,15 +196,15 @@ msgstr "Red %s no encontrada"
 
 #: ../src/astroprint/api/setup.py:138
 msgid "invalidCredentials"
-msgstr "Invalid Credentials"
+msgstr "Credenciales inválidos"
 
 #: ../src/astroprint/api/setup.py:156
 msgid "connectionOptionsNotAvaiable"
-msgstr "Connection options not available"
+msgstr "Opciones de conexión no disponibles"
 
 #: ../src/astroprint/api/setup.py:182 ../src/astroprint/api/setup.py:199
 msgid "invalidConnecionSet"
-msgstr "Invalid Connection Settings"
+msgstr "Ajustes de Conexión inválidos"
 
 #: ../src/astroprint/static/js/app/login.js:40
 msgid "invalidEMail"
@@ -472,7 +474,7 @@ msgstr "No es un archivo válido"
 
 #: ../src/astroprint/static/js/app/widgets/uploader.js:69
 msgid "errorUploading"
-msgstr "Hubo un error subiendo: "
+msgstr "Hubo un error en la subida: "
 
 #: ../src/astroprint/static/js/app/widgets/uploader.js:99
 msgid "errorUploadingFile"
@@ -693,8 +695,9 @@ msgstr "Subir Archivos"
 
 #: ../src/astroprint/templates/home.jinja2:40
 #: ../src/astroprint/templates/home.jinja2:47
-#: ../src/astroprint/templates/home.jinja2:66
-#: ../src/astroprint/templates/home.jinja2:73
+#: ../src/astroprint/templates/home.jinja2:61
+#: ../src/astroprint/templates/home.jinja2:68
+#: ../src/astroprint/templates/home.jinja2:75
 msgid "launch"
 msgstr "Ejecutar"
 
@@ -703,7 +706,7 @@ msgid "control"
 msgstr "Control"
 
 #: ../src/astroprint/templates/home.jinja2:54
-#: ../src/astroprint/templates/home.jinja2:80
+#: ../src/astroprint/templates/home.jinja2:82
 msgid "visit"
 msgstr "Visitar"
 
@@ -711,16 +714,20 @@ msgstr "Visitar"
 msgid "supplies"
 msgstr "Suplementos"
 
-#: ../src/astroprint/templates/home.jinja2:68
+#: ../src/astroprint/templates/home.jinja2:63
+msgid "camera"
+msgstr "Cámara"
+
+#: ../src/astroprint/templates/home.jinja2:70
 #: ../src/astroprint/templates/settings.jinja2:3
 msgid "settings"
 msgstr "Ajustes"
 
-#: ../src/astroprint/templates/home.jinja2:75
+#: ../src/astroprint/templates/home.jinja2:77
 msgid "gcTerminal"
 msgstr "Terminal GCODE"
 
-#: ../src/astroprint/templates/home.jinja2:82
+#: ../src/astroprint/templates/home.jinja2:84
 msgid "support"
 msgstr "Ayuda"
 
@@ -1631,13 +1638,9 @@ msgstr "no fue capaz de completar la actualización."
 
 #~ msgid "wepSecDepreDesc3-3"
 #~ msgstr ""
-#~ "y no está <b>considerada segura</b>, por"
-#~ " favor configura tu red WiFi para "
-#~ "usar WPA o WPA2."
 
 #~ msgid "useThe"
 #~ msgstr "usar"
 
 #~ msgid "whenNearIt"
 #~ msgstr "cuando estés cerca de él"
-
