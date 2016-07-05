@@ -77,20 +77,36 @@ def check_internet():
 def connect_internet():
 	if "application/json" in request.headers["Content-Type"]:
 		data = request.json
-    nm = networkManager()
+		nm = networkManager()
+		print '1'
+		print data['id']
+		print data['password']
+		
+		try:
 
-		result = nm.setWifiNetwork(data['id'], data['password'])
+			result = nm.setWifiNetwork(data['id'], data['password'])
+			print '2'
+	
+			print result
+			print '3'
 
-		if result:
-			return jsonify(result)
-		else:
-
-      result = nm.startHotspot()
-
-      if result is True:
-        return ("Network %s not found" % data['id'], 404)
-      else:
-        return (result, 500)
+			if result and result['ip']:#CHANGE CONDITION
+				return jsonify(result)
+			else:
+	
+      				result = nm.startHotspot()
+	
+				if result is True:
+					print 'reconnection successfully'
+					return ("Network %s not found" % data['id'], 404)
+				else:
+					print 'reconnection fails'
+					return (result, 500)
+		except:
+			print 'reconnection before raise'
+			result = nm.startHotspot()
+			
+			raise
 
 	return ("Invalid Request", 400)
 

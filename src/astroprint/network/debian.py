@@ -411,9 +411,15 @@ class DebianNetworkManager(NetworkManagerBase):
 						(connection, activeConnection) = self._nm.NetworkManager.AddAndActivateConnection(options, wifiDevice, accessPoint)
 
 				except DBusException as e:
+					print 'network manager 1'
+
 					if e.get_dbus_name() == 'org.freedesktop.NetworkManager.InvalidProperty' and e.get_dbus_message() == 'psk':
+						print 'network manager 2'
+					
 						return {'message': 'Invalid Password'}
 					else:
+						print 'network manager 3'
+	
 						raise
 
 				return {
