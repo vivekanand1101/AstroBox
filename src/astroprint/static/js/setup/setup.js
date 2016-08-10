@@ -374,7 +374,7 @@ var WiFiNetworkPasswordDialog = Backbone.View.extend({
 	el: '#wifi-network-password-modal',
 	events: {
     'click input.button.connect': 'showMessage',
-		'click button.info': 'connectClicked',
+		'click input.button.info': 'connectClicked',
 		'submit form': 'showMessage',
 		'click a.cancel': 'cancelClicked'
 	},
