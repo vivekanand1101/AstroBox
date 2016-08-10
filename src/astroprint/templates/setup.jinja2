@@ -156,9 +156,13 @@
   							</div>
   						</form>
             </div>
-            <div id="infoMessage">
+            <div id="infoMessage" style="display: none;">
+              <h2 class="bold" align="center">IMPORTANT</h2>
+              <p align="center">You are trying to connect to <span class="name bold"><%= wifi.name %></span>.</p>
               <div>
+                <p align="center">
                 Astrobox-4567 will try to connect to AstroPrintWLAN. While connecting could go something wrong, that's why, during between 10 and 20 seconds, your Astrobox will seem to be disconnected. If connection will be wrong, for example: had a mistake in password; you could try to connect again.
+                </p>
               </div>
               <div class="small-12 medium-6 columns">
                 <div class="loading-button expand">
