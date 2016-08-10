@@ -250,9 +250,6 @@ var StepInternet = StepView.extend({
 		})
 	},
   startHotspot: function(e) {
-    var el = $(e.target).closest('.loading-button');
-
-    el.addClass('loading');
 
     $.ajax({
       url: API_BASEURL + "settings/network/hotspot",
@@ -271,9 +268,6 @@ var StepInternet = StepView.extend({
     });
   },
   stopHotspot: function(e) {
-    var el = $(e.target).closest('.loading-button');
-
-    el.addClass('loading');
 
     $.ajax({
       url: API_BASEURL + "settings/network/hotspot",
