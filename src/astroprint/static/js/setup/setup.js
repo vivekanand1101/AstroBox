@@ -373,7 +373,7 @@ var StepInternet = StepView.extend({
 var WiFiNetworkPasswordDialog = Backbone.View.extend({
 	el: '#wifi-network-password-modal',
 	events: {
-    'click button.connect': 'showMessage',
+    'click input.button.connect': 'showMessage',
 		'click button.info': 'connectClicked',
 		'submit form': 'showMessage',
 		'click a.cancel': 'cancelClicked'
