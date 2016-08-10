@@ -118,43 +118,58 @@
 			</div>
 
 			<div id="wifi-network-password-modal" class="reveal-modal medium radius" data-reveal>
-				<script type="text/template" id="wifi-network-password-modal-template">
-					<% if (wifi.wep) { %>
-						<h2 class="bold" align="center">WEP Security Deprecated</h2>
-						<p>
-							The <%= wifi.name %> WiFi network seems to be configured to use WEP security.
-						</p>
-						<p>
-							WiFI WEP Security was <a href="https://en.wikipedia.org/wiki/Wired_Equivalent_Privacy" target="_info">deprecated in 2004</a>
-							and is <b>not considered safe</b>, please configure your WiFi network to use WPA or WPA2.
-						</p>
-						<div class="row">
-							<div class="small-12 medium-6 columns medium-centered">
-								<a class="button secondary radius cancel expand" href="#internet">Close</a>
-							</div>
-						</div>
-					<% } else { %>
-						<h2 class="bold" align="center">WiFi Password</h2>
-						<p align="center">Enter the password for <span class="name bold"><%= wifi.name %></span>.</p>
-						<form>
-							<input type="hidden" class="network-id-field" name="id" value="<%= wifi.id %>"/>
-							<input type="password" class="network-password-field" name="password"/>
-							<div class="row">
-								<div class="small-12 medium-6 columns">
-									<a class="button secondary radius cancel expand" href="#internet">Cancel</a>
-								</div>
-								<div class="small-12 medium-6 columns">
-									<div class="loading-button expand">
-										<input type="submit" class="button radius success connect" value="Connect"/>
-										<span class="loading button success disabled radius">
-											<i class="icon-rocket-spinner animate-spin"></i> Might be a while. Please be patient...
-										</span>
-									</div>
-								</div>
-							</div>
-						</form>
-					<% } %>
-				</script>
+        <div id="content">
+  				<script type="text/template" id="wifi-network-password-modal-template">
+  					<% if (wifi.wep) { %>
+  						<h2 class="bold" align="center">WEP Security Deprecated</h2>
+  						<p>
+  							The <%= wifi.name %> WiFi network seems to be configured to use WEP security.
+  						</p>
+  						<p>
+  							WiFI WEP Security was <a href="https://en.wikipedia.org/wiki/Wired_Equivalent_Privacy" target="_info">deprecated in 2004</a>
+  							and is <b>not considered safe</b>, please configure your WiFi network to use WPA or WPA2.
+  						</p>
+  						<div class="row">
+  							<div class="small-12 medium-6 columns medium-centered">
+  								<a class="button secondary radius cancel expand" href="#internet">Close</a>
+  							</div>
+  						</div>
+  					<% } else { %>
+  						<h2 class="bold" align="center">WiFi Password</h2>
+  						<p align="center">Enter the password for <span class="name bold"><%= wifi.name %></span>.</p>
+  						<form>
+  							<input type="hidden" class="network-id-field" name="id" value="<%= wifi.id %>"/>
+  							<input type="password" class="network-password-field" name="password"/>
+  							<div class="row">
+  								<div class="small-12 medium-6 columns">
+  									<a class="button secondary radius cancel expand" href="#internet">Cancel</a>
+  								</div>
+  								<div class="small-12 medium-6 columns">
+  									<div class="loading-button expand">
+  										<input type="submit" class="button radius success connect" value="Connect"/>
+  										<span class="loading button success disabled radius">
+  											<i class="icon-rocket-spinner animate-spin"></i> Might be a while. Please be patient...
+  										</span>
+  									</div>
+  								</div>
+  							</div>
+  						</form>
+  					<% } %>
+  				</script>
+        </div>
+        <div id="infoMessage">
+          <div>
+            Astrobox-4567 will try to connect to AstroPrintWLAN. While connecting could go something wrong, that's why, during between 10 and 20 seconds, your Astrobox will seem to be disconnected. If connection will be wrong, for example: had a mistake in password; you could try to connect again.
+          </div>
+          <div class="small-12 medium-6 columns">
+            <div class="loading-button expand">
+              <button class="radius success connect">ok</button>
+              <span class="loading button success disabled radius">
+                <i class="icon-rocket-spinner animate-spin"></i> Might be a while. Please be patient...
+              </span>
+            </div>
+          </div>
+        </div>
 			</div>
 
 			<script type="text/template" id="wifi-network-list-template">
