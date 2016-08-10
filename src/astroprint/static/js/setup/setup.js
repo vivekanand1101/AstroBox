@@ -400,7 +400,7 @@ var WiFiNetworkPasswordDialog = Backbone.View.extend({
 		}, this));
 	},
   showMessage: function(e){
-    if(form.find('.network-password-field').val()){
+    if(this.$('form .network-password-field').val()){
       this.$('#content').hide();
       this.$('#infoMessage').show();
     }
