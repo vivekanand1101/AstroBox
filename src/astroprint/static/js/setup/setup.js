@@ -277,9 +277,6 @@ var StepInternet = StepView.extend({
       error: function(xhr) {
         noty({text: xhr.responseText, timeout:3000});
       },
-      complete: function() {
-        el.removeClass('loading');
-      }
     });
   },
 	doConnect: function(data, callback)
