@@ -77,7 +77,7 @@ def check_internet():
 def connect_internet():
 	if "application/json" in request.headers["Content-Type"]:
 		data = request.json
-    nm = networkManager();
+    nm = networkManager()
 
 		result = nm.setWifiNetwork(data['id'], data['password'])
 
