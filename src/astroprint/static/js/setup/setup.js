@@ -261,9 +261,6 @@ var StepInternet = StepView.extend({
       }, this),
       error: function(xhr) {
         noty({text: xhr.responseText, timeout:3000});
-      },
-      complete: function() {
-        el.removeClass('loading');
       }
     });
   },
@@ -355,12 +352,12 @@ var StepInternet = StepView.extend({
 				if (callback) callback(true);
 			}
 		}, this))
-		.fail(function(){
+		.fail(_.bind(function(){
       this.startHotspot();
 			noty({text: "There was an error connecting.", timeout: 3000});
 			loadingBtn.removeClass('loading');
 			if (callback) callback(true);
-		})
+		},this))
 	}
 });
 
