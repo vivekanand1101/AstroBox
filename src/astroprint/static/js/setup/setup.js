@@ -249,10 +249,54 @@ var StepInternet = StepView.extend({
 			noty({text: "There was an error saving hotspot option.", timeout: 3000});
 		})
 	},
+  startHotspot: function(e) {
+    var el = $(e.target).closest('.loading-button');
+
+    el.addClass('loading');
+
+    $.ajax({
+      url: API_BASEURL + "settings/network/hotspot",
+      type: "POST",
+      success: _.bind(function(data, code, xhr) {
+        noty({text: 'Your '+PRODUCT_NAME+' has created a hotspot. Connect to <b>'+this.settings.hotspot.name+'</b>.', type: 'success', timeout:3000});
+        this.settings.hotspot.active = true;
+        this.render();
+      }, this),
+      error: function(xhr) {
+        noty({text: xhr.responseText, timeout:3000});
+      },
+      complete: function() {
+        el.removeClass('loading');
+      }
+    });
+  },
+  stopHotspot: function(e) {
+    var el = $(e.target).closest('.loading-button');
+
+    el.addClass('loading');
+
+    $.ajax({
+      url: API_BASEURL + "settings/network/hotspot",
+      type: "DELETE",
+      success: _.bind(function(data, code, xhr) {
+        noty({text: 'The hotspot has been stopped', type: 'success', timeout:3000});
+        this.settings.hotspot.active = false;
+        this.render();
+      }, this),
+      error: function(xhr) {
+        noty({text: xhr.responseText, timeout:3000});
+      },
+      complete: function() {
+        el.removeClass('loading');
+      }
+    });
+  },
 	doConnect: function(data, callback)
 	{
 		var loadingBtn = this.$el.find(".settings-state .loading-button");
 		loadingBtn.addClass('loading');
+
+    this.stopHotspot();
 
 		$.ajax({
 			url: API_BASEURL + 'setup/internet',
@@ -318,6 +362,7 @@ var StepInternet = StepView.extend({
 			}
 		}, this))
 		.fail(function(){
+      this.startHotspot();
 			noty({text: "There was an error connecting.", timeout: 3000});
 			loadingBtn.removeClass('loading');
 			if (callback) callback(true);
@@ -355,8 +400,10 @@ var WiFiNetworkPasswordDialog = Backbone.View.extend({
 		}, this));
 	},
   showMessage: function(e){
-    this.$('#content').hide();
-    this.$('#infoMessage').show();
+    if(form.find('.network-password-field').val()){
+      this.$('#content').hide();
+      this.$('#infoMessage').show();
+    }
   },
   showDialog: function(e){
     this.$('#infoMessage').hide();
@@ -372,18 +419,16 @@ var WiFiNetworkPasswordDialog = Backbone.View.extend({
 		var loadingBtn = this.$el.find('.loading-button');
 		var password = form.find('.network-password-field').val();
 
-		if (password) {
-			loadingBtn.addClass('loading');
-			this.parent.doConnect(
-				{id: form.find('.network-id-field').val(), password: password},
-				_.bind(function(error) { //callback
-					loadingBtn.removeClass('loading');
-					form.find('.network-password-field').val('');
-					if (!error) {
-						this.$el.foundation('reveal', 'close');
-					}
-				}, this)
-			);
+		loadingBtn.addClass('loading');
+		this.parent.doConnect(
+			{id: form.find('.network-id-field').val(), password: password},
+			_.bind(function(error) { //callback
+				loadingBtn.removeClass('loading');
+				form.find('.network-password-field').val('');
+				if (!error) {
+					this.$el.foundation('reveal', 'close');
+				}
+			}, this)
 		}
 	},
 	cancelClicked: function(e)
