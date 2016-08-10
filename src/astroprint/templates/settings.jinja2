@@ -227,7 +227,7 @@
 										</label>
 										<% if (settings.structure.fps.length > 1) { %>
 											<select id="video-stream-framerate" name="framerate">
-												<% _.each(settings.structure.fps, function(v) { 
+												<% _.each(settings.structure.fps, function(v) {
 														if(v.resolution == settings.size) { %>
 															<option value="<%= v.value %>" <%= settings.framerate == v.value ? 'selected' : '' %>><%= v.label %></option>
 												<% 		}
@@ -242,7 +242,7 @@
 										<label for="video-stream-format" class="bold">
 											Camera Output Format
 										</label>
-										<% 
+										<%
 											if (settings.structure.cameraOutput.length > 1) { %>
 											<select id="video-stream-format" name="format">
 												<% _.each(settings.structure.cameraOutput, function(v) { %>
@@ -332,47 +332,63 @@
 		</div>
 
 		<div id="wifi-network-password-modal" class="reveal-modal medium radius" data-reveal>
-			<script type="text/template" id="wifi-network-password-modal-template">
-				<% if (wifi.wep) { %>
-					<h2 class="bold" align="center">WEP Security Deprecated</h2>
-					<div class="modal-body">
-						<p>
-							The <%= wifi.name %> WiFi network seems to be configured to use WEP security.
-						</p>
-						<p>
-							WiFI WEP Security was <a href="https://en.wikipedia.org/wiki/Wired_Equivalent_Privacy" target="_info">deprecated in 2004</a>
-							and is <b>not considered safe</b>, please configure your WiFi network to use WPA or WPA2.
-						</p>
-					</div>
-					<div class="modal-actions row">
-						<div class="small-12 medium-6 medium-centered columns">
-							<button class="secondary radius cancel expand" onclick="$('#wifi-network-password-modal').foundation('reveal', 'close')">Close</button>
-						</div<
-					</div>
-				<% } else { %>
-					<h2 class="bold" align="center">WiFi Password</h2>
-					<div class="modal-body">
-						<p align="center">Enter the password for <span class="name bold"><%= wifi.name %></span>.</p>
-						<form>
-							<input type="hidden" class="network-id-field" name="id" value="<%= wifi.id %>">
-							<input type="password" class="network-password-field" name="password"/>
-						</form>
-					</div>
-					<div class="modal-actions row">
-						<div class="small-12 medium-6 columns">
-							<button class="secondary radius cancel expand" onclick="$('#wifi-network-password-modal').foundation('reveal', 'close')">Cancel</button>
-						</div>
-						<div class="small-12 medium-6 columns">
-							<div class="loading-button expand">
-								<button class="radius success connect">Connect</button>
-								<span class="loading button success disabled radius">
-									<i class="icon-rocket-spinner animate-spin"></i> Might be a while. Please be patient...
-								</span>
-							</div>
-						</div>
-					</div>
-				<% } %>
-			</script>
+      <div id="content">
+  			<script type="text/template" id="wifi-network-password-modal-template">
+  				<% if (wifi.wep) { %>
+  					<h2 class="bold" align="center">WEP Security Deprecated</h2>
+  					<div class="modal-body">
+  						<p>
+  							The <%= wifi.name %> WiFi network seems to be configured to use WEP security.
+  						</p>
+  						<p>
+  							WiFI WEP Security was <a href="https://en.wikipedia.org/wiki/Wired_Equivalent_Privacy" target="_info">deprecated in 2004</a>
+  							and is <b>not considered safe</b>, please configure your WiFi network to use WPA or WPA2.
+  						</p>
+  					</div>
+  					<div class="modal-actions row">
+  						<div class="small-12 medium-6 medium-centered columns">
+  							<button class="secondary radius cancel expand" onclick="$('#wifi-network-password-modal').foundation('reveal', 'close')">Close</button>
+  						</div<
+  					</div>
+  				<% } else { %>
+  					<h2 class="bold" align="center">WiFi Password</h2>
+  					<div class="modal-body">
+  						<p align="center">Enter the password for <span class="name bold"><%= wifi.name %></span>.</p>
+  						<form>
+  							<input type="hidden" class="network-id-field" name="id" value="<%= wifi.id %>">
+  							<input type="password" class="network-password-field" name="password"/>
+  						</form>
+  					</div>
+  					<div class="modal-actions row">
+  						<div class="small-12 medium-6 columns">
+  							<button class="secondary radius cancel expand" onclick="$('#wifi-network-password-modal').foundation('reveal', 'close')">Cancel</button>
+  						</div>
+  						<div class="small-12 medium-6 columns">
+  							<div class="loading-button expand">
+  								<button class="radius success connect">Connect</button>
+  								<span class="loading button success disabled radius">
+  									<i class="icon-rocket-spinner animate-spin"></i> Might be a while. Please be patient...
+  								</span>
+  							</div>
+  						</div>
+  					</div>
+  				<% } %>
+  			</script>
+      </div>
+      <div id="infoMessage">
+        <div>
+            Astrobox-4567 will try to connect to AstroPrintWLAN. While connecting could go something wrong, that's why, during between 10 and 20 seconds, your Astrobox will seem to be disconnected. If connection will be wrong, for example: had a mistake in password; you could try to connect again.
+          </div>
+          <div class="small-12 medium-6 columns">
+            <div class="loading-button expand">
+              <button class="radius success connect">ok</button>
+              <span class="loading button success disabled radius">
+                <i class="icon-rocket-spinner animate-spin"></i> Might be a while. Please be patient...
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
 		</div>
 
 		<script type="text/template" id="internet-connection-settings-page-template">
