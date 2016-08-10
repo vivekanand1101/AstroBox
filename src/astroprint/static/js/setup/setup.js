@@ -255,9 +255,10 @@ var StepInternet = StepView.extend({
       url: API_BASEURL + "settings/network/hotspot",
       type: "POST",
       success: _.bind(function(data, code, xhr) {
-        noty({text: 'Your '+PRODUCT_NAME+' has created a hotspot. Connect to <b>'+this.settings.hotspot.name+'</b>.', type: 'success', timeout:3000});
+        //noty({text: 'Your '+PRODUCT_NAME+' has created a hotspot. Connect to <b>'+this.settings.hotspot.name+'</b>.', type: 'success', timeout:3000});
         this.settings.hotspot.active = true;
-        this.render();
+        //this.render();
+        location.reload();
       }, this),
       error: function(xhr) {
         noty({text: xhr.responseText, timeout:3000});
