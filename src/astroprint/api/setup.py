@@ -82,7 +82,13 @@ def connect_internet():
 		if result:
 			return jsonify(result)
 		else:
-			return ("Network %s not found" % data['id'], 404)
+
+      result = nm.startHotspot()
+
+      if result is True:
+        return ("Network %s not found" % data['id'], 404)
+      else:
+        return (result, 500)
 
 	return ("Invalid Request", 400)
 

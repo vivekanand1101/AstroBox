@@ -249,22 +249,6 @@ var StepInternet = StepView.extend({
 			noty({text: "There was an error saving hotspot option.", timeout: 3000});
 		})
 	},
-  startHotspot: function(e) {
-
-    $.ajax({
-      url: API_BASEURL + "settings/network/hotspot",
-      type: "POST",
-      success: _.bind(function(data, code, xhr) {
-        //noty({text: 'Your '+PRODUCT_NAME+' has created a hotspot. Connect to <b>'+this.settings.hotspot.name+'</b>.', type: 'success', timeout:3000});
-        this.settings.hotspot.active = true;
-        //this.render();
-        location.reload();
-      }, this),
-      error: function(xhr) {
-        noty({text: xhr.responseText, timeout:3000});
-      }
-    });
-  },
   stopHotspot: function(e) {
 
     $.ajax({
@@ -350,12 +334,11 @@ var StepInternet = StepView.extend({
 				if (callback) callback(true);
 			}
 		}, this))
-		.fail(_.bind(function(){
-      this.startHotspot();
+		.fail(function(){
 			noty({text: "There was an error connecting.", timeout: 3000});
 			loadingBtn.removeClass('loading');
 			if (callback) callback(true);
-		},this))
+		})
 	}
 });
 
