@@ -429,7 +429,7 @@ var WiFiNetworkPasswordDialog = Backbone.View.extend({
 					this.$el.foundation('reveal', 'close');
 				}
 			}, this)
-		}
+		);
 	},
 	cancelClicked: function(e)
 	{
