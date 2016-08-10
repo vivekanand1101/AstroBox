@@ -65,6 +65,8 @@ class AstroPrintCloud(object):
 		self.settings = settings()
 		self.hmacAuth = None
 
+		self.tryingLoggingTimes = 0
+
 		loggedUser = self.settings.get(['cloudSlicer', 'loggedUser'])
 		if loggedUser:
 			from octoprint.server import userManager
@@ -198,6 +200,7 @@ class AstroPrintCloud(object):
 			return None, None, None
 
 	def get_private_key(self, email, password):
+
 		r = requests.post( "%s/%s" % (self.apiHost , 'auth/privateKey'),
 						   data={
 							"email": email,
@@ -213,7 +216,7 @@ class AstroPrintCloud(object):
 		if data and "private_key" in data:
 			return data["private_key"]
 		else:
-			return None		
+			return None
 
 	def get_public_key(self, email, private_key):
 		r = requests.post( "%s/%s" % (self.apiHost , 'auth/publicKey'),
@@ -449,13 +452,21 @@ class AstroPrintCloud(object):
 		else: 
 			return None
 
-	def print_job(self, id= None, print_file_id= None, print_file_name= None, status= 'started' ):
+	def print_job(self, id= None, print_file_id= None, print_file_name= None, status= 'started', reason= None ):
 		if self.cloud_enabled():
 			try:
 				if id:
-					r = requests.put("%s/printjobs/%s" % (self.apiHost, id), data=json.dumps({
-						'status': status
-					}), auth=self.hmacAuth, headers={'Content-Type': 'application/json'} )
+
+					data = {'status': status}
+
+					if reason:
+						data['reason'] = reason
+
+					r = requests.put("%s/printjobs/%s" % (self.apiHost, id), 
+						data=json.dumps(data), 
+						auth=self.hmacAuth, 
+						headers={'Content-Type': 'application/json'} 
+					)
 
 				else:
 					#create a print job
