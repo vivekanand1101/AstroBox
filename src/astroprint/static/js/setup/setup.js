@@ -412,11 +412,12 @@ var WiFiNetworkPasswordDialog = Backbone.View.extend({
 		this.parent.doConnect(
 			{id: form.find('.network-id-field').val(), password: password},
 			_.bind(function(error) { //callback
-				loadingBtn.removeClass('loading');
-				form.find('.network-password-field').val('');
-				if (!error) {
-					this.$el.foundation('reveal', 'close');
-				}
+				//loadingBtn.removeClass('loading');
+				//form.find('.network-password-field').val('');
+				//if (!error) {
+				//	this.$el.foundation('reveal', 'close');
+				//}
+        location.reload();
 			}, this)
 		);
 	},
