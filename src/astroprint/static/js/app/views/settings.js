@@ -1125,22 +1125,29 @@ var WifiHotspotView = SettingsPage.extend({
 
       this.parent.subviews["internet-connection"].settings = data;
 
-      this.$('#advertMessage').foundation('reveal', 'open', {
-        close_on_background_click: false,
-        close_on_esc: false
-      });
+      /*if (data.networks.wired.ip) {
 
-      $('#advertMessage input.button.success.ok').on('click', _.bind(function(){
-        $('#advertMessage').foundation('reveal', 'close');
-        this.parent.subviews['internet-connection'].listNetworks(false)
-        .always(_.bind(function(){this.render();},this));
-      },this) );
+        this.stopHotspot(e);
 
-      $('#advertMessage input.button.secondary.cancel').on('click', _.bind(function(){
-        $('#advertMessage').foundation('reveal', 'close');
-        this.render();
-      },this) );
+      } else {*/
 
+        this.$('#advertMessage').foundation('reveal', 'open', {
+          close_on_background_click: false,
+          close_on_esc: false
+        });
+
+        $('#advertMessage input.button.success.ok').on('click', _.bind(function(){
+          $('#advertMessage').foundation('reveal', 'close');
+          this.parent.subviews['internet-connection'].listNetworks(false)
+          .always(_.bind(function(){this.render();},this));
+        },this) );
+
+        $('#advertMessage input.button.secondary.cancel').on('click', _.bind(function(){
+          $('#advertMessage').foundation('reveal', 'close');
+          this.render();
+        },this) );
+
+      //}
     }, this))
     .fail(function() {
       noty({text: "There was an error getting WiFi settings.", timeout: 3000});
