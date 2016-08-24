@@ -75,27 +75,27 @@ def check_internet():
 @api.route('/setup/internet', methods=['POST'])
 @not_setup_only
 def connect_internet():
-	if "application/json" in request.headers["Content-Type"]:
+	"""if "application/json" in request.headers["Content-Type"]:
 		data = request.json
 		nm = networkManager()
 		print '1'
 		print data['id']
 		print data['password']
-		
+
 		try:
 
 			result = nm.setWifiNetwork(data['id'], data['password'])
 			print '2'
-	
+
 			print result
 			print '3'
 
 			if result and result['ip']:#CHANGE CONDITION
 				return jsonify(result)
 			else:
-	
-      				result = nm.startHotspot()
-	
+
+				result = nm.startHotspot()
+
 				if result is True:
 					print 'reconnection successfully'
 					return ("Network %s not found" % data['id'], 404)
@@ -105,11 +105,24 @@ def connect_internet():
 		except:
 			print 'reconnection before raise'
 			result = nm.startHotspot()
-			
+
 			raise
 
 	return ("Invalid Request", 400)
+"""
+	if "application/json" in request.headers["Content-Type"]:
+		data = request.json
+		result = networkManager().setWifiNetwork(data['id'], data['password'])
 
+		if result:
+			return jsonify(result)
+		else:
+			return ("Network %s not found" % data['id'], 404)
+
+	return ("Invalid Request", 400)
+
+"""
+#UNUSED WITH RPI3 WIFI DEVICE
 @api.route('/setup/internet', methods=['PUT'])
 @not_setup_only
 def save_hotspot_option():
@@ -123,6 +136,7 @@ def save_hotspot_option():
 			return jsonify()
 
 	return ("Invalid Request", 400)
+"""
 
 @api.route('/setup/astroprint', methods=['GET'])
 @not_setup_only

@@ -102,21 +102,21 @@ def handleWifiHotspot():
 			'hotspot': {
 				'active': nm.isHotspotActive(),
 				'name': nm.getHostname(),
-				'hotspotOnlyOffline': settings().getBoolean(['wifi', 'hotspotOnlyOffline'])	
+				#'hotspotOnlyOffline': settings().getBoolean(['wifi', 'hotspotOnlyOffline'])
 			} if nm.isHotspotable() else False
 		})
 
-	elif request.method == "PUT":
-		if "application/json" in request.headers["Content-Type"]:
-			data = request.json
+	#elif request.method == "PUT":
+	#	if "application/json" in request.headers["Content-Type"]:
+	#		data = request.json
 
-			if "hotspotOnlyOffline" in data:
-				s = settings()
-				s.setBoolean(['wifi', 'hotspotOnlyOffline'], data["hotspotOnlyOffline"])
-				s.save()
-				return jsonify()
+	#		if "hotspotOnlyOffline" in data:
+	#			s = settings()
+	#			s.setBoolean(['wifi', 'hotspotOnlyOffline'], data["hotspotOnlyOffline"])
+	#			s.save()
+	#			return jsonify()
 
-		return ("Invalid Request", 400)
+	#	return ("Invalid Request", 400)
 
 	elif request.method == "DELETE":
 		result = networkManager().stopHotspot()
@@ -155,7 +155,7 @@ def cameraSettings():
 
 			if "format" in data:
 				s.set(['camera', 'format'], data['format'])
-			
+
 			s.save()
 
 			cm.settingsChanged({
@@ -166,12 +166,12 @@ def cameraSettings():
 			})
 
 	return jsonify(
-		encoding= s.get(['camera', 'encoding']), 
+		encoding= s.get(['camera', 'encoding']),
 		size= s.get(['camera', 'size']),
 		framerate= s.get(['camera', 'framerate']),
 		format= s.get(['camera','format']),
 		structure= cm.settingsStructure()
-	)	
+	)
 
 @api.route("/settings/software/advanced", methods=["GET"])
 @restricted_access
@@ -181,7 +181,7 @@ def getAdvancedSoftwareSettings():
 
 	return jsonify(
 		apiKey= UI_API_KEY,
-		serialActivated= s.getBoolean(['serial', 'log']), 
+		serialActivated= s.getBoolean(['serial', 'log']),
 		sizeLogs= sum([os.path.getsize(os.path.join(logsDir, f)) for f in os.listdir(logsDir)])
 	)
 
@@ -215,6 +215,7 @@ def resetFactorySettings():
 	emptyFolder(s.get(['folder', 'virtualSd']) or s.getBaseFolder('virtualSd'))
 
 	networkManager().forgetWifiNetworks()
+	networkManager().startHotspot()
 
 	#replace config.yaml with config.factory
 	config_file = s._configfile
@@ -281,7 +282,7 @@ def changeSerialLogs():
 		printerManager().setSerialDebugLogging(data['active'])
 
 		return jsonify();
-	
+
 	else:
 		return ("Wrong data sent in.", 400)
 

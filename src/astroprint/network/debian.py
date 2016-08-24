@@ -27,10 +27,10 @@ from octoprint.server import eventManager
 from octoprint.events import Events
 
 def idle_add_decorator(func):
-    def callback(*args):
-        #GObject.idle_add(func, *args)
-        func(*args)
-    return callback
+		def callback(*args):
+				#GObject.idle_add(func, *args)
+				func(*args)
+		return callback
 
 class NetworkManagerEvents(threading.Thread):
 	def __init__(self, manager):
@@ -135,7 +135,7 @@ class NetworkManagerEvents(threading.Thread):
 
 	@idle_add_decorator
 	def propertiesChanged(self, properties):
-		if "ActiveConnections" in properties: 
+		if "ActiveConnections" in properties:
 			#if len(properties['ActiveConnections']) == 0:
 			#	self._setOnline(False)
 			#	return
@@ -174,16 +174,16 @@ class NetworkManagerEvents(threading.Thread):
 				d = self.getActiveConnectionDevice()
 				if d.DeviceType == NetworkManager.NM_DEVICE_TYPE_ETHERNET:
 					eventManager.fire(Events.INTERNET_CONNECTING_STATUS, {
-						'status': 'connected', 
+						'status': 'connected',
 						'info': {
 							'type': 'ethernet',
 							'ip': d.Ip4Address
 						}
-					})					
+					})
 				else:
 					ap = d.SpecificDevice().ActiveAccessPoint
 					eventManager.fire(Events.INTERNET_CONNECTING_STATUS, {
-						'status': 'connected', 
+						'status': 'connected',
 						'info': {
 							'type': 'wifi',
 							'signal': ap.Strength,
@@ -254,7 +254,7 @@ class NetworkManagerEvents(threading.Thread):
 				eventManager.fire(Events.NETWORK_STATUS, 'offline')
 				if self._manager.isHotspotActive() is False: #isHotspotActive returns None if not possible
 					logger.info('AstroBox is offline. Starting hotspot...')
-					result = self._manager.startHotspot() 
+					result = self._manager.startHotspot()
 					if result is True:
 						logger.info('Hostspot started')
 					else:
@@ -269,9 +269,6 @@ class DebianNetworkManager(NetworkManagerBase):
 		self._startHotspotCondition = threading.Condition()
 		self._eventListener.start()
 		logger.info('NetworkManagerEvents is listening for signals')
-
-		if not self.settings.getBoolean(['wifi', 'hotspotOnlyOffline']):
-			self.startHotspot()
 
 	def close(self):
 		self._eventListener.stop()
@@ -331,7 +328,7 @@ class DebianNetworkManager(NetworkManagerBase):
 
 							ap = d.SpecificDevice().ActiveAccessPoint
 
-							if type(ap) is NetworkManager.AccessPoint:						
+							if type(ap) is NetworkManager.AccessPoint:
 								wpaSecured = True if ap.WpaFlags or ap.RsnFlags else False
 								wepSecured = not wpaSecured and ap.Flags == NetworkManager.NM_802_11_AP_FLAGS_PRIVACY
 
@@ -386,7 +383,7 @@ class DebianNetworkManager(NetworkManagerBase):
 
 						if 'ipv4' in options:
 							del options['ipv4']
-						
+
 						connection = c
 						break
 
@@ -415,11 +412,11 @@ class DebianNetworkManager(NetworkManagerBase):
 
 					if e.get_dbus_name() == 'org.freedesktop.NetworkManager.InvalidProperty' and e.get_dbus_message() == 'psk':
 						print 'network manager 2'
-					
+
 						return {'message': 'Invalid Password'}
 					else:
 						print 'network manager 3'
-	
+
 						raise
 
 				return {
@@ -435,9 +432,6 @@ class DebianNetworkManager(NetworkManagerBase):
 
 	def forgetWifiNetworks(self):
 		conns = self._nm.Settings.ListConnections()
-
-		if not self.isHotspotActive():
-			self.startHotspot()
 
 		for c in conns:
 			settings = c.GetSettings()
@@ -471,6 +465,10 @@ class DebianNetworkManager(NetworkManagerBase):
 				return True
 
 			try:
+				#BEFORE ACTIVATE THE HOTSPOT, IT IS NEED TO BE DISCONNECTED FROM A WIFILAN
+				self.forgetWifiNetworks()
+				##########################################################################
+
 				p = sarge.run("service wifi_access_point start", stderr=sarge.Capture())
 				if p.returncode != 0:
 					returncode = p.returncode
@@ -525,7 +523,7 @@ class DebianNetworkManager(NetworkManagerBase):
 				remove(file_path)
 				#Move new file
 				move(abs_path, file_path)
-			
+
 			udpateFiles = [
 				'/etc/hosts'
 			]
@@ -538,3 +536,5 @@ class DebianNetworkManager(NetworkManagerBase):
 
 		else:
 			return False
+
+

@@ -347,11 +347,11 @@ var CameraVideoStreamView = SettingsPage.extend({
 					if(this.cameraName != response.cameraName){
 						//previousCameraName = this.cameraName;
 						this.cameraName = response.cameraName;
-					} 
-					
+					}
+
 
 					$.getJSON(API_BASEURL + 'settings/camera', null, _.bind(function(data) {
-						
+
 						if(data.structure){
 
 							this.settings = data;
@@ -464,13 +464,13 @@ var CameraVideoStreamView = SettingsPage.extend({
 			this._reloadFpsSelect();
 		}
 
-		
+
 	},
 	_reloadFpsSelect: function(){
-		$.each(this.settings.structure.fps, _.bind(function(i, item) { 
+		$.each(this.settings.structure.fps, _.bind(function(i, item) {
 			if(item.resolution == this.$('#video-stream-size').val()) {
 				if (this.settings.framerate == item.value){
-					this.$('#video-stream-framerate').append($('<option>', { 
+					this.$('#video-stream-framerate').append($('<option>', {
 				        		value: item.value,
 				        		text : item.label,
 				        		selected: 'selected'
@@ -478,7 +478,7 @@ var CameraVideoStreamView = SettingsPage.extend({
 			    		)
 			    	);
 				} else {
-					this.$('#video-stream-framerate').append($('<option>', { 
+					this.$('#video-stream-framerate').append($('<option>', {
 				        		value: item.value,
 				        		text : item.label
 			    			}
@@ -500,7 +500,7 @@ var CameraVideoStreamView = SettingsPage.extend({
 			if(response.isCameraPlugged){
 				this.settings = null;
 				this.cameraName = '';
-				this.show(previousCameraName);				
+				this.show(previousCameraName);
 			} else {
 				this.cameraName = false;
 				this.render();
@@ -620,99 +620,162 @@ var InternetConnectionView = SettingsPage.extend({
 			settings: this.settings
 		}));
 	},
-	connect: function(id, password) {
-		var promise = $.Deferred();
+  tryConnect: function(promise,id, password, restartHotspot){
+    $.ajax({
+      url: API_BASEURL + 'settings/network/active',
+      type: 'POST',
+      contentType: 'application/json',
+      dataType: 'json',
+      data: JSON.stringify({id: id, password: password})
+    })
+      .done(_.bind(function(data) {
+        if (data.name) {
+          var connectionCb = null;
 
-		$.ajax({
-			url: API_BASEURL + 'settings/network/active',
-			type: 'POST',
-			contentType: 'application/json',
-			dataType: 'json',
-			data: JSON.stringify({id: id, password: password})
-		})
-			.done(_.bind(function(data) {
-				if (data.name) {
-					var connectionCb = null;
+          //Start Timeout
+          var connectionTimeout = setTimeout(function(){
+            connectionCb.call(this, {status: 'failed', reason: 'timeout'});
+          }, 70000); //1 minute
 
-					//Start Timeout
-					var connectionTimeout = setTimeout(function(){
-						connectionCb.call(this, {status: 'failed', reason: 'timeout'});
-					}, 70000); //1 minute
+          connectionCb = function(connectionInfo){
+            switch (connectionInfo.status) {
+              case 'disconnected':
+              case 'connecting':
+                //Do nothing. the failed case should report the error
+              break;
 
-					connectionCb = function(connectionInfo){
-						switch (connectionInfo.status) {
-							case 'disconnected':
-							case 'connecting':
-								//Do nothing. the failed case should report the error
-							break;
+              case 'connected':
+                app.eventManager.off('astrobox:InternetConnectingStatus', connectionCb, this);
+                noty({text: "Your "+PRODUCT_NAME+" is now connected to "+data.name+".", type: "success", timeout: 3000});
+                this.settings.networks['wireless'] = data;
+                this.render();
+                $.getJSON(API_BASEURL + 'settings/network/hotspot', null, _.bind(function(data) {
+                  this.parent.subviews["wifi-hotspot"].settings = data;
+                  this.parent.subviews["wifi-hotspot"].render();
+                }, this))
+                .fail(function() {
+                  noty({text: "There was an error getting WiFi Hotspot settings.", timeout: 3000});
+                });
+                promise.resolve();
+                clearTimeout(connectionTimeout);
+              break;
 
-							case 'connected':
-								app.eventManager.off('astrobox:InternetConnectingStatus', connectionCb, this);
-								noty({text: "Your "+PRODUCT_NAME+" is now connected to "+data.name+".", type: "success", timeout: 3000});
-								this.settings.networks['wireless'] = data;
-								this.render();
-								promise.resolve();
-								clearTimeout(connectionTimeout);
-							break;
+              case 'failed':
+                app.eventManager.off('astrobox:InternetConnectingStatus', connectionCb, this);
+                if (connectionInfo.reason == 'no_secrets') {
+                  message = "Invalid password for "+data.name+".";
+                } else {
+                  message = "Unable to connect to "+data.name+".";
+                }
+                promise.reject(message);
+                clearTimeout(connectionTimeout);
+                if (restartHotspot) {
+                  //RELOAD SETTINGS ABOUT WIFI HOTSTPOT PREVENTING YOU NEVER HAS OPENED THIS VIEW
+                  //AND STARTS THE HOTSPOT
+                  var hotspotView = this.parent.subviews["wifi-hotspot"];
+                  hotspotView.reloadSettings(hotspotView.startHotspot);
+                }
+                break;
 
-							case 'failed':
-								app.eventManager.off('astrobox:InternetConnectingStatus', connectionCb, this);
-								if (connectionInfo.reason == 'no_secrets') {
-									message = "Invalid password for "+data.name+".";
-								} else {
-									message = "Unable to connect to "+data.name+".";
-								}
-								promise.reject(message);
-								clearTimeout(connectionTimeout);
-								break;
+              default:
+                app.eventManager.off('astrobox:InternetConnectingStatus', connectionCb, this);
+                promise.reject("Unable to connect to "+data.name+".");
+                clearTimeout(connectionTimeout);
+            }
+            $.getJSON(API_BASEURL + 'settings/network', null, _.bind(function(data) {
+              this.parent.subviews["internet-connection"].settings = data;
+              this.parent.subviews["internet-connection"].render();
+            }, this))
+            .fail(function() {
+              noty({text: "There was an error getting WiFi settings.", timeout: 3000});
+            });
+            //this.parent.subviews['internet-connection'].settings = null;
+          };
 
-							default:
-								app.eventManager.off('astrobox:InternetConnectingStatus', connectionCb, this);
-								promise.reject("Unable to connect to "+data.name+".");
-								clearTimeout(connectionTimeout);
-						}
-					};
+          app.eventManager.on('astrobox:InternetConnectingStatus', connectionCb, this);
 
-					app.eventManager.on('astrobox:InternetConnectingStatus', connectionCb, this);
+        } else if (data.message) {
+          noty({text: data.message, timeout: 3000});
+          promise.reject()
+        }
+      }, this))
+      .fail(_.bind(function(){
+        if (restartHotspot) {
+          //RELOAD SETTINGS ABOUT WIFI HOTSTPOT PREVENTING YOU NEVER HAS OPENED THIS VIEW
+          //AND STARTS THE HOTSPOT
+          var hotspotView = this.parent.subviews["wifi-hotspot"];
+          hotspotView.reloadSettings(hotspotView.startHotspot);
+        }
+        noty({text: "There was an error connecting to a Wifi net.", timeout: 3000});
+        promise.reject();
+      }, this));
+  },
+	connect: function(id, password, restartHotspot) {
 
-				} else if (data.message) {
-					noty({text: data.message, timeout: 3000});
-					promise.reject()
-				}
-			}, this))
-			.fail(_.bind(function(){
-				noty({text: "There was an error saving setting.", timeout: 3000});
-				promise.reject();
-			}, this));
+    var promise = $.Deferred();
 
-		return promise;
+    if (restartHotspot) {
+
+      $.ajax({
+        url: API_BASEURL + "settings/network/hotspot",
+        type: "DELETE"
+      })
+      .done( _.bind(function(data, code, xhr) {
+          noty({text: 'The hotspot has been stopped', type: 'success', timeout:3000});
+          this.tryConnect(promise,id, password, true)
+      }, this))
+      .fail( function(xhr) {
+          noty({text: xhr.responseText + ". Wifi connection can not be created. Please, try again.", timeout:3000});
+      });
+
+    } else {
+
+      this.tryConnect(promise,id, password, false);
+
+    }
+
+    return promise;
 	},
 	listNetworksClicked: function(e) {
+
 		var el = $(e.target).closest('.loading-button');
 
 		el.addClass('loading');
 
-		$.getJSON(
-			API_BASEURL + "settings/network/wifi-networks",
-			_.bind(function(data) {
-				if (data.message) {
-					noty({text: data.message});
-				} else if (data.networks) {
-					var self = this;
-					this.networksDlg.open(_.sortBy(_.uniq(_.sortBy(data.networks, function(el){return el.name}), true, function(el){return el.name}), function(el){
-						el.active = self.settings.networks.wireless && self.settings.networks.wireless.name == el.name;
-						return -el.signal
-					}));
-				}
-			}, this)
-		).
-		fail(function(){
+		this.listNetworks(true)
+    .fail(function(){
 			noty({text: "There was an error retrieving networks.", timeout:3000});
 		}).
-		complete(function(){
+		always(function(){
 			el.removeClass('loading');
 		});
-	}
+	},
+  listNetworks: function(evalHotspotState){
+
+    var promise = $.Deferred();
+
+    $.getJSON(
+      API_BASEURL + "settings/network/wifi-networks",
+      _.bind(function(data) {
+        if (data.message) {
+          noty({text: data.message});
+          promise.reject();
+        } else if (data.networks) {
+          var self = this;
+          this.networksDlg.open(_.sortBy(_.uniq(_.sortBy(data.networks, function(el){return el.name}), true, function(el){return el.name}), function(el){
+            el.active = self.settings.networks.wireless && self.settings.networks.wireless.name == el.name;
+            return -el.signal
+          }),evalHotspotState);
+          promise.resolve();
+        }
+      }, this)
+    ).
+    fail(function(){
+      promise.reject()
+    });
+
+    return promise;
+  }
 });
 
 var WiFiNetworkPasswordDialog = Backbone.View.extend({
@@ -723,6 +786,7 @@ var WiFiNetworkPasswordDialog = Backbone.View.extend({
 	},
 	template: _.template($('#wifi-network-password-modal-template').html()),
 	parent: null,
+  restartHotspot: null,
 	initialize: function(params) {
 		this.parent = params.parent;
 	},
@@ -730,8 +794,9 @@ var WiFiNetworkPasswordDialog = Backbone.View.extend({
 	{
 		this.$el.html( this.template({wifi: wifiInfo}) );
 	},
-	open: function(wifiInfo) {
+	open: function(wifiInfo,restartHotspot) {
 		this.render(wifiInfo);
+    this.restartHotspot = restartHotspot;
 		this.$el.foundation('reveal', 'open', {
 			close_on_background_click: false,
 			close_on_esc: false
@@ -739,6 +804,12 @@ var WiFiNetworkPasswordDialog = Backbone.View.extend({
 		this.$el.one('opened', _.bind(function() {
 			this.$el.find('.network-password-field').focus();
 		}, this));
+
+    this.$el.find('button.secondary').on('click',_.bind(function(){
+      this.$el.foundation('reveal', 'close');
+      //Make sure we reload next time we load this tab
+      this.parent.parent.subviews['internet-connection'].settings = null;
+    },this));
 	},
 	connectClicked: function(e) {
 		e.preventDefault();
@@ -758,7 +829,7 @@ var WiFiNetworkPasswordDialog = Backbone.View.extend({
 		loadingBtn.addClass('loading');
 		cancelBtn.hide();
 
-		this.parent.connect(id, password)
+		this.parent.connect(id, password,this.restartHotspot)
 			.done(_.bind(function(){
 				form.find('.network-password-field').val('');
 				this.$el.foundation('reveal', 'close');
@@ -782,52 +853,142 @@ var WiFiNetworksDialog = Backbone.View.extend({
 	passwordDlg: null,
 	parent: null,
 	networks: null,
+  networkSelected: null,
+  loadingBtn: null,
 	initialize: function(params) {
 		this.parent = params.parent;
+    $('#infoMessage input.button.success.connect').on('click', _.bind(this.confirmConnection,this) );
+    $('#infoMessage input.button.secondary.cancel').on('click', _.bind(this.closeMessage,this) );
 	},
-	open: function(networks) {
-		var content = this.$el.find('.modal-content');
-		content.empty();
+	open: function(networks,evalHotspotState) {
 
-		this.networks = networks;
-
-		content.html(this.networksTemplate({
-			networks: this.networks
-		}));
-
-		content.find('button').bind('click', _.bind(this.networkSelected, this));
+		this.loadNetworksList(networks,evalHotspotState);
 
 		this.$el.foundation('reveal', 'open');
 	},
-	networkSelected: function(e) {
+  loadNetworksList: function(networks,evalHotspotState){
+    var content = this.$el.find('.modal-content');
+    content.empty();
+
+    this.networks = networks;
+
+    content.html(this.networksTemplate({
+      networks: this.networks
+    }));
+
+    content.find('button').bind('click', _.bind(this.networkSelection, this, evalHotspotState));
+    this.$el.find('div .modal-actions.row').find('.secondary').on('click',_.bind(function(){
+      this.$el.foundation('reveal', 'close');
+    },this));
+
+  },
+  showMessage: function(e){
+
+    this.$('#infoMessage p.titleMessage').html('You are trying to connect to <span class="name bold">' + this.networkSelected.name + '</span>.');
+    this.$('#infoMessage p.bodyMessage').html('You will try to connect to '
+      + this.networkSelected.name +
+      '. For being able to do this, hotspot will be disable.</p><p align="center">During the process, <span class="name bold">if something go wrong</span>, for example: the wifi password is incorrect, <span class="name bold"> '
+      + PRODUCT_NAME +
+      ' will turn on the hotspot again for being accesible again</span>.');
+
+
+    this.$('#direct-connect-dialog').hide();
+    this.$('#infoMessage').show();
+
+  },
+  closeMessage: function(e){
+    this.$('#infoMessage').hide();
+    this.$('#direct-connect-dialog').show();
+  },
+	networkSelection: function(evalHotspotState,e) {
 		e.preventDefault();
 
-		var button = $(e.target);
+    var button = $(e.target);
 
-		if (!this.passwordDlg) {
-			this.passwordDlg = new WiFiNetworkPasswordDialog({parent: this.parent});
-		}
+    this.loadingBtn = button.closest('.loading-button');
 
-		var network = this.networks[button.data('id')]
+    this.networkSelected = this.networks[button.data('id')];
 
-		if (network.secured) {
-			this.passwordDlg.open(network);
-		} else {
-			var loadingBtn = button.closest('.loading-button');
+    if (evalHotspotState) {
 
-			loadingBtn.addClass('loading');
+      $.ajax({
+        url: '/api/settings/network/hotspot',
+        method: 'GET',
+        contentType: 'application/json',
+        dataType: 'json'
+      })
+      .done(_.bind(function(data){
+        if (data.hotspot) {
+          if (data.hotspot.active) {
+            this.showMessage();
+          } else {
+            this.doConnection(false);
+          }
+        } else {
+          noty({text: "There was an error getting wifi device state.", timeout: 3000});
+        }
+      }, this))
+      .fail(function(){
+        noty({text: "There was an error getting wifi device state.", timeout: 3000});
+      });
 
-			this.parent.connect(network.id, null)
-				.done(_.bind(function(){
-					this.$el.foundation('reveal', 'close');
-					loadingBtn.removeClass('loading');
-				}, this))
-				.fail(function(message){
-					noty({text: message, timeout: 3000});
-					loadingBtn.removeClass('loading');
-				});
-		}
-	}
+    } else {
+
+      this.doConnection(true);
+
+    }
+	},
+  confirmConnection: function(){
+    this.$('#infoMessage').hide();
+    this.$('#direct-connect-dialog').show();
+    this.doConnection(true);
+  },
+  doConnection: function(restartHotspot){
+
+
+    if (!this.passwordDlg) {
+      this.passwordDlg = new WiFiNetworkPasswordDialog({parent: this.parent});
+    }
+
+    if (this.networkSelected.secured) {
+
+      this.passwordDlg.open(this.networkSelected,restartHotspot);
+
+    } else {
+
+      this.loadingBtn.addClass('loading');
+
+      this.parent.connect(this.networkSelected.id, null, restartHotspot)
+        .done(_.bind(function(){
+          this.$el.foundation('reveal', 'close');
+          this.loadingBtn.removeClass('loading');
+        }, this))
+        .fail(_.bind(function(message){
+          noty({text: message, timeout: 3000});
+          this.loadingBtn.removeClass('loading');
+
+          /*$.getJSON(
+            API_BASEURL + "settings/network/wifi-networks",
+            _.bind(function(data) {
+              if (data.message) {
+                noty({text: data.message});
+              } else if (data.networks) {
+                var self = this;
+                this.loadNetworksList(_.sortBy(_.uniq(_.sortBy(data.networks, function(el){return el.name}), true, function(el){return el.name}), function(el){
+                  el.active = self.parent.settings.networks.wireless && self.parent.settings.networks.wireless.name == el.name;
+                  return -el.signal
+                }),true);
+              }
+            }, this)
+          )
+          .fail(function(){
+            noty({text: "There was an error retrieving networks.", timeout:3000});
+            this.$el.foundation('reveal', 'close');
+          })*/
+
+        },this));
+    }
+  }
 });
 
 /*************************
@@ -840,71 +1001,174 @@ var WifiHotspotView = SettingsPage.extend({
 	settings: null,
 	events: {
 		'click .loading-button.start-hotspot button': 'startHotspotClicked',
-		'click .loading-button.stop-hotspot button': 'stopHotspotClicked',
-		'change .hotspot-off input': 'hotspotOffChanged'
+		'click .loading-button.stop-hotspot button': 'stopHotspotClicked'/*,
+		'change .hotspot-off input': 'hotspotOffChanged'*/
 	},
+  wirelessName: null,
 	show: function() {
 		//Call Super
 		SettingsPage.prototype.show.apply(this);
 
-		if (!this.settings) {
-			$.getJSON(API_BASEURL + 'settings/network/hotspot', null, _.bind(function(data) {
-				this.settings = data;
-				this.render();
-			}, this))
-			.fail(function() {
-				noty({text: "There was an error getting WiFi Hotspot settings.", timeout: 3000});
-			});
-		}
+    this.reloadWirelessName()
+    .done(_.bind(function(){
+      if (!this.settings) {
+        $.getJSON(API_BASEURL + 'settings/network/hotspot', null, _.bind(function(data) {
+          this.settings = data;
+          this.render();
+        }, this))
+        .fail(function() {
+          noty({text: "There was an error getting WiFi Hotspot settings.", timeout: 3000});
+        });
+      }
+    },this));
 	},
 	render: function() {
 		this.$el.html(this.template({
 			settings: this.settings
 		}));
 	},
+  reloadWirelessName: function(){
+
+    var promise = $.Deferred();
+
+    $.ajax({
+      url: API_BASEURL + 'settings/network',
+      type: 'GET',
+      dataType: 'json'
+    })
+    .done(_.bind(function(data) {
+      if (data.networks.wireless) {
+        this.wirelessName = data.networks.wireless.name;
+      }
+      promise.resolve();
+    }, this))
+    .fail(function(){promise.reject();})
+
+    return promise;
+  },
 	startHotspotClicked: function(e) {
-		var el = $(e.target).closest('.loading-button');
 
-		el.addClass('loading');
+    $(e.target).closest('.loading-button').addClass('loading');
 
-		$.ajax({
-			url: API_BASEURL + "settings/network/hotspot",
-			type: "POST",
-			success: _.bind(function(data, code, xhr) {
-				noty({text: 'Your '+PRODUCT_NAME+' has created a hotspot. Connect to <b>'+this.settings.hotspot.name+'</b>.', type: 'success', timeout:3000});
-				this.settings.hotspot.active = true;
-				this.render();
-			}, this),
-			error: function(xhr) {
-				noty({text: xhr.responseText, timeout:3000});
-			},
-			complete: function() {
-				el.removeClass('loading');
-			}
-		});
+    if (!this.wirelessName) {
+      this.reloadWirelessName()
+      .done(_.bind(function(){
+        this.evalHotspotEnablingProc(e);
+      },this))
+      .fail(_.bind(function(){
+        noty({text: "There was an error getting WiFi settings.", timeout: 3000});
+        $('#infoMessage').foundation('reveal', 'close');
+      },this));
+    } else {
+      this.evalHotspotEnablingProc(e);
+    }
 	},
+  evalHotspotEnablingProc: function(e){
+    if (this.wirelessName) {
+
+      this.$('#infoMessage').foundation('reveal', 'open', {
+        close_on_background_click: false,
+        close_on_esc: false
+      });
+
+      $('#infoMessage input.button.success.ok').on('click', _.bind(function(){
+        $('#infoMessage').foundation('reveal', 'close');
+        this.startHotspot();
+      },this) );
+
+      $('#infoMessage input.button.secondary.cancel').on('click', _.bind(this.cancelStartHotspot,this) );
+
+    } else {
+      this.startHotspot(e);
+    }
+  },
+  cancelStartHotspot: function(e){
+    this.$('.loading-button.start-hotspot.loading').removeClass('loading')
+    $('#infoMessage').foundation('reveal', 'close');
+    this.render();
+  },
+  reloadSettings: function(callback){
+    $.getJSON(API_BASEURL + 'settings/network/hotspot', null, _.bind(function(data) {
+        this.settings = data;
+        if (callback) {
+          callback.call(this);
+        }
+    }, this))
+    .fail(function() {
+      noty({text: "There was an error getting WiFi Hotspot settings.", timeout: 3000});
+    });
+  },
+  startHotspot: function(e){
+
+    $.ajax({
+      url: API_BASEURL + "settings/network/hotspot",
+      type: "POST"})
+    .done(_.bind(function(data, code, xhr) {
+      noty({text: 'Your '+PRODUCT_NAME+' has created a hotspot. Connect to <b>'+this.settings.hotspot.name+'</b>.', type: 'success', timeout:3000});
+      this.settings.hotspot.active = true;
+      this.render();
+      this.parent.subviews['internet-connection'].settings = null;
+    }, this))
+    .fail(function(xhr) {
+      noty({text: xhr.responseText, timeout:3000});
+    })
+    .always(function() {
+      if (e) {//This function can be called from an scope wich e does not exist
+        $(e.target).closest('.loading-button').removeClass('loading');
+      }
+    });
+  },
 	stopHotspotClicked: function(e) {
-		var el = $(e.target).closest('.loading-button');
 
-		el.addClass('loading');
 
-		$.ajax({
-			url: API_BASEURL + "settings/network/hotspot",
-			type: "DELETE",
-			success: _.bind(function(data, code, xhr) {
-				noty({text: 'The hotspot has been stopped', type: 'success', timeout:3000});
-				this.settings.hotspot.active = false;
-				this.render();
-			}, this),
-			error: function(xhr) {
-				noty({text: xhr.responseText, timeout:3000});
-			},
-			complete: function() {
-				el.removeClass('loading');
-			}
-		});
+    $.getJSON(API_BASEURL + 'settings/network', null, _.bind(function(data) {
+
+      this.parent.subviews["internet-connection"].settings = data;
+
+      this.$('#advertMessage').foundation('reveal', 'open', {
+        close_on_background_click: false,
+        close_on_esc: false
+      });
+
+      $('#advertMessage input.button.success.ok').on('click', _.bind(function(){
+        $('#advertMessage').foundation('reveal', 'close');
+        this.parent.subviews['internet-connection'].listNetworks(false)
+        .always(_.bind(function(){this.render();},this));
+      },this) );
+
+      $('#advertMessage input.button.secondary.cancel').on('click', _.bind(function(){
+        $('#advertMessage').foundation('reveal', 'close');
+        this.render();
+      },this) );
+
+    }, this))
+    .fail(function() {
+      noty({text: "There was an error getting WiFi settings.", timeout: 3000});
+    });
 	},
-	hotspotOffChanged: function(e)
+  stopHotspot: function(e){
+
+    var el = $(e.target).closest('.loading-button');
+
+    el.addClass('loading');
+
+    $.ajax({
+      url: API_BASEURL + "settings/network/hotspot",
+      type: "DELETE",
+      success: _.bind(function(data, code, xhr) {
+        noty({text: 'The hotspot has been stopped', type: 'success', timeout:3000});
+        this.settings.hotspot.active = false;
+        this.render();
+      }, this),
+      error: function(xhr) {
+        noty({text: xhr.responseText, timeout:3000});
+      },
+      complete: function() {
+        el.removeClass('loading');
+      }
+    });
+  }
+	/*hotspotOffChanged: function(e)
 	{
 		var target = $(e.currentTarget);
 		var checked = target.is(':checked');
@@ -924,7 +1188,7 @@ var WifiHotspotView = SettingsPage.extend({
 			.fail(function(){
 				noty({text: "There was an error saving hotspot option.", timeout: 3000});
 			});
-	}
+	}*/
 });
 
 /********************
@@ -1193,7 +1457,7 @@ var ResetConfirmDialog = Backbone.View.extend({
 		if (this.$('input').val() == 'RESET') {
 			var loadingBtn = this.$('.loading-button');
 			loadingBtn.addClass('loading');
-			
+
 			$.ajax({
 				url: API_BASEURL + 'settings/software/settings',
 				type: 'DELETE',
