@@ -128,8 +128,8 @@
 								Heated Bed
 							</label>
 							<div class="switch radius">
-							  <input id="heated-bed" name="heated_bed" type="checkbox" <% if (settings.heated_bed) { %> value="yes" checked<% } %>>
-							  <label for="heated-bed"></label>
+								<input id="heated-bed" name="heated_bed" type="checkbox" <% if (settings.heated_bed) { %> value="yes" checked<% } %>>
+								<label for="heated-bed"></label>
 							</div>
 							<label for="invert-z" class="bold">
 								Z-Axis Movement
@@ -180,10 +180,10 @@
 					<div class="text-center">
 						<label class="bold"><%= this.cameraName %></label>
 						<div id="buttonRefresh" class="loading-button still">
-		                    <div class="still-camera">
-							    <button class="success radius spin">Re-scan for plugged camera</i></button>
-							    <span class="button success radius loading disabled"><i class="icon-rocket-spinner animate-spin"></i></span>
-		                    </div>
+												<div class="still-camera">
+									<button class="success radius spin">Re-scan for plugged camera</i></button>
+									<span class="button success radius loading disabled"><i class="icon-rocket-spinner animate-spin"></i></span>
+												</div>
 						</div>
 					</div>
 					<hr>
@@ -273,10 +273,10 @@
 						<i class="icon-attention"></i>
 						<label class="bold">No Camera Found</label>
 						<div id="buttonRefresh" class="loading-button still">
-		                    <div class="still-camera">
-							    <button class="success radius spin">Scan for Cameras</i></button>
-							    <span class="button success radius loading disabled"><i class="icon-rocket-spinner animate-spin"></i></span>
-		                    </div>
+												<div class="still-camera">
+									<button class="success radius spin">Scan for Cameras</i></button>
+									<span class="button success radius loading disabled"><i class="icon-rocket-spinner animate-spin"></i></span>
+												</div>
 						</div>
 					</div>
 				<% } %>
@@ -321,74 +321,81 @@
 
 		<div id="internet-connection" class="settings-page hide"></div>
 		<div id="wifi-network-list-modal" class="reveal-modal medium radius" data-reveal align="center">
-			<h2 class="bold">Select a WiFi Network</h2>
-			<div class="modal-content"></div>
-			<div class="modal-actions row">
-				<div class="small-12 medium-6 medium-centered columns">
-					<button class="secondary radius expand" onclick="$('#wifi-network-list-modal').foundation('reveal', 'close')">Cancel</button>
+			<div id="direct-connect-dialog">
+				<h2 class="bold">Select a WiFi Network</h2>
+				<div class="modal-content"></div>
+				<div class="modal-actions row">
+					<div class="small-12 medium-6 medium-centered columns">
+						<button class="secondary radius expand">Cancel</button>
+					</div>
 				</div>
 			</div>
+			<div id="infoMessage" style="display: none;">
+				<div>
+					<h2 class="bold" align="center">IMPORTANT</h2>
+	        <p align="center" class="titleMessage"/><!-- MESSAGE IN JAVASCRIPT SOURCE CODE VIEW -->
+	        <div>
+	          <p align="center" class="bodyMessage"/><!-- MESSAGE IN JAVASCRIPT SOURCE CODE VIEW -->
+	        </div>
+	      </div>
+        <div class="modal-actions row">
+	       	<div class="small-12 medium-6 columns">
+	         	<div class="loading-button expand">
+	            <input type="button" class="button radius secondary cancel" value="cancel" />
+	          </div>
+	        </div>
+	        <div class="small-12 medium-6 columns">
+	          <div class="loading-button expand">
+	          	<input type="button" class="button radius success connect" value="ok" />
+	         	</div>
+	        </div>
+	      </div>
+      </div>
 			<a class="close-reveal-modal">&#215;</a>
 		</div>
 
 		<div id="wifi-network-password-modal" class="reveal-modal medium radius" data-reveal>
-      <div id="content">
-  			<script type="text/template" id="wifi-network-password-modal-template">
-  				<% if (wifi.wep) { %>
-  					<h2 class="bold" align="center">WEP Security Deprecated</h2>
-  					<div class="modal-body">
-  						<p>
-  							The <%= wifi.name %> WiFi network seems to be configured to use WEP security.
-  						</p>
-  						<p>
-  							WiFI WEP Security was <a href="https://en.wikipedia.org/wiki/Wired_Equivalent_Privacy" target="_info">deprecated in 2004</a>
-  							and is <b>not considered safe</b>, please configure your WiFi network to use WPA or WPA2.
-  						</p>
-  					</div>
-  					<div class="modal-actions row">
-  						<div class="small-12 medium-6 medium-centered columns">
-  							<button class="secondary radius cancel expand" onclick="$('#wifi-network-password-modal').foundation('reveal', 'close')">Close</button>
-  						</div<
-  					</div>
-  				<% } else { %>
-  					<h2 class="bold" align="center">WiFi Password</h2>
-  					<div class="modal-body">
-  						<p align="center">Enter the password for <span class="name bold"><%= wifi.name %></span>.</p>
-  						<form>
-  							<input type="hidden" class="network-id-field" name="id" value="<%= wifi.id %>">
-  							<input type="password" class="network-password-field" name="password"/>
-  						</form>
-  					</div>
-  					<div class="modal-actions row">
-  						<div class="small-12 medium-6 columns">
-  							<button class="secondary radius cancel expand" onclick="$('#wifi-network-password-modal').foundation('reveal', 'close')">Cancel</button>
-  						</div>
-  						<div class="small-12 medium-6 columns">
-  							<div class="loading-button expand">
-  								<button class="radius success connect">Connect</button>
-  								<span class="loading button success disabled radius">
-  									<i class="icon-rocket-spinner animate-spin"></i> Might be a while. Please be patient...
-  								</span>
-  							</div>
-  						</div>
-  					</div>
-  				<% } %>
-  			</script>
-      </div>
-      <div id="infoMessage">
-        <div>
-            Astrobox-4567 will try to connect to AstroPrintWLAN. While connecting could go something wrong, that's why, during between 10 and 20 seconds, your Astrobox will seem to be disconnected. If connection will be wrong, for example: had a mistake in password; you could try to connect again.
-          </div>
-          <div class="small-12 medium-6 columns">
-            <div class="loading-button expand">
-              <button class="radius success connect">ok</button>
-              <span class="loading button success disabled radius">
-                <i class="icon-rocket-spinner animate-spin"></i> Might be a while. Please be patient...
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
+			<script type="text/template" id="wifi-network-password-modal-template">
+				<% if (wifi.wep) { %>
+					<h2 class="bold" align="center">WEP Security Deprecated</h2>
+					<div class="modal-body">
+						<p>
+							The <%= wifi.name %> WiFi network seems to be configured to use WEP security.
+						</p>
+						<p>
+							WiFI WEP Security was <a href="https://en.wikipedia.org/wiki/Wired_Equivalent_Privacy" target="_info">deprecated in 2004</a>
+							and is <b>not considered safe</b>, please configure your WiFi network to use WPA or WPA2.
+						</p>
+					</div>
+					<div class="modal-actions row">
+						<div class="small-12 medium-6 medium-centered columns">
+							<button class="secondary radius cancel expand">Close</button>
+						</div<
+					</div>
+				<% } else { %>
+					<h2 class="bold" align="center">WiFi Password</h2>
+					<div class="modal-body">
+						<p align="center">Enter the password for <span class="name bold"><%= wifi.name %></span>.</p>
+						<form>
+							<input type="hidden" class="network-id-field" name="id" value="<%= wifi.id %>">
+							<input type="password" class="network-password-field" name="password"/>
+						</form>
+					</div>
+					<div class="modal-actions row">
+						<div class="small-12 medium-6 columns">
+							<button class="secondary radius cancel expand">Cancel</button>
+						</div>
+						<div class="small-12 medium-6 columns">
+							<div class="loading-button expand">
+								<button class="radius success connect">Connect</button>
+								<span class="loading button success disabled radius">
+									<i class="icon-rocket-spinner animate-spin"></i> Might be a while. Please be patient...
+								</span>
+							</div>
+						</div>
+					</div>
+				<% } %>
+			</script>
 		</div>
 
 		<script type="text/template" id="internet-connection-settings-page-template">
@@ -482,6 +489,29 @@
 								<i class="icon-rocket-spinner animate-spin"></i> Stopping Hotspot...
 							</span>
 						</div>
+						<div id="advertMessage" class="reveal-modal medium radius" data-reveal>
+	            <h2 class="bold" align="center">IMPORTANT</h2>
+	            <p align="center">You will disable the hotspot access, and <span class="name bold">{{astroboxName}} has not a wire connection</span>, so, <span class="name bold">you have to connect {{astroboxName}} to a Wifi net for keeping it accesible</span>.
+	            </p>
+	            <p align="center">During the process, <span class="name bold">if something go wrong</span>, for example: the wifi password is incorrect, <span class="name bold">{{astroboxName}} will turn on the hotspot again for being accesible again</span>.</p>
+	            <div>
+	              <p align="center">
+	              Do you want to continue stopping the hotspot?
+	              </p>
+	            </div>
+							<div class="modal-actions row">
+								<div class="small-12 medium-6 columns">
+		              <div class="loading-button expand">
+		                <input type="button" class="button radius secondary cancel" value="cancel" />
+		              </div>
+		            </div>
+		            <div class="small-12 medium-6 columns">
+		              <div class="loading-button expand">
+		                <input type="button" class="button radius success ok" value="yes" />
+		              </div>
+		            </div>
+		          </div>
+	          </div>
 					<% } else { %>
 						<div class="loading-button start-hotspot">
 							<button class="radius">Start hotspot</button>
@@ -489,8 +519,33 @@
 								<i class="icon-rocket-spinner animate-spin"></i> Starting Hotspot...
 							</span>
 						</div>
+						<div id="infoMessage" class="reveal-modal medium radius" data-reveal>
+	            <h2 class="bold" align="center">IMPORTANT</h2>
+	            <p align="center">You are trying to connect to activate <span class="name bold">Hotspot feature</span>.</p>
+	            <div>
+	              <p align="center">
+	              {{astroboxName}} will enable the hotspot feature, so {{astroboxName}} will be disconnected from <%= this.wirelessName %> Wifi connection
+	              </p>
+	              <p align="center">
+	              <span class="name bold">{{astroboxName}} could be accesible by hotspot</span>.
+	              </p>
+	              <p align="center">Are you sure?</p>
+	            </div>
+							<div class="modal-actions row">
+								<div class="small-12 medium-6 columns">
+		              <div class="loading-button expand">
+		                <input type="button" class="button radius secondary cancel" value="cancel" />
+		              </div>
+		            </div>
+		            <div class="small-12 medium-6 columns">
+		              <div class="loading-button expand">
+		                <input type="button" class="button radius success ok" value="yes" />
+		              </div>
+		            </div>
+		          </div>
+	          </div>
 					<% } %>
-					<div class="row hotspot-off">
+					<!-- <div class="row hotspot-off">
 						<div class="small-2 large-1 columns">
 							<input id="hotspot-off" type="checkbox" <% if (settings.hotspot.hotspotOnlyOffline) { %> value="yes" checked <% } %>>
 						</div>
@@ -499,7 +554,7 @@
 								<b>Turn hotspot off when a known network is found in the future.</b>
 							</label>
 						</div>
-					</div>
+					</div> -->
 				</div>
 			<% } %>
 		</script>
