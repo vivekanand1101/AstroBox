@@ -718,15 +718,20 @@ var InternetConnectionView = SettingsPage.extend({
 
       $.ajax({
         url: API_BASEURL + "settings/network/hotspot",
-        type: "DELETE"
+        type: "DELETE",
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify({tryWifi: true, id: id, password: password})
       })
       .done( _.bind(function(data, code, xhr) {
           noty({text: 'The hotspot has been stopped', type: 'success', timeout:3000});
-          this.tryConnect(promise,id, password, true)
+          //it would not be necessary
+          //this.tryConnect(promise,id, password, true)
       }, this))
-      .fail( function(xhr) {
+      .fail( _.bind(function(xhr) {
           noty({text: xhr.responseText + ". Wifi connection can not be created. Please, try again.", timeout:3000});
-      });
+          promise.reject();
+      },this));
 
     } else {
 
@@ -887,9 +892,9 @@ var WiFiNetworksDialog = Backbone.View.extend({
     this.$('#infoMessage p.titleMessage').html('You are trying to connect to <span class="name bold">' + this.networkSelected.name + '</span>.');
     this.$('#infoMessage p.bodyMessage').html('You will try to connect to '
       + this.networkSelected.name +
-      '. For being able to do this, hotspot will be disable.</p><p align="center">During the process, <span class="name bold">if something go wrong</span>, for example: the wifi password is incorrect, <span class="name bold"> '
+      '. For being able to do this, <span class="name bold">hotspot will be disable</span>.</p><p align="center">During the process, <span class="name bold">if something goes wrong</span>, for example: the wifi password is incorrect, <span class="name bold"> '
       + PRODUCT_NAME +
-      ' will turn on the hotspot again for being accesible again</span>.');
+      ' will turn on the hotspot for being accesible again</span>.');
 
 
     this.$('#direct-connect-dialog').hide();
@@ -1125,11 +1130,11 @@ var WifiHotspotView = SettingsPage.extend({
 
       this.parent.subviews["internet-connection"].settings = data;
 
-      /*if (data.networks.wired.ip) {
+      if (data.networks.wired && data.networks.wired.ip) {
 
         this.stopHotspot(e);
 
-      } else {*/
+      } else {
 
         this.$('#advertMessage').foundation('reveal', 'open', {
           close_on_background_click: false,
@@ -1147,7 +1152,7 @@ var WifiHotspotView = SettingsPage.extend({
           this.render();
         },this) );
 
-      //}
+      }
     }, this))
     .fail(function() {
       noty({text: "There was an error getting WiFi settings.", timeout: 3000});

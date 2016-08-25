@@ -92,7 +92,7 @@ def setWifiNetwork():
 
 	return ("Invalid Request", 400)
 
-@api.route("/settings/network/hotspot", methods=["GET", "POST", "PUT", "DELETE"])
+@api.route("/settings/network/hotspot", methods=["GET", "POST", "DELETE"])
 @restricted_access
 def handleWifiHotspot():
 	nm = networkManager()
@@ -119,10 +119,37 @@ def handleWifiHotspot():
 	#	return ("Invalid Request", 400)
 
 	elif request.method == "DELETE":
-		result = networkManager().stopHotspot()
+		result = nm.stopHotspot()
 
 		if result is True:
+
+			try:
+
+				if "application/json" in request.headers["Content-Type"]:
+					data = request.json
+
+					if data['tryWifi']:
+
+						try:
+
+							result = nm.setWifiNetwork(data['id'], data['password'])
+
+							if not result:
+								nm.startHotspot()
+								return ("Network %s not found" % data['id'], 404)
+
+						except:
+
+							nm.startHotspot()
+
+							raise
+
+			except:
+
+					pass
+
 			return jsonify()
+
 		else:
 			return (result, 500)
 

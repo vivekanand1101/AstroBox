@@ -211,6 +211,14 @@ class NetworkManagerEvents(threading.Thread):
 
 				self._activatingConnection = None
 
+				if self._manager.isHotspotActive() is False: #isHotspotActive returns None if not possible
+					logger.info('AstroBox is offline. Starting hotspot...')
+					result = self._manager.startHotspot()
+					if result is True:
+						logger.info('Hostspot started')
+					else:
+						logger.error('Failed to start hostspot: %s' % result)
+
 				#check the global connection status before setting it to false
 				#if NetworkManager.NetworkManager.state() != NetworkManager.NM_STATE_CONNECTED_GLOBAL:
 				#	self._setOnline(False)
@@ -243,6 +251,7 @@ class NetworkManagerEvents(threading.Thread):
 						logger.info('Active Connection is now %s (%s)' % (d.IpInterface, self._currentIpv4Address))
 
 						self._online = True
+
 						eventManager.fire(Events.NETWORK_STATUS, 'online')
 
 				except Exception as e:
@@ -408,15 +417,10 @@ class DebianNetworkManager(NetworkManagerBase):
 						(connection, activeConnection) = self._nm.NetworkManager.AddAndActivateConnection(options, wifiDevice, accessPoint)
 
 				except DBusException as e:
-					print 'network manager 1'
 
 					if e.get_dbus_name() == 'org.freedesktop.NetworkManager.InvalidProperty' and e.get_dbus_message() == 'psk':
-						print 'network manager 2'
-
 						return {'message': 'Invalid Password'}
 					else:
-						print 'network manager 3'
-
 						raise
 
 				return {

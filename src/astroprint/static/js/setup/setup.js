@@ -148,13 +148,19 @@ var StepInternet = StepView.extend({
 	networkListTemplate: null,
 	networks: null,
 	passwordDialog: null,
-	initialize: function()
+  parent: null,
+  networkSelected: null,
+	initialize: function(params)
 	{
+      this.parent = params.setup_view;
+
 		_.extend(this.events, {
 			'click .failed-state button': 'onShow',
-			'click .settings-state button.connect': 'onConnectClicked',
-			'change .hotspot-off input': 'hotspotOffChanged'
+			'click .settings-state button.connect': 'showMessage'/*,
+			'change .hotspot-off input': 'hotspotOffChanged'*/
 		});
+    this.$('#infoMessage input.button.success.ok').on('click', _.bind(this.confirmConnection,this) );
+    this.$('#infoMessage input.button.secondary.cancel').on('click', _.bind(this.closeMessage,this) );
 	},
 	onShow: function()
 	{
@@ -184,7 +190,7 @@ var StepInternet = StepView.extend({
 					}));
 
 					//Bind events
-					list.find('ul li').bind('click', _.bind(this.networkSelected, this));
+					list.find('ul li').bind('click', _.bind(this.networkSelection, this));
 
 					this.$el.addClass('settings');
 				}
@@ -198,15 +204,15 @@ var StepInternet = StepView.extend({
 			}, this)
 		})
 	},
-	networkSelected: function(e)
+	networkSelection: function(e)
 	{
 		var networkRow = $(e.currentTarget);
 
 		this.$('.wifi-network-list li.selected').removeClass('selected');
 		networkRow.addClass('selected');
 
-		var network = this.networks[networkRow.data('id')];
-		if (network) {
+		this.networkSelected = this.networks[networkRow.data('id')];
+		if (this.networkSelected) {
 			this.$('.settings-state button.connect').removeClass('disabled');
 		}
 
@@ -214,9 +220,61 @@ var StepInternet = StepView.extend({
           scrollTop: this.$('.settings-state button.connect').offset().top
         }, 1000);
 	},
-	onConnectClicked: function()
+  getCurrentName: function(){
+
+    var promise = $.Deferred();
+
+    $.ajax({
+      url: API_BASEURL + 'setup/name',
+      type: 'GET',
+      dataType: 'json'
+    })
+    .done(_.bind(function(data) {
+      this.parent.steps.name.currentName = data.name;
+      promise.resolve();
+    }, this))
+    .fail(function(){promise.reject();})
+
+    return promise;
+  },
+  showMessage: function(e){
+
+    this.$('#infoMessage p.titleMessage').html('You are trying to connect to <span class="name bold">' + this.networkSelected.name + '</span>.');
+
+    this.getCurrentName()
+    .done(_.bind(function(){
+
+      this.$('#infoMessage p.bodyMessage').html('You will try to connect to '
+        + this.networkSelected.name +
+        '. For being able to do this, <span class="name bold">hotspot will be disable</span>.</p><p align="center">During the process, <span class="name bold">if something goes wrong</span>, for example: the wifi password is incorrect, <span class="name bold"> '
+        + this.parent.steps.name.currentName +
+        ' will turn on the hotspot for being accesible again</span>.');
+
+    },this))
+    .fail(_.bind(function(){
+
+      this.$('#infoMessage p.bodyMessage').html('You will try to connect to '
+        + this.networkSelected.name +
+        '. For being able to do this, <span class="name bold">hotspot will be disable</span>.</p><p align="center">During the process, <span class="name bold">if something goes wrong</span>, for example: the wifi password is incorrect, <span class="name bold"> '
+        + ' your Astrobox will turn on the hotspot for being accesible again</span>.');
+
+    },this))
+    .always(_.bind(function(){
+      this.$('.content').hide();
+      this.$('#infoMessage').show();
+    },this));
+
+  },
+  closeMessage: function(e){
+    this.$('#infoMessage').hide();
+    this.$('.content').show();
+  },
+	confirmConnection: function()
 	{
 		var networkRow = this.$el.find('.wifi-network-list li.selected');
+
+    this.$('#infoMessage').hide();
+    this.$('.content').show();
 
 		if (networkRow.length == 1) {
 			var network = this.networks[networkRow.data('id')];
@@ -232,7 +290,7 @@ var StepInternet = StepView.extend({
 			}
 		}
 	},
-	hotspotOffChanged: function(e)
+	/*hotspotOffChanged: function(e)
 	{
 		var target = $(e.currentTarget);
 
@@ -248,106 +306,92 @@ var StepInternet = StepView.extend({
 		fail(function(){
 			noty({text: "There was an error saving hotspot option.", timeout: 3000});
 		})
-	},
-  stopHotspot: function(e) {
-
-    $.ajax({
-      url: API_BASEURL + "settings/network/hotspot",
-      type: "DELETE",
-      success: _.bind(function(data, code, xhr) {
-        noty({text: 'The hotspot has been stopped', type: 'success', timeout:3000});
-        this.settings.hotspot.active = false;
-        this.render();
-      }, this),
-      error: function(xhr) {
-        noty({text: xhr.responseText, timeout:3000});
-      },
-    });
-  },
+	},*/
 	doConnect: function(data, callback)
 	{
 		var loadingBtn = this.$el.find(".settings-state .loading-button");
 		loadingBtn.addClass('loading');
 
-    this.stopHotspot();
+    $.ajax({
+      url: API_BASEURL + 'setup/internet',
+      type: 'POST',
+      contentType: 'application/json',
+      dataType: 'json',
+      data: JSON.stringify({id: data.id, password: data.password})
+    })
+    .done(_.bind(function(data) {
 
-		$.ajax({
-			url: API_BASEURL + 'setup/internet',
-			type: 'POST',
-			contentType: 'application/json',
-			dataType: 'json',
-			data: JSON.stringify({id: data.id, password: data.password})
-		})
-		.done(_.bind(function(data) {
-			if (data.name) {
+      //if ajax POST would be ok, never fire .done event :)
 
-				var connectionCb = null;
+      /*if (data.name) {
 
-				//Start Timeout
-				var connectionTimeout = setTimeout(function(){
-					connectionCb.call(this, {status: 'failed', reason: 'timeout'});
-				}, 70000); //1 minute
+        var connectionCb = null;
 
-				connectionCb = function(connectionInfo){
-					switch (connectionInfo.status) {
-						case 'disconnected':
-						case 'connecting':
-							//Do nothing. the failed case should report the error
-						break;
+        //Start Timeout
+        var connectionTimeout = setTimeout(function(){
+          connectionCb.call(this, {status: 'failed', reason: 'timeout'});
+        }, 70000); //1 minute
 
-						case 'connected':
-							setup_view.eventManager.off('astrobox:InternetConnectingStatus', connectionCb, this);
-							noty({text: "Your "+PRODUCT_NAME+" is now connected to "+connectionInfo.info.name+".", type: "success", timeout: 3000});
-							loadingBtn.removeClass('loading');
-							if (callback) callback(false);
-							this.$el.removeClass('settings');
-							this.$el.addClass('success');
-							clearTimeout(connectionTimeout);
-						break;
+        connectionCb = function(connectionInfo){
+          switch (connectionInfo.status) {
+            case 'disconnected':
+            case 'connecting':
+              //Do nothing. the failed case should report the error
+            break;
 
-						case 'failed':
-							setup_view.eventManager.off('astrobox:InternetConnectingStatus', connectionCb, this);
-							if (connectionInfo.reason == 'no_secrets') {
-								noty({text: "Invalid password for "+data.name+".", timeout: 3000});
-							} else {
-								noty({text: "Unable to connect to "+data.name+".", timeout: 3000});
-							}
-							loadingBtn.removeClass('loading');
-							if (callback) callback(true);
-							clearTimeout(connectionTimeout);
-							break;
+            case 'connected':
+              setup_view.eventManager.off('astrobox:InternetConnectingStatus', connectionCb, this);
+              noty({text: "Your "+PRODUCT_NAME+" is now connected to "+connectionInfo.info.name+".", type: "success", timeout: 3000});
+              loadingBtn.removeClass('loading');
+              if (callback) callback(false);
+              this.$el.removeClass('settings');
+              this.$el.addClass('success');
+              clearTimeout(connectionTimeout);
+            break;
 
-						default:
-							setup_view.eventManager.off('astrobox:InternetConnectingStatus', connectionCb, this);
-							noty({text: "Unable to connect to "+data.name+".", timeout: 3000});
-							loadingBtn.removeClass('loading');
-							clearTimeout(connectionTimeout);
-							if (callback) callback(true);
-					}
-				};
+            case 'failed':
+              setup_view.eventManager.off('astrobox:InternetConnectingStatus', connectionCb, this);
+              if (connectionInfo.reason == 'no_secrets') {
+                noty({text: "Invalid password for "+data.name+".", timeout: 3000});
+              } else {
+                noty({text: "Unable to connect to "+data.name+".", timeout: 3000});
+              }
+              loadingBtn.removeClass('loading');
+              if (callback) callback(true);
+              clearTimeout(connectionTimeout);
+              break;
 
-				setup_view.eventManager.on('astrobox:InternetConnectingStatus', connectionCb, this);
+            default:
+              setup_view.eventManager.off('astrobox:InternetConnectingStatus', connectionCb, this);
+              noty({text: "Unable to connect to "+data.name+".", timeout: 3000});
+              loadingBtn.removeClass('loading');
+              clearTimeout(connectionTimeout);
+              if (callback) callback(true);
+          }
+        };
 
-			} else if (data.message) {
-				noty({text: data.message, timeout: 3000});
-				loadingBtn.removeClass('loading');
-				if (callback) callback(true);
-			}
-		}, this))
-		.fail(function(){
-			noty({text: "There was an error connecting.", timeout: 3000});
-			loadingBtn.removeClass('loading');
-			if (callback) callback(true);
-		})
+        setup_view.eventManager.on('astrobox:InternetConnectingStatus', connectionCb, this);
+
+      } else if (data.message) {
+        noty({text: data.message, timeout: 3000});
+        loadingBtn.removeClass('loading');
+        if (callback) callback(true);
+      }*/
+    }, this))
+    .fail(function(){
+      noty({text: "There was an error connecting. Please, reconnect to hotspot wifi connection and go to 10.10.0.1 again...", timeout: 3000});
+      loadingBtn.removeClass('loading');
+      //if (callback) callback(true);
+      location.reload();
+      setInterval(function(){location.reload();},4000);
+    })
 	}
 });
 
 var WiFiNetworkPasswordDialog = Backbone.View.extend({
 	el: '#wifi-network-password-modal',
 	events: {
-    'click input.button.connect': 'showMessage',
-		'click input.button.ok': 'connectClicked',
-		'submit form': 'showMessage',
+		'submit form': 'connectClicked',
 		'click a.cancel': 'cancelClicked'
 	},
 	parent: null,
@@ -371,21 +415,9 @@ var WiFiNetworkPasswordDialog = Backbone.View.extend({
 			this.$el.find('.network-password-field').focus();
 		}, this));
 	},
-  showMessage: function(e){
-    if(this.$('form .network-password-field').val()){
-      this.$('#content').hide();
-      this.$('#infoMessage').show();
-    }
-  },
-  showDialog: function(e){
-    this.$('#infoMessage').hide();
-    this.$('#content').show();
-  },
 	connectClicked: function(e)
 	{
 		e.preventDefault();
-
-    this.showDialog()
 
 		var form = this.$el.find('form');
 		var loadingBtn = this.$el.find('.loading-button');
@@ -395,11 +427,11 @@ var WiFiNetworkPasswordDialog = Backbone.View.extend({
 		this.parent.doConnect(
 			{id: form.find('.network-id-field').val(), password: password},
 			_.bind(function(error) { //callback
-				//loadingBtn.removeClass('loading');
-				//form.find('.network-password-field').val('');
-				//if (!error) {
-				//	this.$el.foundation('reveal', 'close');
-				//}
+				loadingBtn.removeClass('loading');
+				form.find('.network-password-field').val('');
+				if (!error) {
+					this.$el.foundation('reveal', 'close');
+				}
         location.reload();
 			}, this)
 		);

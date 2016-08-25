@@ -75,49 +75,34 @@ def check_internet():
 @api.route('/setup/internet', methods=['POST'])
 @not_setup_only
 def connect_internet():
-	"""if "application/json" in request.headers["Content-Type"]:
-		data = request.json
-		nm = networkManager()
-		print '1'
-		print data['id']
-		print data['password']
-
-		try:
-
-			result = nm.setWifiNetwork(data['id'], data['password'])
-			print '2'
-
-			print result
-			print '3'
-
-			if result and result['ip']:#CHANGE CONDITION
-				return jsonify(result)
-			else:
-
-				result = nm.startHotspot()
-
-				if result is True:
-					print 'reconnection successfully'
-					return ("Network %s not found" % data['id'], 404)
-				else:
-					print 'reconnection fails'
-					return (result, 500)
-		except:
-			print 'reconnection before raise'
-			result = nm.startHotspot()
-
-			raise
-
-	return ("Invalid Request", 400)
-"""
 	if "application/json" in request.headers["Content-Type"]:
 		data = request.json
-		result = networkManager().setWifiNetwork(data['id'], data['password'])
+		nm = networkManager()
 
-		if result:
-			return jsonify(result)
+		result = nm.stopHotspot()
+
+		if result is True:
+
+			try:
+
+				result = nm.setWifiNetwork(data['id'], data['password'])
+
+				if not result:
+
+					nm.startHotspot()
+
+					return ("Network %s not found" % data['id'], 404)
+
+			except:
+
+				nm.startHotspot()
+
+				raise
+
+			return jsonify()
+
 		else:
-			return ("Network %s not found" % data['id'], 404)
+			return (result, 500)
 
 	return ("Invalid Request", 400)
 

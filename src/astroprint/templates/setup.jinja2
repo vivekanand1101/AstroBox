@@ -67,7 +67,7 @@
 						Your {{variantData['productName']}} is now connected to the internet.
 					</p>
 					<hr/>
-					<div class="row hotspot-off">
+					<!-- <div class="row hotspot-off">
 						<div class="small-2 medium-1 columns">
 							<input id="hotspot-off" type="checkbox" {%- if (settings.getBoolean(['wifi','hotspotOnlyOffline'])) %} value="yes" checked {%- endif %}>
 						</div>
@@ -77,7 +77,7 @@
 								<small>(This can be changed later in the settings menu)</small>
 							</label>
 						</div>
-					</div>
+					</div> -->
 					<a class="button success radius expand" href="#astroprint"><small>Next:</small> <b>AstroPrint Account</b> <i class="icon-right-open"></i></a>
 				</div>
 				<div class="checking-state" align="center">
@@ -117,6 +117,26 @@
 				</div>
 			</div>
 
+			<div id="infoMessage" style="display: none;">
+				<div>
+					<h2 class="bold" align="center">IMPORTANT</h2>
+					<p align="center" class="titleMessage"/><!-- MESSAGE IN JAVASCRIPT SOURCE CODE VIEW -->
+					<div>
+						<p align="center" class="bodyMessage"/><!-- MESSAGE IN JAVASCRIPT SOURCE CODE VIEW -->
+					</div>
+				</div>
+				<div class="small-12 medium-6 columns">
+					<div class="loading-button expand">
+						<input type="button" class="button radius secondary cancel" value="cancel" />
+					</div>
+				</div>
+				<div class="small-12 medium-6 columns">
+					<div class="loading-button expand">
+						<input type="button" class="button radius success ok" value="ok" />
+					</div>
+				</div>
+			</div>
+
 			<div id="wifi-network-password-modal" class="reveal-modal medium radius" data-reveal>
 				<script type="text/template" id="wifi-network-password-modal-template">
 
@@ -135,41 +155,25 @@
 							</div>
 						</div>
 					<% } else { %>
-            <div id="content">
-						  <h2 class="bold" align="center">WiFi Password</h2>
-  						<p align="center">Enter the password for <span class="name bold"><%= wifi.name %></span>.</p>
-  						<form>
-  							<input type="hidden" class="network-id-field" name="id" value="<%= wifi.id %>"/>
-  							<input type="password" class="network-password-field" name="password"/>
-  							<div class="row">
-  								<div class="small-12 medium-6 columns">
-  									<a class="button secondary radius cancel expand" href="#internet">Cancel</a>
-  								</div>
-  								<div class="small-12 medium-6 columns">
-  									<div class="loading-button expand">
-  										<input type="button" class="button radius success connect" value="Connect"/>
-  										<span class="loading button success disabled radius">
-  											<i class="icon-rocket-spinner animate-spin"></i> Might be a while. Please be patient...
-  										</span>
-  									</div>
-  								</div>
-  							</div>
-  						</form>
-            </div>
-            <div id="infoMessage" style="display: none;">
-              <h2 class="bold" align="center">IMPORTANT</h2>
-              <p align="center">You are trying to connect to <span class="name bold"><%= wifi.name %></span>.</p>
-              <div>
-                <p align="center">
-                {{astroboxName}} will try to connect to <%= wifi.name %>. While connecting could go something wrong, that's why, during between 10 and 20 seconds, your Astrobox will seem to be disconnected. If connection will be wrong, for example: had a mistake in password; you should try to connect to {{astroboxName}} wifi access point and got to 10.10.0.1 again.
-                </p>
-              </div>
-              <div class="small-12 medium-6 columns">
-                <div class="loading-button expand">
-                  <input type="button" class="button radius success ok" value="ok" />
-                </div>
-              </div>
-            </div>
+					  <h2 class="bold" align="center">WiFi Password</h2>
+						<p align="center">Enter the password for <span class="name bold"><%= wifi.name %></span>.</p>
+						<form>
+							<input type="hidden" class="network-id-field" name="id" value="<%= wifi.id %>"/>
+							<input type="password" class="network-password-field" name="password"/>
+							<div class="row">
+								<div class="small-12 medium-6 columns">
+									<a class="button secondary radius cancel expand" href="#internet">Cancel</a>
+								</div>
+								<div class="small-12 medium-6 columns">
+									<div class="loading-button expand">
+										<input type="submit" class="button radius success connect" value="Connect"/>
+										<span class="loading button success disabled radius">
+											<i class="icon-rocket-spinner animate-spin"></i> Might be a while. Please be patient...
+										</span>
+									</div>
+								</div>
+							</div>
+						</form>
 					<% } %>
 				</script>
 			</div>
