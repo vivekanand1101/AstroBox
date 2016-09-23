@@ -356,7 +356,7 @@ class DebianNetworkManager(NetworkManagerBase):
 		devices = self._nm.NetworkManager.GetDevices()
 		for d in devices:
 			# Return the first MANAGED device that's a WiFi
-			if d.Managed and d.DeviceType == self._nm.NM_DEVICE_TYPE_WIFI:
+			if d.DeviceType == self._nm.NM_DEVICE_TYPE_WIFI:
 				return d
 
 		return False
