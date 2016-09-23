@@ -454,7 +454,7 @@ class DebianNetworkManager(NetworkManagerBase):
 				logger.warn("Hotspot interface (%s) is not valid in this system." % interface)
 
 			else:
-				return netifaces.AF_INET in info
+				return netifaces.AF_INET in info and info[2][0]['addr'] == '10.10.0.1'
 
 		return None
 
