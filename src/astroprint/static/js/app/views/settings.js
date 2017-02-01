@@ -1006,64 +1006,6 @@ var SoftwareUpdateDialog = Backbone.View.extend({
 });
 
 /************************
-* Software - General
-*************************/
-
-var SoftwareGeneralView = SettingsPage.extend({
-	el: '#software-general',
-	template: _.template( $("#software-general-content-template").html() ),
-	settings: null,
-	events: {
-		'change #language-code': 'languageChanged'
-	},
-	initialize: function(params)
-	{
-		SettingsPage.prototype.initialize.apply(this, arguments);
-	},
-	show: function()
-	{
-		//Call Super
-		SettingsPage.prototype.show.apply(this);
-
-		if (!this.settings) {
-			$.getJSON(API_BASEURL + 'settings/software/general', null, _.bind(function(data) {
-				this.settings = data;
-				this.render();
-			}, this))
-			.fail(function() {
-				noty({text: gettext('errorGettingGeneralSet'), timeout: 3000});
-			});
-		}
-	},
-	render: function()
-	{
-		this.$el.html(this.template({
-			data: this.settings,
-		}));
-	},
-	languageChanged: function(e)
-	{
-		var target = $(e.currentTarget);
-		var lang = target.find(':selected').attr('data-lang');
-
-		$.ajax({
-			url: '/api/settings/software/language',
-			method: 'PUT',
-			data: JSON.stringify({
-				'lang': lang
-			}),
-			contentType: 'application/json',
-			dataType: 'json'
-		})
-		.done(function(){
-			location.reload();
-		})
-		.fail(function(){
-			noty({text: gettext('errorGettingLanguage'), timeout: 3000});
-		});
-	}
-});
-/************************
 * Software - Advanced
 *************************/
 
