@@ -1,14 +1,13 @@
 # coding=utf-8
-__author__ = "Gina Häußge <osd@foosel.net>"
-__author__ = "Daniel Arroyo <daniel@astroprint.com>"
+__author__ = "AstroPrint Product Team <product@astroprint.com> based on work done by Gina Häußge"
 __license__ = 'GNU Affero General Public License http://www.gnu.org/licenses/agpl.html'
+__copyright__ = "Copyright (C) 2016 3DaGoGo, Inc - Released under terms of the AGPLv3 License"
 
 import uuid
-import flask
 import json
 import tornado.wsgi
-from sockjs.tornado import SockJSRouter
-from flask import Flask, render_template, send_from_directory, make_response, Response, request
+from ext.sockjs.tornado import SockJSRouter
+from flask import Flask, render_template, send_from_directory, make_response, Response, request, abort
 from flask.ext.login import LoginManager, current_user, logout_user
 from flask.ext.principal import Principal, Permission, RoleNeed, identity_loaded, UserNeed
 from flask.ext.compress import Compress
@@ -54,8 +53,7 @@ admin_permission = Permission(RoleNeed("admin"))
 user_permission = Permission(RoleNeed("user"))
 
 # only import the octoprint stuff down here, as it might depend on things defined above to be initialized already
-from octoprint.server.util import LargeResponseHandler, ReverseProxied, restricted_access, PrinterStateConnection, admin_validator, \
-	UrlForwardHandler, user_validator
+from octoprint.server.util import LargeResponseHandler, ReverseProxied, restricted_access, PrinterStateConnection, admin_validator, UrlForwardHandler, user_validator
 from astroprint.printer.manager import printerManager
 from octoprint.settings import settings
 import octoprint.util as util
@@ -73,7 +71,7 @@ from astroprint.printerprofile import printerProfileManager
 from astroprint.variant import variantManager
 from astroprint.discovery import DiscoveryManager
 
-UI_API_KEY = ''.join('%02X' % ord(z) for z in uuid.uuid4().bytes)
+UI_API_KEY = None
 VERSION = None
 
 babel = Babel(app)
@@ -98,16 +96,14 @@ def box_identify():
 	br = boxrouterManager()
 	nm = networkManager()
 
-	response = Response()
-
-	response.headers['Access-Control-Allow-Origin'] = request.headers['Origin']
-	response.data = json.dumps({
+	return Response(json.dumps({
 		'id': br.boxId,
 		'name': nm.getHostname(),
 		'version': VERSION
-	})
-
-	return response
+	}),
+	headers= {
+		'Access-Control-Allow-Origin': '*'
+	} if settings().getBoolean(['api', 'allowCrossOrigin']) else None)
 
 @app.route("/")
 def index():
@@ -128,8 +124,9 @@ def index():
 			variantData= variantManager().data,
 			astroboxName= networkManager().getHostname(),
 			checkSoftware= swm.shouldCheckForNew,
-			settings=s,
-			locale= get_locale()
+			settings= s,
+			locale= get_locale(),
+			wsToken= create_ws_token(userManager.findUser(loggedUsername).publicKey if loggedUsername else None)
 		)
 
 	elif softwareManager.updatingRelease or softwareManager.forceUpdateInfo:
@@ -143,10 +140,11 @@ def index():
 			variantData= variantManager().data,
 			astroboxName= networkManager().getHostname(),
 			locale= get_locale()
+			wsToken= create_ws_token(userManager.findUser(loggedUsername).publicKey if loggedUsername else None)
 		)
 
-	elif loggedUsername and (current_user is None or not current_user.is_authenticated() or current_user.get_id() != loggedUsername):
-		if current_user.is_authenticated():
+	elif loggedUsername and (current_user is None or not current_user.is_authenticated or current_user.get_id() != loggedUsername):
+		if current_user.is_authenticated:
 			logout_user()
 
 		return render_template(
@@ -184,12 +182,13 @@ def index():
 			checkSoftware= swm.shouldCheckForNew,
 			serialLogActive= s.getBoolean(['serial', 'log']),
 			locale= get_locale(),
-			cameraManager= cm.name
+			cameraManager= cm.name,
+			wsToken= create_ws_token(userManager.findUser(loggedUsername).publicKey if loggedUsername else None)
 		)
 
 @app.route("/discovery.xml")
 def discoveryXml():
-	response = flask.make_response( discoveryManager.getDiscoveryXmlContents() )
+	response = make_response( discoveryManager.getDiscoveryXmlContents() )
 	response.headers['Content-Type'] = 'application/xml'
 	return response
 
@@ -406,13 +405,14 @@ def apple_icon():
 
 @app.route('/img/<path:path>')
 def static_proxy_images(path):
-    return app.send_static_file(os.path.join('img', path))
+	return app.send_static_file(os.path.join('img', path))
 
 @app.route('/font/<path:path>')
 def static_proxy_fonts(path):
-    return app.send_static_file(os.path.join('font', path))
+	return app.send_static_file(os.path.join('font', path))
 
 @app.route('/camera/snapshot', methods=["GET"])
+@restricted_access
 def camera_snapshot():
 	cameraMgr = cameraManager()
 	pic_buf = cameraMgr.get_pic(text=request.args.get('text'))
@@ -420,6 +420,112 @@ def camera_snapshot():
 		return Response(pic_buf, mimetype='image/jpeg')
 	else:
 		return 'Camera not ready', 404
+
+
+@app.route("/status", methods=["GET"])
+@restricted_access
+def getStatus():
+	printer = printerManager()
+	cm = cameraManager()
+
+	fileName = None
+
+	if printer.isPrinting():
+		currentJob = printer.getCurrentJob()
+		fileName = currentJob["file"]["name"]
+
+	return Response(
+		json.dumps({
+			'id': boxrouterManager().boxId,
+			'name': networkManager().getHostname(),
+			'printing': printer.isPrinting(),
+			'fileName': fileName,
+			'printerModel': None,
+			'material': None,
+			'operational': printer.isOperational(),
+			'paused': printer.isPaused(),
+			'camera': cm.isCameraConnected(),
+			#'printCapture': cm.timelapseInfo,
+			'remotePrint': True,
+			'capabilities': ['remotePrint'] + cm.capabilities
+		}),
+		mimetype= 'application/json',
+		headers= {
+			'Access-Control-Allow-Origin': '*'
+		} if settings().getBoolean(['api', 'allowCrossOrigin']) else None
+	)
+
+@app.route("/wsToken", methods=['GET'])
+def getWsToken():
+	publicKey = None
+	userLogged = settings().get(["cloudSlicer", "loggedUser"])
+
+	if userLogged:
+		if current_user.is_anonymous or current_user.get_name() != userLogged:
+			abort(401, "Unauthorized Access")
+
+		user = userManager.findUser(userLogged)
+		if user:
+			publicKey = user.publicKey
+		else:
+			abort(403, 'Invalid Logged User')
+
+	return Response(
+		json.dumps({
+		'ws_token': create_ws_token(publicKey)
+		}),
+		headers= {
+			'Access-Control-Allow-Origin': '*'
+		} if settings().getBoolean(['api', 'allowCrossOrigin']) else None
+	)
+
+@app.route("/accessKeys", methods=["POST"])
+def getAccessKeys():
+	from astroprint.cloud import astroprintCloud
+
+	publicKey = None
+	email = request.values.get('email', None)
+	accessKey = request.values.get('accessKey', None)
+
+	userLogged = settings().get(["cloudSlicer", "loggedUser"])
+	####
+	# - nobody logged: None
+	# - any log: email
+
+	if email and accessKey:#somebody is logged in the remote client
+		if userLogged:#Somebody logged in Astrobox
+			if userLogged == email:#I am the user logged
+				online = networkManager().isOnline()
+
+				if online:
+					publicKey = astroprintCloud().get_public_key(email, accessKey)
+
+					if not publicKey:
+						abort(403)
+
+				else:
+					user = userManager.findUser(email)
+					if user.get_private_key() != accessKey:
+						abort(403)
+
+			else:#I am NOT the logged user
+				abort(403)
+
+	else:#nodody is logged in the remote client
+		if userLogged:
+			abort(401)
+
+	return Response(
+		json.dumps({
+			'api_key': UI_API_KEY,
+			'ws_token': create_ws_token(publicKey)
+		}),
+		mimetype= 'application/json',
+		headers= {
+			'Access-Control-Allow-Origin': '*'
+		} if settings().getBoolean(['api', 'allowCrossOrigin']) else None
+	)
+
 
 @identity_loaded.connect_via(app)
 def on_identity_loaded(sender, identity):
@@ -433,12 +539,29 @@ def on_identity_loaded(sender, identity):
 	if user.is_admin():
 		identity.provides.add(RoleNeed("admin"))
 
-
 def load_user(id):
 	if userManager is not None:
 		return userManager.findUser(id)
 	return users.DummyUser()
 
+def create_ws_token(public_key= None):
+	from itsdangerous import URLSafeTimedSerializer
+
+	s = URLSafeTimedSerializer(UI_API_KEY)
+	return s.dumps({ 'public_key': public_key })
+
+def read_ws_token(token):
+	if not token:
+		return None
+
+	from itsdangerous import URLSafeTimedSerializer, BadSignature
+
+	s = URLSafeTimedSerializer(UI_API_KEY)
+
+	try:
+		return s.loads(token, max_age= 10)
+	except BadSignature as e:
+		return None
 
 #~~ startup code
 
@@ -470,6 +593,7 @@ class Server():
 		global softwareManager
 		global discoveryManager
 		global VERSION
+		global UI_API_KEY
 
 		from tornado.wsgi import WSGIContainer
 		from tornado.httpserver import HTTPServer
@@ -484,12 +608,14 @@ class Server():
 		self._initSettings(self._configfile, self._basedir)
 		s = settings()
 
+		UI_API_KEY = s.getString(['api', 'key'])
+
 		# then initialize logging
 		self._initLogging(self._debug, self._logConf)
 		logger = logging.getLogger(__name__)
 
 		if s.getBoolean(["accessControl", "enabled"]):
-			userManagerName = settings().get(["accessControl", "userManager"])
+			userManagerName = s.get(["accessControl", "userManager"])
 			try:
 				clazz = util.getClass(userManagerName)
 				userManager = clazz()
@@ -511,8 +637,8 @@ class Server():
 		from astroprint.network.manager import networkManager
 		from astroprint.boxrouter import boxrouterManager
 
-		boxrouterManager()
 		networkManager()
+		boxrouterManager()
 
 		# configure timelapse
 		#octoprint.timelapse.configureTimelapse()
@@ -568,9 +694,9 @@ class Server():
 				"""
 				wsgi_environ = tornado.wsgi.WSGIContainer.environ(request)
 				with app.request_context(wsgi_environ):
-					app.session_interface.open_session(app, flask.request)
+					app.session_interface.open_session(app, request)
 					loginManager.reload_user()
-					validator(flask.request)
+					validator(request)
 			return f
 
 		self._tornado_app = Application(self._router.urls + [
@@ -580,7 +706,7 @@ class Server():
 			#(r"/downloads/camera/current", UrlForwardHandler, {"url": s.get(["webcam", "snapshot"]), "as_attachment": True, "access_validation": access_validation_factory(user_validator)}),
 			(r".*", FallbackHandler, {"fallback": WSGIContainer(app.wsgi_app)})
 		])
-		self._server = HTTPServer(self._tornado_app, max_buffer_size=167772160) #Allows for uploads up to 160MB
+		self._server = HTTPServer(self._tornado_app, max_buffer_size=1048576 * s.getInt(['server', 'maxUploadSize']))
 		self._server.listen(self._port, address=self._host)
 
 		logger.info("Listening on http://%s:%d" % (self._host, self._port))
@@ -688,17 +814,18 @@ class Server():
 
 		if settings().getBoolean(["serial", "log"]):
 			# enable debug logging to serial.log
-			logging.getLogger("SERIAL").setLevel(logging.DEBUG)
-			logging.getLogger("SERIAL").debug("Enabling serial logging")
+			serialLogger = logging.getLogger("SERIAL")
+			serialLogger.setLevel(logging.DEBUG)
+			serialLogger.debug("Enabling serial logging")
 
 	def cleanup(self):
 		global discoveryManager
 
+		printerManager().rampdown()
 		discoveryManager.shutdown()
 		discoveryManager = None
 		boxrouterManager().shutdown()
 		cameraManager().shutdown()
-		webRtcManager().shutdown()
 
 		from astroprint.network.manager import networkManagerShutdown
 		networkManagerShutdown()

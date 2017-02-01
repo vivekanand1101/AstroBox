@@ -10,7 +10,7 @@ Its website can be found at [astroprint.com](https://www.astroprint.com).
 Reporting bugs
 --------------
 
-Our issue tracker can be found [on Github](https://github.com/3dagogo/astrobox/issues).
+Our issue tracker can be found [on Github](https://github.com/astroprint/astrobox/issues).
 
 
 Installation instructions
@@ -20,7 +20,7 @@ Installation instructions
 
 * Create an bootable image using the images from [AstroPrint](https://www.astroprint.com/downloads)
 
-* Download the source code for getting your working copy:
+* Download the source code to get a working copy:
 
   <pre>
     git clone https://github.com/AstroPrint/AstroBox.git
@@ -29,7 +29,6 @@ Installation instructions
 * If you intent to run from source, you also need to install:
 
   <pre>
-
     $ sudo apt-get install rubygems oracle-java8-jdk
     $ sudo gem install sass 
     $ sudo pip install -r requirements.txt
@@ -41,3 +40,20 @@ Installation instructions
     $ sudo service astrobox stop
     $ sudo python ./run --config /etc/astrobox/config.yaml --host 127.0.0.1
   </pre>
+
+Setting up the virtual printer
+-------
+
+The AstroBox Software comes with a handy virtual printer so that you can test without the need of a real 3D Printer attached. Here's how you can set it up
+
+* Edit the `printer-profile.yaml` file in your settings directory (by default `[AstroBox Directory]/local`). Change the `driver` property to `virtual`.
+
+* Edit or create the `virtual-printer-settings.yaml` file in the same directory to guide your printing simulation. All values are in seconds. Here's a sample:
+
+<pre>
+connection: 3.0
+heatingUp: 5.0
+printJob: 10.0
+</pre>
+
+* Restart AstroBox any time you make changes to these files

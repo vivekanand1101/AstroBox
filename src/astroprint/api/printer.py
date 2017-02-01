@@ -1,7 +1,7 @@
 # coding=utf-8
-__author__ = "Gina Häußge <osd@foosel.net>"
-__author__ = "Daniel Arroyo <daniel@astroprint.com>"
-__license__ = 'GNU Affero General Public License http://www.gnu.org/licenses/agpl.html'
+__author__ = "AstroPrint Product Team <product@astroprint.com> based on previous work by Gina Häußge"
+__license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agpl.html"
+__copyright__ = "Copyright (C) 2016 3DaGoGo, Inc - Released under terms of the AGPLv3 License"
 
 import re
 
@@ -87,7 +87,7 @@ def printerToolCommand():
 		if not tool.startswith("tool"):
 			return make_response(gettext('invalidToolSelectionS') % tool, 400)
 
-		pm.changeTool(tool)
+		pm.changeTool(int(tool[len("tool"):]))
 
 	##~~ temperature
 	elif command == "target":
@@ -113,12 +113,21 @@ def printerToolCommand():
 			return make_response(gettext('printerCurrentlyPrinting'), 409)
 
 		amount = data["amount"]
+		speed = data.get("speed")
+		tool = data.get("tool")
 		if not isinstance(amount, (int, long, float)):
 			return make_response(gettext('notNumberExtAmountR') % amount, 400)
-		pm.extrude(None, amount)
+
+
+		if tool is not None and re.match(validation_regex, tool) is None:
+			return make_response("Invalid extruder value: %r" % tool, 400)
+
+		if speed and not isinstance(speed, (int, long, float)):
+			speed = None
+
+		pm.extrude(int(tool[len("tool"):]) if tool is not None else None, amount, speed)
 
 	return NO_CONTENT
-
 
 @api.route("/printer/tool", methods=["GET"])
 def printerToolState():

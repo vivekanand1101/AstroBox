@@ -19,17 +19,15 @@ import os
 import signal
 import re
 import time
-import uuid
 
-import astroprint.util as processesUtil
+from blinker import signal
 
 from octoprint.settings import settings
 from astroprint.webrtc.janus import Plugin, Session, KeepAlive
 from astroprint.boxrouter import boxrouterManager
+from astroprint.network.manager import networkManager
 from astroprint.camera import cameraManager
 from astroprint.util import interval
-
-from blinker import signal
 
 
 class WebRtc(object):
@@ -37,28 +35,10 @@ class WebRtc(object):
 		self._connectedPeers = {}
 		self._logger = logging.getLogger(__name__)
 		self._peerCondition = threading.Condition()
+		self._janusStartStopCondition = threading.Condition()
 		self._JanusProcess = None
 		self.videoId = 1
-		initialized = signal('initialized')
 		self.peersDeadDetacher = None
-
-	def ensureJanusRunning(self):
-		if len(self._connectedPeers.keys()) <= 0:
-			return self.startJanus()
-		else:
-			return True #Janus was running before it
-
-	def ensureGstreamerRunning(self):
-		cam = cameraManager()
-		if cam.open_camera():
-			if not cam.start_video_stream():
-				self._logger.error('Managing Gstreamer error in WebRTC object')
-				#Janus is forced to be closed
-				self.stopJanus()
-				return False
-			return False
-		else:
-			return True	
 
 	def shutdown(self):
 		self._logger.info('Shutting Down WebRtcManager')
@@ -71,7 +51,6 @@ class WebRtc(object):
 
 	def closeLocalSession(self, sessionId):
 		with self._peerCondition:
-
 			if len(self._connectedPeers.keys()) > 0:
 				try:
 					peer = self._connectedPeers[sessionId]
@@ -84,23 +63,23 @@ class WebRtc(object):
 
 				self._logger.info("There are %d peers left.", len(self._connectedPeers))
 
-				if len(webRtcManager()._connectedPeers.keys()) == 0:
+				if len(self._connectedPeers) == 0:
 					#last session
-					self.stopGStreamer()
 					self.stopJanus()
+					cameraManager().stop_video_stream()
 
 			return True
 
 	def startPeerSession(self, clientId):
 		with self._peerCondition:
-
 			if len(self._connectedPeers.keys()) == 0:
 				#first session
 				self.startJanus()
 
 			peer = ConnectionPeer(clientId, self)
+
 			sessionId = peer.start()
-			
+
 			if sessionId:
 				self._connectedPeers[sessionId] = peer
 				return sessionId
@@ -108,8 +87,8 @@ class WebRtc(object):
 			else:
 				#something went wrong, no session started. Do we still need Janus up?
 				if len(self._connectedPeers.keys()) == 0:
-					self.stopGStreamer()
 					self.stopJanus()
+					cameraManager().stop_video_stream()
 
 				return None
 
@@ -124,36 +103,35 @@ class WebRtc(object):
 					peer = None
 
 				if peer:
-					peer.streamingPlugin.send_message({'request':'destroy'})
+					peer.streamingPlugin.send_message({'request':'destroy', 'id': sessionId})
 					peer.close()
-					self.sendEventToPeer(self._connectedPeers[sessionId], 'stopConnection')
+					peer.sendEventToPeer('stopConnection')
 					del self._connectedPeers[sessionId]
 
 				self._logger.info("There are %d peers left.", len(self._connectedPeers))
 
 				if len(self._connectedPeers.keys()) == 0:
 					#last session
-					self.stopGStreamer()
 					self.stopJanus()
-					ready = signal('manage_fatal_error_webrtc')
-					ready.disconnect(self.closeAllSessions)
+					cameraManager().stop_video_stream()
 
-	def closeAllSessions(self,sender,message):
-		
+	def closeAllSessions(self, sender= None, message= None):
 		self._logger.info("Closing all streaming sessions")
 
-		for key in self._connectedPeers.keys():
-			if self._connectedPeers[key] != 'local':
+		for sessionId in self._connectedPeers.keys():
+			peer = self._connectedPeers[sessionId]
+			#if peer != 'local':
+			if isinstance(peer, ConnectionPeer):
 				if message:
-					self.sendEventToPeer(self._connectedPeers[key], sender, message)
-				self.closePeerSession(key)				
+					peer.sendEventToPeer("cameraError", message)
+
+				self.closePeerSession(sessionId)
 			else:
-				self.closeLocalSession(key)
+				self.closeLocalSession(sessionId)
 
 		self.stopJanus()
 
 	def preparePlugin(self, sessionId):
-		
 		try:
 			peer = self._connectedPeers[sessionId]
 
@@ -164,21 +142,18 @@ class WebRtc(object):
 
 		if peer:
 			peer.streamingPlugin.send_message({'request':'list'})
-			
+
 			videoEncodingSelected = settings().get(["camera", "encoding"])
-						
+
 			if videoEncodingSelected == 'h264':
-				
 				self.videoId = 1
-				
+
 			else:#VP8
-				
 				self.videoId = 2
-			
+
 			self._connectedPeers[sessionId].streamingPlugin.send_message({'request':'watch','id':self.videoId})
 
 	def setSessionDescriptionAndStart(self, sessionId, data):
-
 		try:
 			peer = self._connectedPeers[sessionId]
 
@@ -192,120 +167,161 @@ class WebRtc(object):
 			self._connectedPeers[sessionId].streamingPlugin.set_session_description(data['type'],data['sdp'])
 			self._connectedPeers[sessionId].streamingPlugin.send_message({'request':'start'})
 			#able to serve video
-			self.startGStreamer()
+			self.startVideoStream()
 
 
 	def tickleIceCandidate(self, sessionId, candidate, sdp_mid, sdp_mline_index):
 		self._connectedPeers[sessionId].streamingPlugin.add_ice_candidate(candidate, sdp_mid, sdp_mline_index)
 
 	def pongCallback(self, data, key):
-		
 		if 'pong' != data:
 			if 'error' in data:
 				self._logger.error('Webrtc client lost: %s. Automatic peer session closing...',data['error'])
+
 			self.closePeerSession(key)
 
 	def pingPongRounder(self,params=None):
-		
-		for key in self._connectedPeers.keys():
-			if self._connectedPeers[key] != 'local':
-				#sendRequestToClient(self, clientId, type, data, timeout, respCallback)
-				boxrouterManager().sendRequestToClient(self._connectedPeers[key].clientId, 'ping',None,10, self.pongCallback, [key])
+		for sessionId in self._connectedPeers.keys():
+			peer = self._connectedPeers[sessionId]
+			#if peer != 'local':
+			if isinstance(peer, ConnectionPeer):
+				try:
+					boxrouterManager().sendRequestToClient(peer.clientId, 'ping', None, 10, self.pongCallback, [sessionId])
 
-	def startGStreamer(self):
-		#Start Gstreamer
-		if not cameraManager().start_video_stream():
-			self._logger.error('Managing Gstreamer error in WebRTC object')
-			self.stopJanus()
+				except:
+					self._logger.error('Error sending ping to peer %s' % (type, peer.clientId), exc_info = True)
+
+	def startVideoStream(self):
+		#Start Video Stream
+		def startDone(success):
+			if not success:
+				self._logger.error('Managing GStreamer error in WebRTC object')
+				self.stopJanus()
+
+		cameraManager().start_video_stream(startDone)
 
 	def startJanus(self):
-		#Start janus command here
-		args = ['/opt/janus/bin/./janus']
+		with self._janusStartStopCondition:
+			#Start janus command here
+			if self._JanusProcess and self._JanusProcess.returncode is None:
+				self._logger.debug('Janus was already running')
+				return True #already running
 
-		try:
-			self._JanusProcess = subprocess.Popen(
-		    	args,
-		    	stdout=subprocess.PIPE
-			)
+			args = ['/opt/janus/bin/janus']
 
-		except Exception, error:
-			self._logger.error("Error initiating janus process: %s" % str(error))
-			self._JanusProcess = None
-			self.sendEventToPeers('stopConnection')
+			nm = networkManager()
+			if not nm.isOnline():
+				args.append('--config=/opt/janus/etc/janus/janus.cfg.local')
+
+			try:
+				self._JanusProcess = subprocess.Popen(
+					args,
+					stdout=subprocess.PIPE
+				)
+
+			except Exception, error:
+				self._logger.error("Error initiating janus process: %s" % str(error))
+				self._JanusProcess = None
+				self.sendEventToPeers('stopConnection')
+
+			if self._JanusProcess:
+				self._logger.debug('Janus Starting...')
+
+				from requests import Session as RequestsSession
+
+				session = RequestsSession()
+				response = None
+
+				tryingCounter = 0
+				while response is None:
+					time.sleep(0.3)
+
+					try:
+						response = session.post(
+							url= 'http://127.0.0.1:8088',
+							data= {
+							 	"message":{
+									"request": 'info',
+									"transaction": 'ready'
+								}
+							}
+						)
+
+					except Exception, error:
+						self._logger.debug('Waiting for Janus initialization')
+						tryingCounter += 1
+
+						if tryingCounter >= 100:
+							self._logger.error(error)
+							return False
+
+				self._logger.debug('Janus Started.')
+
+				#Connect the signal for fatal errors when they happen
+				ready = signal('manage_fatal_error_webrtc')
+				ready.connect(self.closeAllSessions)
+
+				#START TIMER FOR LOST PEERS
+				self.peersDeadDetacher = interval(30.0, self.pingPongRounder, None)
+				self.peersDeadDetacher.start()
+
+				return True
+
 			return False
-
-		if self._JanusProcess:
-			from requests import Session
-
-			session = Session()
-			response = None
-
-			tryingCounter = 0
-			while response is None:
-				time.sleep(0.3)
-
-				try:
-					response = session.post(
-					    url='http://127.0.0.1:8088',
-					    data={
-						 "message":{ 
-						 	"request": 'info',
-         					 	"transaction": 'ready'
-						  	}
-					    } 
-					)
-					
-				except Exception, error:
-					#self._logger.warn('Waiting for Janus initialization')
-					tryingCounter += 1
-					
-					if tryingCounter >= 100:
-						self._logger.error(error)
-						return False
-
-			ready = signal('manage_fatal_error')
-			ready.connect(self.closeAllSessions)
-
-			#START TIMER FOR LOST PEERS
-			self.peersDeadDetacher = interval(30.0,self.pingPongRounder,None)
-			self.peersDeadDetacher.start()
-
-			return True
 
 	def stopJanus(self):
-		
-		try:
-			if self._JanusProcess is not None:
-				self._JanusProcess.kill()
-				self.sendEventToPeers('stopConnection')
-				self._connectedPeers = {}
+		with self._janusStartStopCondition:
+			try:
+				if self._JanusProcess is not None:
+					#it's possible that a new client came it while stopping the camera feed
+					#in that case we should not try to stop it
+					if self._JanusProcess.returncode is None:
+						self._logger.debug('Attempting to terminate the Janus process')
+						self._JanusProcess.terminate()
 
-				#STOP TIMER FOR LOST PEERS
-				self.peersDeadDetacher.cancel()
-				
-				return True
-		except Exception, error:
-			self._logger.error("Error stopping Janus: it is already stopped. Error: %s" % str(error))
+						attempts = 6
+						while self._JanusProcess.returncode is None and attempts > 0:
+							time.sleep(0.3)
+							self._JanusProcess.poll()
+							attempts -= 1
+
+						if self._JanusProcess.returncode is None:
+							#still not terminated
+							self._logger.debug('Janus didn\'t terminate nicely, let\'s kill it')
+							self._JanusProcess.kill()
+							self._JanusProcess.wait()
+
+						self._logger.debug('Janus Stopped')
+
+					self._JanusProcess = None
+					self.sendEventToPeers('stopConnection')
+					self._connectedPeers = {}
+
+					#STOP TIMER FOR LOST PEERS
+					self.peersDeadDetacher.cancel()
+
+					ready = signal('manage_fatal_error_webrtc')
+					ready.disconnect(self.closeAllSessions)
+
+					return True
+
+			except Exception as e:
+				self._logger.error("Error stopping Janus. Error: %s" % e)
+
 			return False
-			
 
-	def stopGStreamer(self):
-		cameraManager().stop_video_stream()
-	
 	def sendEventToPeers(self, type, data=None):
-		for key in self._connectedPeers.keys():
-			if self._connectedPeers[key] != 'local':
-				self.sendEventToPeer(self._connectedPeers[key], type, data)
-			
-	def sendEventToPeer(self, peer, type, data=None):
-		boxrouterManager().sendEventToClient(peer.clientId, type, data)
+		for peer in self._connectedPeers:
+			#if peer != 'local':
+			if isinstance(peer, ConnectionPeer):
+				peer.sendEventToPeer(type, data)
 
 class StreamingPlugin(Plugin):
 	name = 'janus.plugin.streaming'
 
 class ConnectionPeer(object):
-
 	def __init__(self, clientId, parent):
+		self._logger = logging.getLogger(__name__ + ':ConnectionPeer')
 		self.session = None
 		self.clientId = clientId
 		self.sessionKa = None
@@ -317,21 +333,21 @@ class ConnectionPeer(object):
 	#def connection_on_opened(self,connection):
 	#	logging.info('CONNECTION ON OPENED')
 
-	#def connection_on_closed(self,connection,**kw):
-	#	logging.info('CONNECTION ON CLOSED')
+	#def connection_on_closed(self, connection, **kw):
+	#	self._logger.warn('Lost connection with Janus')
 
-	def connection_on_message(self,connection,message):
+	def connection_on_message(self, connection, message):
+		messageToSend = json.loads(str(message))
 
-		messageToReturn = json.loads(str(message))
-
-		if self.session is not None and 'session_id' in messageToReturn and messageToReturn['session_id'] != self.session.id:
+		if self.session is not None and 'session_id' in messageToSend and messageToSend['session_id'] != self.session.id:
 			return
 
-		if 'janus' in messageToReturn and messageToReturn['janus'] == 'hangup':
+		if 'janus' in messageToSend and messageToSend['janus'] == 'hangup':
 			#Finish camera session caused by user or exception
-			self._parent.closePeerSession(messageToReturn['session_id'])
-		elif 'jsep' in messageToReturn:
-			self.sendEventToPeer('getSdp',messageToReturn)
+			self._parent.closePeerSession(messageToSend['session_id'])
+
+		elif 'jsep' in messageToSend:
+			self.sendEventToPeer('getSdp', messageToSend)
 
 	#SESSION
 	#def session_on_connected(self,session,**kw):
@@ -367,8 +383,7 @@ class ConnectionPeer(object):
 	#	logging.info('STREAMINGPLUGIN ON HANGUP')
 
 	def start(self):
-
-		sem = threading.Semaphore(0)
+		sem = threading.Event()
 
 		self.streamingPlugin = StreamingPlugin()
 		self.session = Session('ws://127.0.0.1:8188', secret='d5faa25fe8e3438d826efb1cd3369a50')
@@ -376,7 +391,7 @@ class ConnectionPeer(object):
 		@self.session.on_plugin_attached.connect
 		def receive_data(sender, **kw):
 			#wait until Janus plugin is not attached
-			sem.release()
+			sem.set()
 
 
 		#CONNECTION
@@ -385,29 +400,29 @@ class ConnectionPeer(object):
 		#SIGNALS
 		#
 		# Signal fired when `Connection` has been established.
-	    #	on_opened = blinker.Signal()
+			#	on_opened = blinker.Signal()
 		#self.session.cxn_cls.on_opened.connect(self.connection_on_opened)
 
 		#
-	    # Signal fired when `Connection` has been closed.
-	    #	on_closed = blinker.Signal()
+		# Signal fired when `Connection` has been closed.
+		#	on_closed = blinker.Signal()
 		#self.session.cxn_cls.on_closed.connect(self.connection_on_closed)
 
 		#
-	    # Signal fired when `Connection` receives a message
-	    #	on_message = blinker.Signal()
+		# Signal fired when `Connection` receives a message
+		#	on_message = blinker.Signal()
 		self.session.cxn_cls.on_message.connect(self.connection_on_message)
 
-	    ##
+		##
 
 
-	    #SESSION
-	    #self.session
-	    #
-	    #SIGNALS
-	    #
-	    # Signal fired when `Session` has been connected.
-	    #	on_connected = blinker.Signal()
+		#SESSION
+		#self.session
+		#
+		#SIGNALS
+		#
+		# Signal fired when `Session` has been connected.
+		#	on_connected = blinker.Signal()
 		#self.session.on_connected.connect(self.session_on_connected)
 
 		#
@@ -468,14 +483,19 @@ class ConnectionPeer(object):
 		self.session.register_plugin(self.streamingPlugin);
 		self.session.connect();
 
-
 		self.sessionKa = KeepAlive(self.session)
 		self.sessionKa.daemon = True
 		self.sessionKa.start()
 
-		sem.acquire()
-		
-		return self.session.id
+		waitingState = sem.wait(5)
+		sem.clear()
+
+		if waitingState:
+			return self.session.id
+
+		else:
+			self._logger.error("Error initializing Janus: session can not be started")
+			return None
 
 	def close(self):
 		#stop the keepalive worker
@@ -490,5 +510,9 @@ class ConnectionPeer(object):
 		self.streamingPlugin = None
 
 	def sendEventToPeer(self, type, data= None):
-		boxrouterManager().sendEventToClient(self.clientId, type, data)
+		try:
+			boxrouterManager().sendEventToClient(self.clientId, type, data)
+
+		except:
+			self._logger.error('Error sending event [%s] to peer %s' % (type, self.clientId), exc_info = True)
 

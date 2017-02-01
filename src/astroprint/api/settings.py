@@ -81,7 +81,7 @@ def getNetworkSettings():
 
 	return jsonify({
 		'networks': nm.getActiveConnections(),
-		'hasWifi': bool(nm.getWifiDevice())
+		'hasWifi': nm.hasWifi()
 	})
 
 @api.route("/settings/network/active", methods=["POST"])
@@ -89,12 +89,14 @@ def getNetworkSettings():
 def setWifiNetwork():
 	if "application/json" in request.headers["Content-Type"]:
 		data = request.json
-		result = networkManager().setWifiNetwork(data['id'], data['password'])
+		if 'id' in data and 'password' in data:
+			result = networkManager().setWifiNetwork(data['id'], data['password'])
 
 		if result:
 			return jsonify(result)
 		else:
 			return (gettext('netSNotFound') % data['id'], 404)
+
 
 	return ("Invalid Request", 400)
 
@@ -171,34 +173,39 @@ def cameraSettings():
 		if "application/json" in request.headers["Content-Type"]:
 			data = request.json
 
+			if "source" in data:
+				s.set(['camera', 'source'], data['source'])
+
 			if "size" in data:
 				s.set(['camera', 'size'], data['size'])
 
 			if "encoding" in data:
 				s.set(['camera', 'encoding'], data['encoding'])
 
+			if "format" in data:
+				s.set(['camera', 'format'], data['format'])
+
 			if "framerate" in data:
 				s.set(['camera', 'framerate'], data['framerate'])
 
-			if "format" in data:
-				s.set(['camera', 'format'], data['format'])
-			
 			s.save()
 
 			cm.settingsChanged({
 				'size': s.get(['camera', 'size']),
 				'encoding': s.get(['camera', 'encoding']),
 				'framerate': s.get(['camera', 'framerate']),
+				'source': s.get(['camera', 'source']),
 				'format': s.get(['camera', 'format'])
 			})
 
 	return jsonify(
-		encoding= s.get(['camera', 'encoding']), 
+		encoding= s.get(['camera', 'encoding']),
 		size= s.get(['camera', 'size']),
 		framerate= s.get(['camera', 'framerate']),
-		format= s.get(['camera','format']),
+		format= s.get(['camera', 'format']),
+		source= s.get(['camera', 'source']),
 		structure= cm.settingsStructure()
-	)	
+	)
 
 @api.route("/settings/software/advanced", methods=["GET"])
 @restricted_access
@@ -242,6 +249,8 @@ def resetFactorySettings():
 	emptyFolder(s.get(['folder', 'timelapse_tmp']) or s.getBaseFolder('timelapse_tmp'))
 	emptyFolder(s.get(['folder', 'virtualSd']) or s.getBaseFolder('virtualSd'))
 
+	networkManager().forgetWifiNetworks()
+
 	#replace config.yaml with config.factory
 	config_file = s._configfile
 	os.unlink(config_file)
@@ -251,15 +260,11 @@ def resetFactorySettings():
 	if user_file and os.path.exists(user_file):
 		os.unlink(user_file)
 
-	s._config = {}
-	s.load(migrate=False)
-
-	networkManager().forgetWifiNetworks()
-
 	#We should reboot the whole device
-	softwareManager.restartServer()
-
-	return jsonify()
+	if softwareManager.restartServer():
+		return jsonify()
+	else:
+		return ("There was an error rebooting.", 500)
 
 @api.route("/settings/software/check", methods=['GET'])
 @restricted_access
@@ -322,3 +327,8 @@ def clearLogs():
 		return jsonify();
 	else:
 		return (gettext('errorClearLogs'), 500)
+
+@api.route("/settings/software/system-info", methods=['GET'])
+@restricted_access
+def getSysmteInfo():
+	return jsonify( softwareManager.systemInfo )

@@ -183,7 +183,7 @@ def performSystemAction():
 					except Exception, e:
 						logger.warn("Command failed: %s" % e)
 						return make_response(("Command failed: %s" % e, 500, []))
-				
+
 				else:
 					break
 
@@ -205,7 +205,7 @@ def login():
 			remember = False
 
 		user = octoprint.server.userManager.findUser(username)
-		if user is not None:			
+		if user is not None:
 			if user.check_password(octoprint.server.userManager.createPasswordHash(password)):
 				login_user(user, remember=remember)
 				identity_changed.send(current_app._get_current_object(), identity=Identity(user.get_id()))
@@ -213,7 +213,7 @@ def login():
 		return make_response(("User unknown or password incorrect", 401, []))
 	elif "passive" in request.values.keys():
 		user = current_user
-		if user is not None and not user.is_anonymous():
+		if user is not None and not user.is_anonymous:
 			identity_changed.send(current_app._get_current_object(), identity=Identity(user.get_id()))
 			return jsonify(user.asDict())
 		elif s().getBoolean(["accessControl", "autologinLocal"]) \

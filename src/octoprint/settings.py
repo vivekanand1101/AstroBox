@@ -1,7 +1,7 @@
 # coding=utf-8
-__author__ = "Gina Häußge <osd@foosel.net>"
-__author__ = "Daniel Arroyo <daniel@astroprint.com>"
+__author__ = "AstroPrint Product Team <product@astroprint.com>"
 __license__ = 'GNU Affero General Public License http://www.gnu.org/licenses/agpl.html'
+__copyright__ = "Copyright (C) 2017 3DaGoGo, Inc - Released under terms of the AGPLv3 License"
 
 import sys
 import os
@@ -11,7 +11,7 @@ import re
 import uuid
 import shutil
 
-APPNAME="OctoPrint"
+APPNAME="AstroBox"
 
 instance = None
 
@@ -31,6 +31,9 @@ default_settings = {
 		"baudrate": 250000,
 		"autoconnect": True,
 		"log": False,
+		"dsrdtrFlowControl": False,
+		"rtsctsFlowControl": False,
+		"swFlowControl": True,
 		"timeout": {
 			"detection": 0.5,
 			"connection": 10,
@@ -45,14 +48,20 @@ default_settings = {
 		"port": 5000,
 		"firstRun": True,
 		"baseUrl": "",
-		"scheme": ""
+		"scheme": "",
+		"maxUploadSize": 160, #Size in MB for the max allowed file size
 	},
 	"camera": {
 		"manager": "gstreamer",
 		"encoding": "h264",
 		"size": "640x480",
-		"framerate": "15",
-		"format": "x-raw"
+		"framerate": "15/1",
+		"format": "x-raw", #This is used by mpjeg Manager
+		"pixelformat": "YUYV", #This is used by GStreamer Manager
+		"source": "USB",
+		"debug-level": 0,
+		"graphic-debug": False,
+		"inactivitySecs": 90.0 # After 1.5 minutes of inactivity the camera shuts off
 	},
 	"gcodeViewer": {
 		"enabled": True,
@@ -87,7 +96,7 @@ default_settings = {
 		"movementSpeed": {
 			"x": 6000,
 			"y": 6000,
-			"z": 200,
+			"z": 700,
 			"e": 100
 		},
 		"pauseTriggers": [],
@@ -122,18 +131,18 @@ default_settings = {
 		"config": "/default/path/to/your/cura/config.ini"
 	},
 	"cloudSlicer": {
-		"apiHost": None,
+		"apiHost": "https://api.astroprint.com",
 		"loggedUser": None,
-		"boxrouter": None
+		"boxrouter": "wss://boxrouter.astroprint.com"
 	},
 	"events": {
 		"enabled": False,
 		"subscriptions": []
 	},
 	"api": {
-		"enabled": False,
+		"enabled": True,
 		"key": ''.join('%02X' % ord(z) for z in uuid.uuid4().bytes),
-		"allowCrossOrigin": False
+		"allowCrossOrigin": True
 	},
 	"terminalFilters": [
 		{ "name": "Suppress M105 requests/responses", "regex": "(Send: M105)|(Recv: ok T\d*:)" },
@@ -383,6 +392,17 @@ class Settings(object):
 			return int(value)
 		except ValueError:
 			self._logger.warn("Could not convert %r to a valid integer when getting option %r" % (value, path))
+			return None
+
+	def getString(self, path):
+		value = self.get(path)
+		if value is None:
+			return None
+
+		try:
+			return str(value)
+		except ValueError:
+			self._logger.warn("Could not convert %r to a valid string when getting option %r" % (value, path))
 			return None
 
 	def getFloat(self, path):

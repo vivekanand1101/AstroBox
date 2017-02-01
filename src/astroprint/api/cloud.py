@@ -8,6 +8,7 @@ import uuid
 
 from flask import request, jsonify, abort
 from flask.ext.login import current_user
+from requests import ConnectionError
 
 from octoprint.settings import settings
 from octoprint.server import restricted_access, SUCCESS
@@ -42,11 +43,24 @@ def set_private_key():
 			if astroprintCloud().signin(email, password):
 				return jsonify(SUCCESS)
 
-		except AstroPrintCloudNoConnectionException:
+		except (AstroPrintCloudNoConnectionException, ConnectionError):
 			abort(503, gettext('deviceNotConnectedAstro'))
 
 	else:
 		abort(400)
+
+	abort(401)
+
+@api.route('/astroprint/login-key', methods=['GET'])
+@restricted_access
+def get_login_key():
+	try:
+		key = astroprintCloud().get_login_key()
+		if key:
+			return jsonify(key)
+
+	except (AstroPrintCloudNoConnectionException, ConnectionError):
+		abort(503, "AstroPrint.com can't be reached")
 
 	abort(401)
 
@@ -56,8 +70,19 @@ def upload_data():
 	filePath = request.args.get('file', None)
 
 	if filePath:
-		url, params, redirect_url = astroprintCloud().get_upload_info(filePath)
-		return jsonify(url=url, params=params, redirect=redirect_url)
+		uploadInfo = astroprintCloud().get_upload_info(filePath)
+
+		if uploadInfo:
+			if 'error' in uploadInfo:
+				if uploadInfo['error'] == 'no_user':
+					abort(401)
+				else:
+					abort(500)
+
+			else:
+				return json.dumps(uploadInfo)
+		else:
+			abort(500)
 
 	abort(400)
 
@@ -122,7 +147,7 @@ def designs():
 @api.route("/astroprint/print-files/<string:print_file_id>/download", methods=["GET"])
 @restricted_access
 def design_download(print_file_id):
-	if current_user is None or not current_user.is_authenticated() or not current_user.publicKey:
+	if current_user is None or not current_user.is_authenticated or not current_user.publicKey:
 		abort(401)
 
 	em = eventManager()
@@ -195,3 +220,28 @@ def cancel_design_download(print_file_id):
 
 	else:
 		return abort(404)
+
+
+@api.route("/astroprint/print-jobs/<string:print_job_id>/add-reason", methods=["PUT"])
+@restricted_access
+def update_cancel_reason(print_job_id):
+	if not "application/json" in request.headers["Content-Type"]:
+		return abort(400)
+
+	data = request.json
+
+	#get reason
+	reason = {}
+	if 'reason' in data:
+		reason['reason_id'] = data['reason']
+
+	if 'other_text' in data:
+		reason['other_text'] = data['other_text']
+
+	if reason:
+		if not astroprintCloud().updateCancelReason(print_job_id, reason):
+			return abort(500)
+		else:
+			return jsonify(SUCCESS)
+	else:
+		return abort(400)

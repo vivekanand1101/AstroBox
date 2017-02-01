@@ -708,7 +708,7 @@ msgstr "Control"
 #: ../src/astroprint/templates/home.jinja2:54
 #: ../src/astroprint/templates/home.jinja2:82
 msgid "visit"
-msgstr "Visit"
+msgstr "Get Help"
 
 #: ../src/astroprint/templates/home.jinja2:56
 msgid "supplies"

@@ -47,6 +47,14 @@ class BoxRouterMessageHandler(object):
 
 		return None
 
+	def force_event(self, msg):
+		wsClient = self._weakWs()
+
+		if wsClient and wsClient._eventSender:
+			wsClient._eventSender.sendLastUpdate(msg['data'])
+
+		return None
+
 	def request(self, msg):
 		wsClient = self._weakWs()
 
@@ -82,7 +90,7 @@ class BoxRouterMessageHandler(object):
 
 			except Exception as e:
 				message = 'Error sending [%s] response: %s' % (request, e)
-				self._logger.error( message )
+				self._logger.error( message , exc_info= True)
 				response = {'error': True, 'message': message }
 
 			if response:
@@ -93,10 +101,10 @@ class BoxRouterMessageHandler(object):
 				}))
 
 			#else:
-				# this means that the handler is asynchronous 
+				# this means that the handler is asynchronous
 				# and will respond when done
-				# we should probably have a timeout here too 
-				# even though there's already one at the boxrouter	
+				# we should probably have a timeout here too
+				# even though there's already one at the boxrouter
 
 	def response_from_client(self, msg):
 		router = self._weakRefBoxRouter()

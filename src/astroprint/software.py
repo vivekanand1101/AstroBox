@@ -1,6 +1,7 @@
 # coding=utf-8
-__author__ = "Daniel Arroyo <daniel@astroprint.com>"
+__author__ = "AstroPrint Product Team <product@astroprint.com>"
 __license__ = 'GNU Affero General Public License http://www.gnu.org/licenses/agpl.html'
+__copyright__ = "Copyright (C) 2016 3DaGoGo, Inc - Released under terms of the AGPLv3 License"
 
 # singleton
 _instance = None
@@ -19,16 +20,20 @@ import subprocess
 import threading
 import logging
 import time
+import platform
+import re
 
 from tempfile import mkstemp
-from sys import platform
+from sys import platform as platformStr
 
 from flask.ext.login import current_user
 
 from octoprint.settings import settings
 from octoprint.events import eventManager, Events
 
-if platform != 'darwin':
+from astroprint.boxrouter import boxrouterManager
+
+if platformStr != 'darwin':
 	import apt.debfile
 	import apt.progress.base
 	import apt_pkg
@@ -126,7 +131,7 @@ if platform != 'darwin':
 
 		def pulse(self, owner):
 			if self.current_items != self._lastCurrentReported or self.total_items != self._lastTotalReported:
-				self._progressCb("sources_update", float(self.current_items) / float(self.total_items)) 
+				self._progressCb("sources_update", float(self.current_items) / float(self.total_items))
 				self._logger.info("Update progress item %d of %d" % (self.current_items, self.total_items))
 				self._lastCurrentReported = self.current_items
 				self._lastTotalReported = self.total_items
@@ -145,6 +150,9 @@ class SoftwareUpdater(threading.Thread):
 	def run(self):
 		#We need to give the UI a chance to update before starting so that the message can be sent...
 		self._progressCb("download", 0.0, "Starting download...")
+		#disconnect from the cloud during software upgrade. The reboot will take care of reconnect
+		boxrouterManager().boxrouter_disconnect()
+
 		time.sleep(2)
 		r = requests.get(self.vData["download_url"], stream=True, headers = self._manager._requestHeaders)
 
@@ -162,7 +170,7 @@ class SoftwareUpdater(threading.Thread):
 					self._progressCb("download", round((downloaded_size / content_length), 2))
 
 			self._logger.info('Release downloaded.')
-			if platform == "linux" or platform == "linux2":
+			if platformStr == "linux" or platformStr == "linux2":
 				self._progressCb("download", 1.0 , "Release downloaded. Preparing...")
 				time.sleep(0.5) #give the message a chance to be sent
 
@@ -191,9 +199,9 @@ class SoftwareUpdater(threading.Thread):
 					pkg.check()
 
 				except Exception as e:
-					self._logger.error('There was a problem with update package: \n	%s' % e)
+					self._logger.error('There was a problem with update package: \n %s' % e)
 					completionCb(True)
-					return					
+					return
 
 				if pkg.missing_deps:
 					cache.open()
@@ -202,14 +210,14 @@ class SoftwareUpdater(threading.Thread):
 						for dep in pkg.missing_deps:
 							self._logger.info("Marking dependency [%s] to be installed." % dep)
 							cache[dep].mark_install()
-					
+
 					self._progressCb("deps_download", 0.0)
 					try:
 						cache.commit(DepsDownloadProgress(self._progressCb, completionCb), DepsInstallProgress(self._progressCb, completionCb))
 						self._logger.info("%d Dependencies installed" % len(pkg.missing_deps))
 
 					except Exception as e:
-						self._logger.error('There was a problem installing dependencies: \n	%s' % e)
+						self._logger.error('There was a problem installing dependencies: \n %s' % e)
 						completionCb(True)
 						return
 
@@ -237,15 +245,15 @@ class SoftwareUpdater(threading.Thread):
 			r.close()
 
 class SoftwareManager(object):
-	# Download Phase			start 	end		message
+	# Download Phase      start   end   message
 	updatePhaseProgressInfo = {
-		"download": 			(0.0,	0.2,	"Downloading release..."),
-		"sources_update": 		(0.21,	0.4,	"Updating dependency list..."),
-		"deps_download": 		(0.41,	0.6,	"Downloading dependencies..."),
-		"deps_install": 		(0.61,	0.75,	"Installing dependencies..."),
-		"release_install": 		(0.76,	0.85,	"Upgrading software..."),
-		"release_configure": 	(0.86,	0.95,	"Configuring..."),
-		"release_finalize": 	(0.96,	1.0,	"Finalizing")
+		"download":       (0.0, 0.2,  "Downloading release..."),
+		"sources_update":     (0.21,  0.4,  "Updating dependency list..."),
+		"deps_download":    (0.41,  0.6,  "Downloading dependencies..."),
+		"deps_install":     (0.61,  0.75, "Installing dependencies..."),
+		"release_install":    (0.76,  0.85, "Upgrading software..."),
+		"release_configure":  (0.86,  0.95, "Configuring..."),
+		"release_finalize":   (0.96,  1.0,  "Finalizing")
 	}
 
 	softwareCheckInterval = 86400 #1 day
@@ -301,8 +309,8 @@ class SoftwareManager(object):
 	def versionString(self):
 		return '%s - v%d.%d(%s)' % (
 			self.data['variant']['name'],
-			self.data['version']['major'], 
-			self.data['version']['minor'], 
+			self.data['version']['major'],
+			self.data['version']['minor'],
 			self.data['version']['build'])
 
 	@property
@@ -362,7 +370,7 @@ class SoftwareManager(object):
 		try:
 			r = requests.post('%s/astrobox/software/check' % apiHost, data=json.dumps({
 					'current': [
-						self.data['version']['major'], 
+						self.data['version']['major'],
 						self.data['version']['minor'],
 						self.data['version']['build']
 					],
@@ -459,23 +467,23 @@ class SoftwareManager(object):
 		return False
 
 	def restartServer(self):
-		if platform == "linux" or platform == "linux2":
-			from astroprint.boxrouter import boxrouterManager
-			from astroprint.printer.manager import printerManager
-			from astroprint.camera import cameraManager
-			from astroprint.network.manager import networkManager
-
-			#let's be nice about shutthing things down
-			boxrouterManager().boxrouter_disconnect()
-			printerManager().disconnect()
-			cameraManager().close_camera()
-			networkManager().close()
-
+		if platformStr == "linux" or platformStr == "linux2":
 			actions = self._settings.get(["system", "actions"])
 			for a in actions:
 				if a['action'] == 'astrobox-restart':
 					#Call to Popen will start the restart command but return inmediately before it completes
-					subprocess.Popen(a['command'].split(' '))
+					threading.Timer(1.0, subprocess.Popen, [a['command'].split(' ')]).start()
+					self._logger.info('Restart command scheduled')
+
+					from astroprint.printer.manager import printerManager
+					from astroprint.camera import cameraManager
+					from astroprint.network.manager import networkManagerShutdown
+
+					#let's be nice about shutthing things down
+					printerManager().disconnect()
+					cameraManager().close_camera()
+					networkManagerShutdown()
+
 					return True
 
 			return False
@@ -485,7 +493,6 @@ class SoftwareManager(object):
 	def sendLogs(self, ticketNo=None, message=None):
 		import zipfile
 
-		from astroprint.boxrouter import boxrouterManager
 		from tempfile import gettempdir
 
 		try:
@@ -535,7 +542,7 @@ class SoftwareManager(object):
 		# first delete all old logs
 		for f in os.listdir(logsDir):
 			path = os.path.join(logsDir, f)
-			
+
 			if os.path.isfile(path) and f not in activeLogFiles:
 				os.unlink(path)
 
@@ -546,8 +553,26 @@ class SoftwareManager(object):
 
 		return True
 
+	@property
+	def systemInfo(self):
+		distName, distVersion, id = platform.linux_distribution()
+		system, node, release, version, machine, processor = platform.uname()
+
+		outdated = distName == 'debian' and distVersion < '8.0'
+
+		return {
+			'dist_name': distName,
+			'dist_version': distVersion,
+			'system': system,
+			'release': release,
+			'version': version,
+			'machine': machine,
+			'processor': processor,
+			'outdated': outdated
+		}
+
 	def _checkAuth(self):
-		if current_user and current_user.is_authenticated():
+		if current_user and current_user.is_authenticated and not current_user.is_anonymous:
 			privateKey = current_user.privateKey
 			publicKey = current_user.publicKey
 

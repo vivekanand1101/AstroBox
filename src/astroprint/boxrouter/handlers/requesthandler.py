@@ -27,8 +27,9 @@ class RequestHandler(object):
 		printer = printerManager()
 		cm = cameraManager()
 
-		done({
+		state = {
 			'printing': printer.isPrinting(),
+			'heatingUp': printer.isHeatingUp(),
 			'operational': printer.isOperational(),
 			'paused': printer.isPaused(),
 			'camera': printer.isCameraConnected(),
@@ -36,7 +37,14 @@ class RequestHandler(object):
 			'profile': printerProfileManager().data,
 			'remotePrint': True,
 			'capabilities': ['remotePrint'] + cm.capabilities
-		})
+		}
+
+		if state['printing'] or state['paused']:
+			#Let's add info about the ongoing print job
+			state['job'] = printer._stateMonitor._jobData
+			state['progress'] = printer._stateMonitor._progress
+
+		done(state)
 
 	def job_info(self, data, clientId, done):
 		done(printerManager()._stateMonitor._jobData)
@@ -213,15 +221,14 @@ class PrinterCommandHandler(object):
 		done(None)
 
 	def resume(self, data, clientId, done):
-		self.pause()
+		printerManager().togglePausePrint()
 		done(None)
 
 	def cancel(self, data, clientId, done):
-		printerManager().cancelPrint()
-		done(None)
+		done(printerManager().cancelPrint())
 
 	def photo(self, data, clientId, done):
-		
+
 		def doneWithPhoto(pic):
 			if pic is not None:
 				done({
@@ -232,7 +239,7 @@ class PrinterCommandHandler(object):
 				done({
 					'success': False,
 					'image_data': ''
-				})		
+				})
 
 		cameraManager().get_pic_async(doneWithPhoto)
 
@@ -241,23 +248,21 @@ class PrinterCommandHandler(object):
 
 class CameraCommandHandler(object):
 	def start_video_stream(self, data, clientId, done):
-		cameraManager().start_video_stream()
-		done(None)
+		cameraManager().start_video_stream(done)
 
 	def stop_video_stream(self, data, clientId, done):
-		cameraManager().stop_video_stream()
-		done(None)
+		cameraManager().stop_video_stream(done)
 
 # P2P Command Group Handler
 
 class P2PCommandHandler(object):
-	
+
 	def init_connection(self, data, clientId, done):
 		#initialize the session on Janus
 		#if there is not any session before, Janus is stopped,
 		#so it will turn Janus on
 		sessionId = webRtcManager().startPeerSession(clientId)
-	
+
 		if sessionId:
 			done({
 				'success': True,
@@ -274,17 +279,17 @@ class P2PCommandHandler(object):
 		#Manage the plugin and the type of video source: VP8 or H264
 		webRtcManager().preparePlugin(data['sessionId'])
 		done(None)
-	
+
 	def start_connection(self, data, clientId, done):
 		#Start Janus session and it starts to share video
 		sessionId = data['sessionId']
 		webRtcManager().setSessionDescriptionAndStart(sessionId, data)
 		done(None)
-		
+
 	def stop_connection(self, sessionId, clientId, done):
 		#Stop Janus session
 		#if this is the last (or unique) session in Janus,
-		#Janus will be stopped (of course, Gstreamer too) 
+		#Janus will be stopped (of course, Gstreamer too)
 		webRtcManager().closePeerSession(sessionId)
 		done(None)
 

@@ -1,6 +1,7 @@
 # coding=utf-8
-__author__ = "Daniel Arroyo <daniel@astroprint.com>"
+__author__ = "AstroPrint Product Team <product@astroprint.com>"
 __license__ = 'GNU Affero General Public License http://www.gnu.org/licenses/agpl.html'
+__copyright__ = "Copyright (C) 2016 3DaGoGo, Inc - Released under terms of the AGPLv3 License"
 
 import threading
 import logging
@@ -125,7 +126,7 @@ class PrinterS3g(Printer):
 
 		oldState = self.getStateString()
 		self._state = newState
-		self._logger.info('Changing monitoring state from \'%s\' to \'%s\'' % (oldState, self.getStateString()))
+		self._logger.info('Changing monitoring state from [%s] to [%s]' % (oldState, self.getStateString()))
 
 		# forward relevant state changes to gcode manager
 		if self._comm is not None and oldState == self.STATE_PRINTING:
@@ -295,6 +296,7 @@ class PrinterS3g(Printer):
 			if self._printJob:
 				self._printJob.cancel()
 				self._printJob.join()
+				self._printJob = None
 
 			if self.isConnected():
 				self._comm.close()
@@ -365,7 +367,7 @@ class PrinterS3g(Printer):
 						position[1] += steps
 
 					if axis == 'z':
-						steps = int ( amount * self._profile.values['axes']['Z']['steps_per_mm'] )
+						steps = int ( self.jogAmountWithPrinterProfile('z', amount) * self._profile.values['axes']['Z']['steps_per_mm'] )
 						position[2] += steps
 
 					self._comm.queue_extended_point_classic(position, 500)
@@ -391,13 +393,28 @@ class PrinterS3g(Printer):
 
 				#find out what axis is this:
 				axis = self._profile.values['tools'][str(tool)]['stepper_axis']
-				steps = int ( amount * self._profile.values['axes'][axis]['steps_per_mm'] )
+				stepsPerMM = int( self._profile.values['axes'][axis]['steps_per_mm'] )
+				steps = int ( amount * stepsPerMM )
 				if axis == 'A':
 					position[3] += steps
 				elif axis == 'B':
 					position[4] += steps
 
-				self._comm.queue_extended_point_classic(position, 3000)
+				if speed:
+					#the UI sends mm/s, we need to transfer it to mm/min
+					speed *= 60
+				else:
+					speed = settings().get(["printerParameters", "movementSpeed", "e"])
+
+				#The speed for s3g is microseconds per step. We need to convert mm/min -> ms/step
+				#6e+7 ms in 1 minute
+				#mmPerMs = speed / 6e+7
+				#stepsPerMs = mmPerMs * stepsPerMM
+				#msPerStep = pow ( stepsPerMs, -1 )
+
+				msPerStep = abs ( int( 1 / ( (speed / 6e+7) * stepsPerMM ) ) )
+
+				self._comm.queue_extended_point_classic(position, msPerStep)
 
 	def setTemperature(self, type, value):
 		if self._comm:
@@ -422,8 +439,7 @@ class PrinterS3g(Printer):
 
 	def changeTool(self, tool):
 		try:
-			toolNum = int(tool[len("tool"):])
-			self._selectedTool = toolNum
+			self._selectedTool = tool
 		except ValueError:
 			pass
 
@@ -506,6 +522,15 @@ class PrinterS3g(Printer):
 		else:
 			return time.time() - self._currentFile['start_time']
 
+	def getConsumedFilament(self):
+		return 0
+
+	def getTotalConsumedFilament(self):
+		return 0
+
+	def getSelectedTool(self):
+		return None
+
 	def getPrintFilepos(self):
 		if self._currentFile is None:
 			return None
@@ -528,7 +553,6 @@ class PrinterS3g(Printer):
 		if self._currentFile is None:
 			raise ValueError("No file selected for printing")
 
-
 		if self._printJob and self._printJob.isAlive():
 			raise Exception("A Print Job is still running")
 
@@ -542,15 +566,16 @@ class PrinterS3g(Printer):
 		self._printJob = PrintJobS3G(self, self._currentFile)
 		self._printJob.start()
 
-	def cancelPrint(self, disableMotorsAndHeater=True):
+	def executeCancelCommands(self, disableMotorsAndHeater):
 		"""
 		 Cancel the current printjob.
 		"""
-		if not super(PrinterS3g, self).cancelPrint():
-			return
-
 		self._comm.abort_immediately()
 		self._printJob.cancel()
+
+	def resetSerialLogging(self):
+		if self._comm and self._comm.writer:
+			self._comm.writer.resetSerialLogging()
 
 	# ~~~ Internal Callbacks ~~~~
 
@@ -558,8 +583,13 @@ class PrinterS3g(Printer):
 		# reset progress, height, print time
 		self._setCurrentZ(None)
 		self._setProgressData(None, None, None, None, None)
+		self._printJob = None
 
 		# mark print as failure
 		if self._currentFile is not None:
 			self._fileManager.printFailed(self._currentFile["filename"], self.getPrintTime())
 			self.unselectFile()
+
+	def mcPrintjobDone(self):
+		self._printJob = None
+		super(PrinterS3g, self).mcPrintjobDone()

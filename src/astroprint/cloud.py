@@ -39,7 +39,7 @@ from astroprint.printer.manager import printerManager
 from astroprint.printfiles.downloadmanager import downloadManager
 
 class AstroPrintCloudException(Exception):
-    pass
+	pass
 
 class AstroPrintCloudNoConnectionException(AstroPrintCloudException):
 	#There no connection to the astroprint cloud
@@ -65,10 +65,12 @@ class AstroPrintCloud(object):
 		self.settings = settings()
 		self.hmacAuth = None
 
+		self.tryingLoggingTimes = 0
+
 		loggedUser = self.settings.get(['cloudSlicer', 'loggedUser'])
 		if loggedUser:
 			from octoprint.server import userManager
-			
+
 			user = userManager.findUser(loggedUser)
 
 			if user and user.publicKey and user.privateKey:
@@ -148,8 +150,7 @@ class AstroPrintCloud(object):
 
 		eventManager().fire(Events.LOCK_STATUS_CHANGED, None)
 
-
-	def signout(self):	
+	def signout(self):
 		from flask import session
 
 		logout_user()
@@ -166,44 +167,61 @@ class AstroPrintCloud(object):
 		design_id = uuid.uuid4().hex
 		s3_key = design_id + fileExtension
 
-		try:
-			#Get credentials to upload the file
-			r = requests.get( "%s/designs/upload/params?key=%s" % (self.apiHost, s3_key), auth=self.hmacAuth )
-			data = r.json()
-		except:
-			data = None
+		#only registered users can upload files to the cloud
+		if current_user and not current_user.is_anonymous:
+			try:
+				#Get credentials to upload the file
+				r = requests.get( "%s/designs/upload/params?key=%s" % (self.apiHost, s3_key), auth=self.hmacAuth )
+				data = r.json()
+			except:
+				data = None
 
-		if data:
-			publicKey = current_user.publicKey
-			privateKey = current_user.privateKey
+			if data:
+				publicKey = current_user.publicKey
+				privateKey = current_user.privateKey
 
-			request = json.dumps({
-				'design_id': design_id,
-				's3_key': s3_key,
-				'filename': filename
-			})
+				request = json.dumps({
+					'design_id': design_id,
+					's3_key': s3_key,
+					'filename': filename
+				})
 
-			hashed = hmac.new(privateKey, request, sha256)
-			signature = binascii.b2a_base64(hashed.digest())[:-1]
+				hashed = hmac.new(privateKey, request, sha256)
+				signature = binascii.b2a_base64(hashed.digest())[:-1]
 
-			redirect_url = "%s/design/uploaded?public_key=%s&req=%s&sig=%s" % (
-				self.apiHost.replace('api', 'www'), 
-				publicKey, 
-				quote_plus(request), 
-				quote_plus(signature))
+				redirect_url = "%s/design/uploaded?public_key=%s&req=%s&sig=%s" % (
+					self.apiHost.replace('api', 'www'),
+					publicKey,
+					quote_plus(request),
+					quote_plus(signature))
 
-			#url, post parameters, redirect Url
-			return data['url'], data['post_data'], redirect_url
+				#url, post parameters, redirect Url
+				return {
+					'url': data['url'],
+					'params': data['post_data'],
+					'redirect': redirect_url
+				}
+
+			else:
+				return {
+					'error': 'invalid_data',
+				}
+
 		else:
-			return None, None, None
+			return {
+				'error': 'no_user',
+			}
 
 	def get_private_key(self, email, password):
-		r = requests.post( "%s/%s" % (self.apiHost , 'auth/privateKey'),
-						   data={
-							"email": email,
-							"password": password
-						   },
-						   headers={'User-Agent': self._sm.userAgent})
+
+		r = requests.post(
+			"%s/%s" % (self.apiHost , 'auth/privateKey'),
+			data={
+				"email": email,
+				"password": password
+			},
+			headers={'User-Agent': self._sm.userAgent}
+		)
 
 		try:
 			data = r.json()
@@ -213,15 +231,17 @@ class AstroPrintCloud(object):
 		if data and "private_key" in data:
 			return data["private_key"]
 		else:
-			return None		
+			return None
 
 	def get_public_key(self, email, private_key):
-		r = requests.post( "%s/%s" % (self.apiHost , 'auth/publicKey'),
-						   data={
-							"email": email,
-							"private_key": private_key
-						   },
-						   headers={'User-Agent': self._sm.userAgent})
+		r = requests.post(
+			"%s/%s" % (self.apiHost , 'auth/publicKey'),
+			data={
+				"email": email,
+				"private_key": private_key
+			},
+			headers={'User-Agent': self._sm.userAgent}
+		)
 
 		try:
 			data = r.json()
@@ -233,111 +253,25 @@ class AstroPrintCloud(object):
 		else:
 			return None
 
-	def start_slice_job(self, config, gcodePath, stlPath, procesingCb, completionCb):
-		s = requests.Session()
-		s.auth = self.hmacAuth
-
-		upload_url, upload_data = self.get_upload_info(stlPath)
-
-		if not upload_url:
-			s.close()
-			completionCb(stlPath, gcodePath, "Unable to obtaion creadentials to upload design to the slicer service.")
-			return
+	def get_login_key(self):
+		r = requests.get(
+			"%s/%s" % (self.apiHost , 'auth/loginKey'),
+			headers={'User-Agent': self._sm.userAgent},
+			auth= self.hmacAuth
+		)
 
 		try:
-			# Upload to s3
-
-			m = MultipartEncoder(fields=upload_data.items() + [('file',(stlPath, open(stlPath, 'rb')))])
-			r = requests.post( upload_url, data=m, headers={'Content-Type': m.content_type})
-			m = None #Free the memory?
-			status_code = r.status_code
-		except: 
-			status_code = 500
-
-		if status_code > 204:
-			s.close()
-			completionCb(stlPath, gcodePath, "The design couldn't be uploaded to the slicer service.")
-			return
-
-		path, filename = split(stlPath)
-
-		try:
-			r = s.post( "%s/%s" % (self.apiHost, "designs/slice"), 
-			data={
-				"input_key": s3_key,
-				"filename": filename
-			})
-			data = r.json()
-
-		except:
-			data = None
-
-		if not data or "design_id" not in data:
-			s.close()
-			completionCb(stlPath, gcodePath, "There was an error creating slicing job.")
-			return
-
-		design_id = data['design_id']
-
-		sleep(1)
-		# Loop to watch for completion of the slicing job
-		while True:
-			try:
-				r = s.get('%s/designs/%s' % (self.apiHost, design_id))
-				data = r.json()
-			except:
-				data = None
-
-			if data and "progress" in data and "status" in data:
-				if data["status"] == 'failed':
-					s.close()
-					completionCb(stlPath, gcodePath, data["error"] if "error" in data else "Cloud slicer failed." )
-					return
-
-				procesingCb(min(data["progress"], 90))
-				if data["progress"] >= 100 or data["status"] == 'finished':
-					break
-
-			else:
-				s.close()
-				completionCb(stlPath, gcodePath, "Slicing failed.")
-				return
-
-			sleep(2)
-
-		try:
-			r = s.get('%s/designs/%s/gcode/link' % (self.apiHost, design_id))
 			data = r.json()
 		except:
 			data = None
 
-		s.close()
-		if data and "url" in data:
-			r = requests.get(data["url"], stream=True)
-
-			if r.status_code == 200:
-				content_length = float(r.headers['Content-Length']);
-				downloaded_size = 0.0
-
-				with open(gcodePath, 'wb') as fd:
-					for chunk in r.iter_content(524288): #0.5 MB
-						downloaded_size += len(chunk)
-						fd.write(chunk)
-						procesingCb(90 + round((downloaded_size / content_length) * 10.0, 1))
-
-				completionCb(stlPath, gcodePath)
-				return
-
-			else:
-				r.close()
-
-		completionCb(stlPath, gcodePath, "GCode file was not valid.")
+		return data
 
 	def print_files(self, forceCloudSync = False):
 		if self.cloud_enabled() and (not self._print_file_store or forceCloudSync):
 			self._sync_print_file_store()
 
-		return json.dumps(self._print_file_store)	
+		return json.dumps(self._print_file_store)
 
 	def download_print_file(self, print_file_id, progressCb, successCb, errorCb):
 		fileManager = printerManager().fileManager
@@ -345,7 +279,7 @@ class AstroPrintCloud(object):
 		printFile = fileManager.getFileByCloudId(print_file_id)
 
 		if printFile:
-			self._logger.error('Print file %s is already on the box as %s' % (print_file_id, printFile))
+			self._logger.info('Print file %s is already on the box as %s' % (print_file_id, printFile))
 			successCb(printFile, True)
 			return True
 
@@ -411,8 +345,8 @@ class AstroPrintCloud(object):
 			data['print_job_id'] = print_job_id
 
 		try:
-			r = requests.post( 
-				"%s/prints" % self.apiHost, 
+			r = requests.post(
+				"%s/prints" % self.apiHost,
 				data= data,
 				auth= self.hmacAuth
 			)
@@ -431,36 +365,48 @@ class AstroPrintCloud(object):
 	def uploadImageFile(self, print_id, imageBuf):
 		try:
 			m = MultipartEncoder(fields=[('file',('snapshot.jpg', imageBuf))])
-			r = requests.post( 
+			r = requests.post(
 				"%s/prints/%s/image" % (self.apiHost, print_id),
-				data= m, 
+				data= m,
 				headers= {'Content-Type': m.content_type},
 				auth= self.hmacAuth
 			)
 			m = None #Free the memory?
 			status_code = r.status_code
-		except: 
+		except:
 			status_code = 500
 
 		if status_code == 201:
 			data = r.json()
 			return data
 
-		else: 
+		else:
 			return None
 
-	def print_job(self, id= None, print_file_id= None, print_file_name= None, status= 'started' ):
+	def print_job(self, id= None, print_file_id= None, print_file_name= None, status= 'started', reason= None, materialUsed= None ):
 		if self.cloud_enabled():
 			try:
 				if id:
-					r = requests.put("%s/printjobs/%s" % (self.apiHost, id), data=json.dumps({
-						'status': status
-					}), auth=self.hmacAuth, headers={'Content-Type': 'application/json'} )
+
+					data = {'status': status}
+
+					if reason:
+						data['reason'] = reason
+
+					if materialUsed:
+						data['material_used'] = materialUsed
+
+					r = requests.put("%s/printjobs/%s" % (self.apiHost, id),
+						data=json.dumps(data),
+						auth=self.hmacAuth,
+						headers={'Content-Type': 'application/json'}
+					)
 
 				else:
 					#create a print job
 					data = {
-						'box_id': boxrouterManager().boxId
+						'box_id': boxrouterManager().boxId,
+						'product_variant_id': softwareManager().data['variant']['id']
 					}
 
 					if not print_file_id and not print_file_name:
@@ -469,7 +415,7 @@ class AstroPrintCloud(object):
 
 					if print_file_id:
 						data['print_file_id'] = print_file_id
-					
+
 					if print_file_name:
 						data['name'] = print_file_name
 
@@ -487,7 +433,30 @@ class AstroPrintCloud(object):
 			except Exception as e:
 				self._logger.error("Failed to send print_job request: %s" % e)
 
-		return False	
+		return False
+
+	def updateCancelReason(self, printJobId, reason):
+		if (self.cloud_enabled()):
+			try:
+				r = requests.put("%s/printjobs/%s/add-reason" % (self.apiHost, printJobId),
+					data=json.dumps(reason),
+					auth=self.hmacAuth,
+					headers={'Content-Type': 'application/json'}
+				)
+
+				if r.status_code == 200:
+					return True
+
+				if r.status_code == 400:
+					self._logger.error("Unable to do updateCancelReason (400). Response: %s" % r.text)
+
+				else:
+					self._logger.error("updateCancelReason request failed with status: %d" % r.status_code)
+
+			except Exception as e:
+				self._logger.error("Failed to send updateCancelReason request: %s" % e)
+
+		return False
 
 	def _sync_print_file_store(self):
 		if self.cloud_enabled():
@@ -495,4 +464,4 @@ class AstroPrintCloud(object):
 				r = requests.get( "%s/print-files?format=%s" % (self.apiHost, printerManager().fileManager.fileFormat), auth=self.hmacAuth )
 				self._print_file_store = r.json()
 			except:
-				pass		
+				pass

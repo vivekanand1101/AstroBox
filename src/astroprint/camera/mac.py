@@ -19,6 +19,7 @@ class CameraMacManager(CameraManager):
 		self._logger = logging.getLogger(__name__)
 		self._files = [f for f in glob.glob(os.path.join(os.path.realpath(os.path.dirname(__file__)+'/../../../local'),"camera_test*.jpeg"))]
 		self.cameraName = 'Test Camera'
+		self._opened = False
 		self._logger.info('Mac Simulation Camera Manager initialized')
 
 	def settingsStructure(self):
@@ -37,13 +38,35 @@ class CameraMacManager(CameraManager):
 			]
 		}
 
-	def open_camera(self):
+	def _doOpenCamera(self):
+		self._opened = True
 		return True
 
-	def get_pic_async(self, done, text=None):
-		threading.Timer(3, self._doGetPicAsync,[done, text]).start()
+	def _doCloseCamera(self):
+		self._opened = False
+		return True
 
-	def get_pic(self, text=None):
+	def _doGetPic(self, done, text=None):
+		threading.Timer(3.0, self._simulateGetPicAsync,[done, text]).start()
+
+	@property
+	def capabilities(self):
+		#return ['videoStreaming']
+		return []
+
+	def isCameraConnected(self):
+		return True
+
+	def hasCameraProperties(self):
+		return True
+
+	def isCameraOpened(self):
+		return self._opened
+
+	def isResolutionSupported(self, resolution):
+		return resolution == '640x480'
+
+	def _simulateGetPicAsync(self, done, text):
 		fileCount = len(self._files)
 		image = None
 
@@ -52,16 +75,7 @@ class CameraMacManager(CameraManager):
 			with open(imageFile, "r") as f:
 				image = f.read()
 
-		return image
+		done(image)
 
-	def isCameraConnected(self):
-		return True
-
-	def hasCameraProperties(self):
-		return True
-
-	def isResolutionSupported(self, resolution):
-		return resolution == '640x480'
-
-	def _doGetPicAsync(self, done, text):
-		done(self.get_pic(text))
+	def isVideoStreaming(self):
+		return False

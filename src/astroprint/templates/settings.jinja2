@@ -18,7 +18,6 @@
 				<li class="internet-connection dotted"><a href="#settings/internet-connection">{{ _('internet') }}</a></li>
 				<li class="wifi-hotspot dotted"><a href="#settings/wifi-hotspot">{{ _('hotspot') }}</a></li>
 				<li class="heading bold">{{ _('software') }}</li>
-				<li class="software-general"><a href="#settings/software-general">{{ _('general') }}</a></li>
 				<li class="software-update"><a href="#settings/software-update">{{ _('update') }}</a></li>
 				<li class="software-advanced dotted"><a href="#settings/software-advanced">{{ _('advanced') }}</a></li>
 			</ul>
@@ -132,6 +131,16 @@
 								<input id="heated-bed" name="heated_bed" type="checkbox" <% if (settings.heated_bed) { %> value="yes" checked<% } %>>
 								<label for="heated-bed"></label>
 							</div>
+              <label for="invert-z" class="bold">Z-Axis Movement</label>
+              <div class="toggle">
+                <span class="side-label">Head Moves</span>
+                <span class="switch radius">
+                  <input id="invert-z" name="invert_z" type="checkbox" value="yes" <% if(settings.invert_z) { %> checked <% } %>>
+                  <label for="invert-z"></label>
+                </span>
+                <span class="side-label">Bed Moves</span>
+              </div>
+
 							<div class="input-wrapper max_bed_temp<% if (!settings.heated_bed) { %> hide<% } %>">
 								<label for="max-bed-temp" class="bold">
 									{{ _('maxBedTemp') }}
@@ -180,9 +189,40 @@
 					<% if(!this.videoSettingsError) { %>
 						<div class="row">
 							<div class="small-12">
-								<form data-abide="ajax">
+								<form>
+                  <% if (settings.structure.busSource && settings.structure.busSource.length > 0) { %>
+                    <label for="video-stream-format" class="bold">
+                      Camera Type
+                    </label>
+                    <% if (settings.structure.busSource.length > 1) { %>
+                      <select id="video-stream-source" name="source">
+                        <% _.each(settings.structure.busSource, function(v) { %>
+                          <option value="<%= v.value %>" <%= settings.source == v.value ? 'selected' : '' %>><%= v.label %></option>
+                        <% }) %>
+                      </select>
+                    <% } else { %>
+                      <div class="field-value"><%= settings.structure.source[0].label %></div>
+                      <input type="hidden" name="source" value="<%= settings.structure.source[0].value %>"/>
+                    <% } %>
+                  <% } %>
+                  <% if (settings.structure.cameraOutput.length > 0) { %>
+                    <label for="camera-output-format" class="bold">
+                      Camera Ouput Format
+                    </label>
+                    <% if (settings.structure.cameraOutput.length > 1) { %>
+                      <select id="camera-output-format" name="format">
+                        <% _.each(settings.structure.cameraOutput, function(v) { %>
+                          <option value="<%= v.value %>" <%= settings.format == v.value ? 'selected' : '' %>><%= v.label %></option>
+                        <% }) %>
+                      </select>
+                    <% } else { %>
+                      <div class="field-value"><%= settings.structure.cameraOutput[0].label %></div>
+                      <input type="hidden" name="format" value="<%= settings.structure.cameraOutput[0].value %>"/>
+                    <% } %>
+                  <% } %>
+
 									<% if (settings.structure.videoEncoding.length > 0) { %>
-										<label for="video-stream-format" class="bold">
+										<label for="video-stream-encoding" class="bold">
 											Video Stream Encoding
 										</label>
 										<% if (settings.structure.videoEncoding.length > 1) { %>
@@ -218,27 +258,14 @@
 										<% if (settings.structure.fps.length > 1) { %>
 											<select id="video-stream-framerate" name="framerate">
 												<% _.each(settings.structure.fps, function(v) { %>
+                        <% (if v.resolution == settings.size) { %>
 													<option value="<%= v.value %>" <%= settings.framerate == v.value ? 'selected' : '' %>><%= v.label %></option>
-												<% }) %>
+												<% }
+                        }) %>
 											</select>
 										<% } else { %>
 											<div class="field-value"><%= settings.structure.fps[0].label %></div>
 											<input type="hidden" name="framerate" value="<%= settings.structure.fps[0].value %>"/>
-										<% } %>
-									<% } %>
-									<% if (settings.structure.cameraOutput.length > 0) { %>
-										<label for="video-stream-framerate" class="bold">
-											Camera Output Format
-										</label>
-										<% if (settings.structure.cameraOutput.length > 1) { %>
-											<select id="video-stream-format" name="format">
-												<% _.each(settings.structure.cameraOutput, function(v) { %>
-													<option value="<%= v.value %>" <%= settings.format == v.value ? 'selected' : '' %>><%= v.label %></option>
-												<% }) %>
-											</select>
-										<% } else { %>
-											<div class="field-value"><%= settings.structure.cameraOutput[0].label %></div>
-											<input type="hidden" name="format" value="<%= settings.structure.cameraOutput[0].value %>"/>
 										<% } %>
 									<% } %>
 									<hr/>
@@ -489,6 +516,14 @@
 			<div class="content"></div>
 			<a class="close-reveal-modal">&#215;</a>
 		</div>
+    <script type="text/template" id="software-system-outdated-template">
+      <div data-alert class="alert-box alert radius">
+        <h3 style="color:white"><i class="icon-attention"></i> Warning</h3>
+        <p align="left">
+          Your Operating System version (<%= dist_version %>) is <b>outdated</b>. Some features might not work properly after upgrading. We <b>recommend</b> that you update your system by reflashing a new image from our <u><a href="https://www.astroprint.com/downloads" target="_downloads">Downloads Page</a></u>
+        </p>
+      </div>
+    </script>
 		<script type="text/template" id="software-update-modal-content">
 			<h2 class="bold">
 				<% if (data.update_available && !data.is_current) { %> {{ _('update') }} <% } else { %> {{ _('noUpdates') }} <% } %> {{ _('avaiable') }}
@@ -511,7 +546,9 @@
 						<%= data.release.release_notes %>
 					</p>
 				</div>
-			<% } %>
+        <% } else { %>
+        <h3 class="bold" align="center" style="margin: 20px 0">You are running the latest software</h3>
+      <% } %>
 			<div class="modal-actions row">
 				<% if (data.update_available) { %>
 					<div class="small-12 medium-6 columns">
@@ -531,24 +568,6 @@
 					</div>
 				<% } %>
 			</div>
-		</script>
-
-		<div class="show-for-small zebra software">
-			<a href="#settings/software-general"><h1 class="bold" align="center">{{ _('general') }}</h1></a>
-		</div>
-
-		<div id="software-general" class="settings-page hide" align="center"></div>
-		<script type="text/template" id="software-general-content-template">
-			<h4 class="bold">{{ _('language') }}</h4>
-			<div class="row">
-				<div class="language small-6 small-centered large-3 large-centered columns" >
-					<select name="lang" id="language-code">
-						<option value="en" data-lang="en" <% if (data.language == 'en') { %> selected="selected"  <% } %> > English</option>
-						<option value="es" data-lang="es" <% if (data.language == 'es') { %> selected="selected"  <% } %> > Español</option>
-					</select>
-				</div>
-			</div>
-			<hr>
 		</script>
 
 		<div class="show-for-small zebra software">

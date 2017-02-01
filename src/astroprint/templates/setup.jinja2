@@ -1,9 +1,10 @@
 {% extends 'base.jinja2' %}
 
 {% block css %}
-	{% assets filters="scss", output="css/gen/setup.css", "css/scss/setup.scss" %}
-		<link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" />
-	{% endassets %}
+  {% assets filters="scss", output="css/gen/setup.css",
+    "css/scss/setup.scss" %}
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" />
+  {% endassets %}
 {% endblock %}
 
 {% block content %}
@@ -150,27 +151,27 @@
 				</script>
 			</div>
 
-			<script type="text/template" id="wifi-network-list-template">
-				<ul>
-				<% _.each(networks, function(n, idx) { %>
-					<li data-id="<%= idx %>">
-						<span class="name left"><%= n.name %></span>
-						<span class="indicators right">
-							<% if (n.secured) { %><i class="icon-lock"></i><% } %>
-							<% if (n.signal < 33) { %>
-								<i class="icon-wifi-signal-low"></i>
-							<% } else if (n.signal > 33 && n.signal < 66) { %>
-								<i class="icon-wifi-signal-med"></i>
-							<% } else { %>
-								<i class="icon-wifi-signal-high"></i>
-							<% } %>
-						</span>
-						<div class="clearfix"></div>
-					</li>
-				<% }); %>
-				</ul>
-			</script>
-		</div>
+      <script type="text/template" id="wifi-network-list-template">
+        <ul>
+        <% _.each(networks, function(n, idx) { %>
+          <li data-id="<%= idx %>">
+            <span class="name left"><%= n.name %></span>
+            <span class="indicators right">
+              <% if (n.secured) { %><i class="icon-lock"></i><% } %>
+              <% if (n.signal < 33) { %>
+                <i class="icon-wifi-signal-low"></i>
+              <% } else if (n.signal > 33 && n.signal < 66) { %>
+                <i class="icon-wifi-signal-med"></i>
+              <% } else { %>
+                <i class="icon-wifi-signal-high"></i>
+              <% } %>
+            </span>
+            <div class="clearfix"></div>
+          </li>
+        <% }); %>
+        </ul>
+      </script>
+    </div>
 
 		<div id="step-astroprint" class="step hide">
 			<h1 class="bold">{{ _('astroprintcomAccount') }}<div class="nub"></div></h1>
@@ -249,13 +250,21 @@
 				</div>
 			</div>
 			<script type="text/template" id="step-printer-template">
+      <% if (settings.driver != 'virtual') { %>
 				<label for="settings-printer-driver" class="bold">
-					{{ _('driver') }}Driver
+					{{ _('driver') }}
 					<select id="settings-printer-driver" name="driver">
 						<option value="marlin" <%= settings.driver == 'marlin' ? 'selected' : '' %>>GCODE - Marlin firmware</option>
 						<option value="s3g" <%= settings.driver == 's3g' ? 'selected' : '' %>> X3G - Sailfish / Makerbot firmware</option>
 					</select>
 				</label>
+        <% } else { %>
+          <label class="bold">
+            Driver
+            <input type="hidden" name="driver" value="virtual"/>
+            <p>Virtual Printer Driver<p>
+          </label>
+        <% } %>
 				<label for="settings-serial-port" class="bold">
 					{{ _('usbDevice') }}
 					<% if (settings.portOptions.length > 0) { %>
@@ -277,7 +286,7 @@
 						</p>
 					<% } %>
 				</label>
-				<% if (settings.portOptions.length > 0 && settings.driver != 's3g') { %>
+				<% if (settings.portOptions.length > 0 && ['s3g', 'virtual'].indexOf(settings.driver) == -1) { %>
 					<label for="settings-baudrate" class="bold">Baud Rate
 						<select id="settings-baudrate" name="baudrate">
 							<% _.each(settings.baudrateOptions, function(e) { %>
@@ -286,11 +295,16 @@
 						</select>
 					</label>
 				<% } %>
-				<% if (settings.portOptions.length > 0 && ( settings.baudrateOptions.length > 0 || settings.driver == 's3g')) { %>
+				<% if (settings.portOptions.length > 0 && ( settings.baudrateOptions.length > 0 || ['s3g', 'virtual'].indexOf(settings.driver) != -1)) { %>
 					<div align="center">
 						<div class="loading-button expand">
 							<button class="button success radius submit-action expand bold" href="#share">{{ _('connect') }}</button>
-							<span class="button success disabled radius loading expand"><i class="icon-rocket-spinner animate-spin"></i> {{ _('connecting') }}...</span>
+							<span class="button success disabled radius loading expand">
+                <i class="icon-rocket-spinner animate-spin"></i> Connecting...
+              </span>
+              <span class="button alert disabled radius error expand">
+                <i class="icon-attention"></i> Failed to connect
+              </span>
 						</div>
 					</div>
 				<% } %>
@@ -322,24 +336,24 @@
 {% endblock %}
 
 {% block js %}
-	<script type="text/javascript">
-		var UI_API_KEY = "{{ uiApiKey }}";
-		var BASEURL = "{{ url_for('index') }}";
-		var API_BASEURL = BASEURL + "api/";
-		var SOCKJS_URI = window.location.protocol.slice(0, -1) + "://" + (window.document ? window.document.domain : window.location.hostname) + ":" + window.location.port + "/sockjs";
-		var PRODUCT_NAME = "{{variantData['productName']}}";
-		var shareOptions = {{ variantData['share'] | tojson | safe }};
-		var localeUser = {{ locale | tojson }};
-	</script>
-	<script type="text/javascript" src="/static/js/lib/babel.js"></script>
+  <script type="text/javascript">
+    var UI_API_KEY = "{{ uiApiKey }}";
+    var BASEURL = "{{ url_for('index') }}";
+    var API_BASEURL = BASEURL + "api/";
+    var SOCKJS_URI = window.location.protocol.slice(0, -1) + "://" + (window.document ? window.document.domain : window.location.hostname) + ":" + window.location.port + "/sockjs";
+    var PRODUCT_NAME = "{{variantData['productName']}}";
+    var WS_TOKEN = "{{ wsToken }}";
+    var shareOptions = {{ variantData['share'] | tojson | safe }}
+  </script>
+  <script type="text/javascript" src="/static/js/lib/babel.js"></script>
 	<script type="text/javascript" src="/i18n/setup.js"></script>
-	{% assets filters="closure_js", output="js/gen/setup.js",
-		"js/lib/jquery.js", "js/lib/underscore.js", "js/lib/backbone.js", "js/lib/sockjs.js", "js/lib/fastclick.js", "js/lib/foundation/foundation.js", "js/lib/foundation/foundation.abide.js", "js/lib/foundation/foundation.reveal.js",
-		"js/lib/jquery.noty.js", "js/lib/jquery.noty.top.js", "js/lib/sockjs.js",
-		"js/setup/setup.js" -%}
-			<script type="text/javascript" src="{{ ASSET_URL }}"></script>
-	{%- endassets %}
-	<script type="text/javascript">
-		$(document).foundation();
-	</script>
+  {% assets filters="closure_js", output="js/gen/setup.js",
+    "js/lib/jquery.js", "js/lib/underscore.js", "js/lib/backbone.js", "js/lib/sockjs.js", "js/lib/fastclick.js", "js/lib/foundation/foundation.js", "js/lib/foundation/foundation.abide.js", "js/lib/foundation/foundation.reveal.js",
+    "js/lib/jquery.noty.js", "js/lib/jquery.noty.top.js", "js/lib/sockjs.js",
+    "js/setup/setup.js" -%}
+      <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+  {%- endassets %}
+  <script type="text/javascript">
+    $(document).foundation();
+  </script>
 {% endblock %}

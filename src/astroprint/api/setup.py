@@ -8,6 +8,7 @@ import octoprint.server
 from functools import wraps
 
 from sys import platform
+from requests import ConnectionError
 
 from flask import make_response, request, jsonify
 from flask.ext.login import current_user
@@ -57,7 +58,7 @@ def save_name():
 			if networkManager().setHostname(name):
 				return jsonify()
 			else:
-				return (500, gettext('errorSavingHost'))
+				return make_response(gettext('errorSavingHost'), 500)
 		else:
 			return NO_CONTENT
 
@@ -81,14 +82,15 @@ def check_internet():
 def connect_internet():
 	if "application/json" in request.headers["Content-Type"]:
 		data = request.json
-		result = networkManager().setWifiNetwork(data['id'], data['password'])
+		if 'id' in data and 'password' in data:
+			result = networkManager().setWifiNetwork(data['id'], data['password'])
 
 		if result:
 			return jsonify(result)
 		else:
 			return (gettext('networkSNotFound') % data['id'], 404)
 
-	return ("Invalid Request", 400)
+	return make_response("Invalid Request", 400)
 
 @api.route('/setup/internet', methods=['PUT'])
 @not_setup_only
@@ -102,12 +104,12 @@ def save_hotspot_option():
 			s.save()
 			return jsonify()
 
-	return ("Invalid Request", 400)
+	return make_response("Invalid Request", 400)
 
 @api.route('/setup/astroprint', methods=['GET'])
 @not_setup_only
 def get_astroprint_info():
-	if current_user and current_user.is_authenticated() and current_user.privateKey:
+	if current_user and current_user.is_authenticated and current_user.privateKey:
 		return jsonify(user=current_user.get_id())
 	else:
 		return jsonify(user=None)
@@ -132,8 +134,8 @@ def login_astroprint():
 			if ap.signin(email, password):
 				return make_response("OK", 200)
 
-		except AstroPrintCloudNoConnectionException:
-			return make_response(gettext('deviceNotConnectedAstro'), 503)
+		except (AstroPrintCloudNoConnectionException, ConnectionError):
+			return make_response("AstroPrint.com can't be reached", 503)
 
 	return make_response(gettext('invalidCredentials'), 400)
 
@@ -162,7 +164,7 @@ def save_connection_settings():
 	baudrate = request.values.get('baudrate', None)
 	driver = request.values.get('driver', None)
 
-	if port and ( baudrate or driver == 's3g'):
+	if port and ( baudrate or driver in ['s3g', 'virtual']):
 		s = settings()
 
 		s.set(["serial", "port"], port)

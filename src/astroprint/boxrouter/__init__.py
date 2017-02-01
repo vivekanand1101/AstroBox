@@ -1,6 +1,7 @@
 # coding=utf-8
-__author__ = "Daniel Arroyo. 3DaGogo, Inc <daniel@astroprint.com>"
+__author__ = "AstroPrint Product Team <product@astroprint.com>"
 __license__ = 'GNU Affero General Public License http://www.gnu.org/licenses/agpl.html'
+__copyright__ = "Copyright (C) 2016 3DaGoGo, Inc - Released under terms of the AGPLv3 License"
 
 # singleton
 _instance = None
@@ -20,26 +21,27 @@ import weakref
 import uuid
 
 from time import sleep, time
-
 from flask.ext.login import current_user
+from ws4py.client.threadedclient import WebSocketClient
+from ws4py.messaging import PingControlMessage
 
 from octoprint.events import eventManager, Events
 from octoprint.settings import settings
 
-from astroprint.boxrouter.handlers import BoxRouterMessageHandler
 from astroprint.network.manager import networkManager
-from astroprint.boxrouter.printerlistener import PrinterListener
 from astroprint.software import softwareManager
 from astroprint.printer.manager import printerManager
 
-from ws4py.client.threadedclient import WebSocketClient
-from ws4py.messaging import PingControlMessage
+from .handlers import BoxRouterMessageHandler
+from .printerlistener import PrinterListener
+from .events import EventSender
 
 LINE_CHECK_STRING = 'box'
 
 class AstroprintBoxRouterClient(WebSocketClient):
 	def __init__(self, hostname, router):
 		self._printerListener = None
+		self._eventSender = None
 		self._lastReceived = 0
 		self._lineCheck = None
 		self._error = False
@@ -105,7 +107,7 @@ class AstroprintBoxRouterClient(WebSocketClient):
 		try:
 			self._th = None #If this is not freed, the socket can't be freed because of circular references
 			super(AstroprintBoxRouterClient, self).terminate()
-			
+
 		except AttributeError as e:
 			if self.stream is None:
 				self.environ = None
@@ -130,7 +132,7 @@ class AstroprintBoxRouterClient(WebSocketClient):
 	def received_message(self, m):
 		self._lastReceived = time()
 		msg = json.loads(str(m))
-		
+
 		method  = getattr(self._messageHandler, msg['type'], None)
 		if method:
 			response = method(msg)
@@ -140,16 +142,26 @@ class AstroprintBoxRouterClient(WebSocketClient):
 		else:
 			self._logger.warn('Unknown message type [%s] received' % msg['type'])
 
+	def broadcastEvent(self, event, data):
+		if self._eventSender:
+			self._eventSender.sendUpdate(event, data)
+
 	def registerEvents(self):
 		if not self._printerListener:
 			self._printerListener = PrinterListener(self)
 			printerManager().registerCallback(self._printerListener)
 
+		if not self._eventSender:
+			self._eventSender = EventSender(self)
+
 	def unregisterEvents(self):
 		if self._printerListener:
 			printerManager().unregisterCallback(self._printerListener)
-			self._printerListener.cleanup()
 			self._printerListener = None
+
+		if self._eventSender:
+			self._eventSender.cleanup()
+			self._eventSender = None
 
 class AstroprintBoxRouter(object):
 	RETRY_SCHEDULE = [2, 2, 4, 10, 20, 30, 60, 120, 240, 480, 3600] #seconds to wait before retrying. When all exahusted it gives up
@@ -158,6 +170,7 @@ class AstroprintBoxRouter(object):
 	STATUS_CONNECTING = 'connecting'
 	STATUS_CONNECTED = 'connected'
 	STATUS_ERROR = 'error'
+	ASTROBOX_NAMESPACE_UUID = 'ec35c0da-e6e2-4a50-9c85-3e102fffac48'
 
 	def __init__(self):
 		self._settings = settings()
@@ -214,10 +227,7 @@ class AstroprintBoxRouter(object):
 					self._boxId = f.read()
 
 			if not self._boxId:
-				import uuid
-
-				self._boxId = uuid.uuid4().hex
-
+				self._boxId = uuid.uuid5(uuid.UUID(self.ASTROBOX_NAMESPACE_UUID), str(uuid.getnode())).hex
 				with open(boxIdFile, 'w') as f:
 					f.write(self._boxId)
 
@@ -234,7 +244,7 @@ class AstroprintBoxRouter(object):
 			if loggedUser and userManager:
 				user = userManager.findUser(loggedUser)
 
-				if user:
+				if user and user.is_authenticated:
 					self._publicKey = user.publicKey
 					self._privateKey = user.privateKey
 
@@ -290,7 +300,7 @@ class AstroprintBoxRouter(object):
 				self._ws.unregisterEvents()
 				if not self._ws.terminated:
 					self._ws.terminate()
-				
+
 				self._ws = None
 
 	def _onNetworkStateChanged(self, event, state):
@@ -395,7 +405,7 @@ class AstroprintBoxRouter(object):
 				'eventType': type,
 				'eventData': data
 			}
-		})		
+		})
 
 	def send(self, data):
 		if self._ws and self.connected:
@@ -433,8 +443,8 @@ class AstroprintBoxRouter(object):
 
 			activeConnections = nm.getActiveConnections()
 
-			if activeConnections and ( activeConnections['wired'] or activeConnections['wireless']):
-				preferredConn = activeConnections['wired'] or activeConnections['wireless']
+			if activeConnections and ( activeConnections['wired'] or activeConnections['wireless'] or activeConnections['manual']):
+				preferredConn = activeConnections['wired'] or activeConnections['wireless'] or activeConnections['manual']
 				localIpAddress = preferredConn['ip']
 			else:
 				localIpAddress = None

@@ -1,6 +1,7 @@
 # coding=utf-8
-__author__ = "Daniel Arroyo <daniel@astroprint.com>"
-__license__ = 'GNU Affero General Public License http://www.gnu.org/licenses/agpl.html'
+__author__ = "AstroPrint Product Team <product@astroprint.com> based on previous work by Gina Häußge"
+__license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agpl.html"
+__copyright__ = "Copyright (C) 2016 3DaGoGo, Inc - Released under terms of the AGPLv3 License"
 
 import threading
 import time
@@ -62,6 +63,7 @@ class Printer(object):
 		self._temp = {}
 		self._bedTemp = None
 		self._temps = deque([], 300)
+		self._shutdown = False
 
 		self._messages = deque([], 300)
 
@@ -107,6 +109,8 @@ class Printer(object):
 		return self._currentPrintJobId
 
 	def rampdown(self):
+		self._logger.info('Ramping down Printer Manager')
+		self._shutdown = True
 		self.disconnect()
 		eventManager().unsubscribe(Events.METADATA_ANALYSIS_FINISHED, self.onMetadataAnalysisFinished);
 		self._callbacks = []
@@ -141,8 +145,12 @@ class Printer(object):
 				"temps": list(self._temps),
 				#Currently we don't want the logs to clogg the notification between box/boxrouter/browser
 				#"logs": list(self._log),
-				"messages": list(self._messages)
+				#"messages": list(self._messages)
 			})
+
+			if 'state' in data and 'flags' in data['state']:
+				data['state']['flags'].update({'camera': self.isCameraConnected()})
+
 			callback.sendCurrentData(data)
 			#callback.sendHistoryData(data)
 		except Exception, err:
@@ -245,8 +253,12 @@ class Printer(object):
 		serialLogger = logging.getLogger("SERIAL")
 		if active:
 			serialLogger.setLevel(logging.DEBUG)
+			serialLogger.debug("Enabling serial logging")
 		else:
+			serialLogger.debug("Disabling serial logging")
 			serialLogger.setLevel(logging.CRITICAL)
+
+		self.resetSerialLogging()
 
 	def isOperational(self):
 		return self._comm is not None and (self._state == self.STATE_OPERATIONAL or self._state == self.STATE_PRINTING or self._state == self.STATE_PAUSED)
@@ -282,6 +294,7 @@ class Printer(object):
 		self._stateMonitor.setProgress({
 			"completion": self._progress * 100 if self._progress is not None else None,
 			"currentLayer": self._currentLayer,
+			"filamentConsumed": self.getConsumedFilament(),
 			"filepos": filepos,
 			"printTime": int(self._printTime) if self._printTime is not None else None,
 			"printTimeLeft": int(self._printTimeLeft * 60) if self._printTimeLeft is not None else None
@@ -299,7 +312,7 @@ class Printer(object):
 			return False
 
 		self._setCurrentZ(None)
-		cameraManager().open_camera()
+		#cameraManager().open_camera()
 
 		kwargs = {
 			'print_file_name': os.path.basename(self._selectedFile['filename'])
@@ -320,16 +333,27 @@ class Printer(object):
 		"""
 		 Cancel the current printjob.
 		"""
-		if self._comm is None:
-			return False
 
-		cameraManager().stop_timelapse()
+		if self._comm and (self.isPrinting() or self.isPaused()):
+			activePrintJob = None;
 
-		if self._currentPrintJobId:
-			astroprintCloud().print_job(self._currentPrintJobId, status='failed')
-			self._currentPrintJobId = None
+			cameraManager().stop_timelapse()
 
-		return True
+			consumedMaterial = self.getTotalConsumedFilament()
+
+			if self._currentPrintJobId:
+				astroprintCloud().print_job(self._currentPrintJobId, status='failed', materialUsed= consumedMaterial)
+				activePrintJob = self._currentPrintJobId
+				self._currentPrintJobId = None
+
+			self._logger.info("Print job [%s] CANCELED. Filament used: %f" % (os.path.split(self._selectedFile['filename'])[1] if self._selectedFile else 'unknown', consumedMaterial))
+
+			self.executeCancelCommands(disableMotorsAndHeater)
+
+			return {'print_job_id': activePrintJob}
+
+		else:
+			return {'error': 'no_print_job', 'message': 'No active print job to cancel'}
 
 	def togglePausePrint(self):
 		"""
@@ -342,25 +366,30 @@ class Printer(object):
 
 		self.setPause(not wasPaused)
 
-		#the functions already check if there's a timelapse in progress
-		if wasPaused:
-			cameraManager().resume_timelapse()
-		else:
-			cameraManager().pause_timelapse()
+		cm = cameraManager()
+		if cm.is_timelapse_active():
+			if wasPaused:
+				cm.resume_timelapse()
+			else:
+				cm.pause_timelapse()
 
 	#~~~ Printer callbacks ~~~
 
 	def mcPrintjobDone(self):
 		#stop timelapse if there was one
-		cameraManager().stop_timelapse(True) #True makes it take one last photo 
+		cameraManager().stop_timelapse(True) #True makes it take one last photo
 
 		#Not sure if this is the best way to get the layer count
 		self._setProgressData(1.0, self._selectedFile["filesize"], self.getPrintTime(), 0, self._layerCount)
-		self._stateMonitor.setState({"state": self._state, "stateString": self.getStateString(), "flags": self._getStateFlags()})
+		self._stateMonitor.setState({"state": self._state, "text": self.getStateString(), "flags": self._getStateFlags()})
+
+		consumedMaterial = self.getTotalConsumedFilament()
 
 		if self._currentPrintJobId:
-			astroprintCloud().print_job(self._currentPrintJobId, status='success')
+			astroprintCloud().print_job(self._currentPrintJobId, status= 'success', materialUsed= consumedMaterial)
 			self._currentPrintJobId = None
+
+		self._logger.info("Print job [%s] COMPLETED. Filament used: %f" % (os.path.split(self._selectedFile['filename'])[1] if self._selectedFile else 'unknown', consumedMaterial))
 
 	def mcZChange(self, newZ):
 		"""
@@ -373,6 +402,9 @@ class Printer(object):
 			eventManager().fire(Events.Z_CHANGE, {"new": newZ, "old": oldZ})
 
 		self._setCurrentZ(newZ)
+
+	def mcToolChange(self, newTool, oldTool):
+		eventManager().fire(Events.TOOL_CHANGE, {"new": newTool, "old": oldTool})
 
 	def mcLayerChange(self, layer):
 		eventManager().fire(Events.LAYER_CHANGE, {"layer": layer})
@@ -392,20 +424,35 @@ class Printer(object):
 		progress = self.getPrintProgress()
 		estimatedTimeLeft = None
 
-		if printTime and progress and self._estimatedPrintTime:
-			if progress < 1.0:
-				estimatedTimeLeft = self._estimatedPrintTime * ( 1.0 - progress );
-				elaspedTimeVariance = printTime - ( self._estimatedPrintTime - estimatedTimeLeft );
-				adjustedEstimatedTime = self._estimatedPrintTime + elaspedTimeVariance;
-				estimatedTimeLeft = ( adjustedEstimatedTime * ( 1.0 -  progress) ) / 60;
+		if self._estimatedPrintTime:
+			if printTime and progress:
+				if progress < 1.0:
+					estimatedTimeLeft = self._estimatedPrintTime * ( 1.0 - progress );
+					elaspedTimeVariance = printTime - ( self._estimatedPrintTime - estimatedTimeLeft );
+					adjustedEstimatedTime = self._estimatedPrintTime + elaspedTimeVariance;
+					estimatedTimeLeft = ( adjustedEstimatedTime * ( 1.0 -  progress) ) / 60;
+				else:
+					estimatedTimeLeft = 0
 
-		elif self._estimatedPrintTime:
-			estimatedTimeLeft = self._estimatedPrintTime / 60
+			else:
+				estimatedTimeLeft = self._estimatedPrintTime / 60
 
 		self._setProgressData(progress, self.getPrintFilepos(), printTime, estimatedTimeLeft, self._currentLayer)
 
 	def mcHeatingUpUpdate(self, value):
 		self._stateMonitor._state['flags']['heatingUp'] = value
+
+	def mcCameraConnectionChanged(self, connected):
+		#self._stateMonitor._state['flags']['camera'] = connected
+		self._stateMonitor.setState({"text": self.getStateString(), "flags": self._getStateFlags()})
+
+	#~~~ Print Profile ~~~~
+
+	def jogAmountWithPrinterProfile(self, axis, amount):
+		if axis == 'z':
+			return (-amount if self._profileManager.data.get('invert_z') else amount)
+
+		return amount
 
 	#~~~ Data processing functions ~~~
 
@@ -508,6 +555,15 @@ class Printer(object):
 	def getPrintTime(self):
 		raise NotImplementedError()
 
+	def getConsumedFilament(self):
+		raise NotImplementedError()
+
+	def getTotalConsumedFilament(self):
+		raise NotImplementedError()
+
+	def getSelectedTool(self):
+		raise NotImplementedError()
+
 	def getPrintProgress(self):
 		raise NotImplementedError()
 
@@ -529,10 +585,19 @@ class Printer(object):
 	def extrude(self, tool, amount, speed=None):
 		raise NotImplementedError()
 
+	def changeTool(self, tool):
+		raise NotImplementedError()
+
 	def setTemperature(self, type, value):
 		raise NotImplementedError()
 
 	def sendRawCommand(self, command):
+		raise NotImplementedError()
+
+	def executeCancelCommands(self, disableMotorsAndHeater):
+		raise NotImplementedError()
+
+	def resetSerialLogging(self):
 		raise NotImplementedError()
 
 class StateMonitor(object):
@@ -609,13 +674,16 @@ class StateMonitor(object):
 			if self._stop:
 				#one last update
 				self._updateCallback(self.getCurrentData())
-				break;
+				break
 
 			now = time.time()
 			delta = now - self._lastUpdate
 			additionalWaitTime = self._ratelimit - delta
 			if additionalWaitTime > 0:
 				time.sleep(additionalWaitTime)
+
+			if self._stop:
+				break
 
 			data = self.getCurrentData()
 			self._updateCallback(data)

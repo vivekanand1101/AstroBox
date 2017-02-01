@@ -1,9 +1,10 @@
 # coding=utf-8
-__author__ = "Gina Häußge <osd@foosel.net>"
-__author__ = "Daniel Arroyo <daniel@astroprint.com>"
-__license__ = 'GNU Affero General Public License http://www.gnu.org/licenses/agpl.html'
+__author__ = "AstroPrint Product Team <product@astroprint.com> based on previous work by Gina Häußge"
+__license__ = "GNU Affero General Public License http://www.gnu.org/licenses/agpl.html"
+__copyright__ = "Copyright (C) 2016 3DaGoGo, Inc - Released under terms of the AGPLv3 License"
 
 import time
+import os
 import datetime
 import threading
 import logging
@@ -19,7 +20,6 @@ from octoprint.events import eventManager, Events
 from astroprint.printer import Printer
 from astroprint.printfiles.gcode import PrintFileManagerGcode
 from astroprint.printfiles import FileDestinations
-from astroprint.camera import cameraManager
 
 class PrinterMarlin(Printer):
 	driverName = 'marlin'
@@ -54,10 +54,11 @@ class PrinterMarlin(Printer):
 		self._sdFilelistAvailable = threading.Event()
 		self._streamingFinishedCallback = None
 
-		self._selectedFile = None
-
 		# comm
 		self._comm = None
+
+		self.estimatedTimeLeft = None
+		self.timePercentPreviousLayers = 0
 
 		super(PrinterMarlin, self).__init__()
 
@@ -70,8 +71,8 @@ class PrinterMarlin(Printer):
 		super(PrinterMarlin, self).rampdown()
 
 	def disableMotorsAndHeater(self):
-		self.setTemperature('bed', 5)
-		self.setTemperature('tool', 5)
+		self.setTemperature('bed', 0)
+		self.setTemperature('tool', 0)
 		self.commands(["M84", "M106 S0"]); #Motors Off, Fan off
 
 	#~~ callback handling
@@ -170,21 +171,28 @@ class PrinterMarlin(Printer):
 
 	def jog(self, axis, amount):
 		movementSpeed = settings().get(["printerParameters", "movementSpeed", ["x", "y", "z"]], asdict=True)
-		self.commands(["G91", "G1 %s%.4f F%d" % (axis.upper(), amount, movementSpeed[axis]), "G90"])
+		self.commands(["G91", "G1 %s%.4f F%d" % (axis.upper(), self.jogAmountWithPrinterProfile(axis, amount), movementSpeed[axis]), "G90"])
 
 	def home(self, axes):
 		self.commands(["G91", "G28 %s" % " ".join(map(lambda x: "%s0" % x.upper(), axes)), "G90"])
 
 	def extrude(self, tool, amount, speed=None):
-		if not speed:
-			speed = settings().get(["printerParameters", "movementSpeed", "e"])
+		if self._comm:
+			if speed:
+				#the UI sends mm/s, we need to transfer it to mm/min
+				speed *= 60
+			else:
+				speed = settings().get(["printerParameters", "movementSpeed", "e"])
 
-		self.commands(["G91", "G1 E%s F%d" % (amount, speed), "G90"])
+			selectedTool = self._comm.getSelectedTool()
+			if tool is not None and selectedTool != tool:
+				self.commands(["G91", "T%d" % tool, "G1 E%s F%d" % (amount, speed), "T%d" % selectedTool, "G90"])
+			else:
+				self.commands(["G91", "G1 E%s F%d" % (amount, speed), "G90"])
 
 	def changeTool(self, tool):
 		try:
-			toolNum = int(tool[len("tool"):])
-			self.command("T%d" % toolNum)
+			self.command("T%d" % tool)
 		except ValueError:
 			pass
 
@@ -221,31 +229,16 @@ class PrinterMarlin(Printer):
 		if not super(PrinterMarlin, self).startPrint():
 			return
 
+		self.estimatedTimeLeft = None
+		self.timePercentPreviousLayers = 0
 		self._comm.startPrint()
 
-	def togglePausePrint(self):
-		"""
-		 Pause the current printjob.
-		"""
-		if self._comm is None:
-			return
-
-		wasPaused = self._comm.isPaused()
-
-		self._comm.setPause(not wasPaused)
-
-		#the functions already check if there's a timelapse in progress
-		if wasPaused:
-			cameraManager().resume_timelapse()
-		else:
-			cameraManager().pause_timelapse()
-
-	def cancelPrint(self, disableMotorsAndHeater=True):
+	def executeCancelCommands(self, disableMotorsAndHeater):
 		"""
 		 Cancel the current printjob.
 		"""
-		if not super(PrinterMarlin, self).cancelPrint(disableMotorsAndHeater):
-			return
+
+		self._comm._cancelInProgress = True
 
 		#flush the Queue
 		commandQueue = self._comm._commandQueue
@@ -257,6 +250,12 @@ class PrinterMarlin(Printer):
 
 		# mark print as failure
 		if self._selectedFile is not None:
+			eventManager().fire(Events.PRINT_CANCELLED, {
+				"file": self._selectedFile["filename"],
+				"filename": os.path.basename(self._selectedFile["filename"]),
+				"origin": FileDestinations.LOCAL,
+			})
+
 			self._fileManager.printFailed(self._selectedFile["filename"], self._comm.getPrintTime())
 			payload = {
 				"file": self._selectedFile["filename"],
@@ -266,12 +265,6 @@ class PrinterMarlin(Printer):
 				payload["origin"] = FileDestinations.SDCARD
 			eventManager().fire(Events.PRINT_FAILED, payload)
 			self._selectedFile = None
-
-		self._comm.cancelPrint()
-
-		#don't send home command, some printers don't have stoppers.
-		#self.home(['x','y'])
-		#self.commands(["G92 E0", "G1 X0 Y0 E-2.0 F3000 S1", "G92"]) # this replaces home
 
 		#prepare cancel commands
 		cancelCommands = []
@@ -283,10 +276,12 @@ class PrinterMarlin(Printer):
 			if len(c) > 0:
 				cancelCommands.append(c)
 
-		self.commands(cancelCommands or ['G28 X Y']);
+		self.commands((cancelCommands or ['G28 X Y'] ) + ['M110 N0'] );
 
 		if disableMotorsAndHeater:
 			self.disableMotorsAndHeater()
+
+		self.commands(['_apCommand_CANCEL'])
 
 	#~~ state monitoring
 
@@ -331,6 +326,62 @@ class PrinterMarlin(Printer):
 
 		self._setState(state)
 
+	def mcLayerChange(self, layer):
+
+		super(PrinterMarlin, self).mcLayerChange(layer)
+
+		try:
+			if not layer == 1:
+				self.timePercentPreviousLayers += self._comm.timePerLayers[layer-2]['time']
+			else:
+				self.timePercentPreviousLayers = 0
+		except: pass
+
+
+	def mcProgress(self):
+		"""
+		 Callback method for the comm object, called upon any change in progress of the printjob.
+		 Triggers storage of new values for printTime, printTimeLeft and the current progress.
+		"""
+		try:
+			layerFileUpperPercent = self._comm.timePerLayers[self._currentLayer-1]['upperPercent']
+
+			if self._currentLayer > 1:
+				layerFileLowerPercent = self._comm.timePerLayers[self._currentLayer-2]['upperPercent']
+			else:
+				layerFileLowerPercent = 0
+
+			currentAbsoluteFilePercent = self.getPrintProgress()
+			elapsedTime = self.getPrintTime()
+
+			try:
+				currentLayerPercent = (currentAbsoluteFilePercent - layerFileLowerPercent) / (layerFileUpperPercent - layerFileLowerPercent)
+			except:
+				currentLayerPercent = 0
+
+			layerTimePercent = currentLayerPercent * self._comm.timePerLayers[self._currentLayer-1]['time']
+
+			currentTimePercent = self.timePercentPreviousLayers + layerTimePercent
+
+			estimatedTimeLeft = self._comm.totalPrintTime * ( 1.0 - currentTimePercent )
+
+			elapsedTimeVariance = elapsedTime - ( self._comm.totalPrintTime - estimatedTimeLeft)
+
+			adjustedEstimatedTime = self._comm.totalPrintTime + elapsedTimeVariance
+
+			estimatedTimeLeft = ( adjustedEstimatedTime * ( 1.0 - currentTimePercent ) ) / 60
+
+			if self.estimatedTimeLeft and self.estimatedTimeLeft < estimatedTimeLeft:
+				estimatedTimeLeft = self.estimatedTimeLeft
+			else:
+				self.estimatedTimeLeft = estimatedTimeLeft
+
+			self._setProgressData(self.getPrintProgress(), self.getPrintFilepos(), elapsedTime, estimatedTimeLeft, self._currentLayer)
+
+		except Exception, e:
+			super(PrinterMarlin, self).mcProgress()
+
+
 	def mcMessage(self, message):
 		"""
 		 Callback method for the comm object, called upon message exchanges via serial.
@@ -355,14 +406,14 @@ class PrinterMarlin(Printer):
 	def mcPrintjobDone(self):
 		super(PrinterMarlin, self).mcPrintjobDone()
 		self.disableMotorsAndHeater()
+		self._comm.cleanPrintingVars()
 
 	def mcFileTransferStarted(self, filename, filesize):
 		self._sdStreaming = True
 
 		self._setJobData(filename, filesize, True)
 		self._setProgressData(0.0, 0, 0, None, 1)
-		self._stateMonitor.setState({"state": self._state, "stateString": self.getStateString(), "flags": self._getStateFlags()})
-		#self._stateMonitor.setState({"text": self.getStateString(), "flags": self._getStateFlags()})
+		self._stateMonitor.setState({"state": self._state, "text": self.getStateString(), "flags": self._getStateFlags()})
 
 	def mcFileTransferDone(self, filename):
 		self._sdStreaming = False
@@ -375,11 +426,14 @@ class PrinterMarlin(Printer):
 		self._setCurrentZ(None)
 		self._setJobData(None, None, None)
 		self._setProgressData(None, None, None, None, None)
-		self._stateMonitor.setState({"state": self._state, "stateString": self.getStateString(), "flags": self._getStateFlags()})
-		#self._stateMonitor.setState({"text": self.getStateString(), "flags": self._getStateFlags()})
+		self._stateMonitor.setState({"state": self._state, "text": self.getStateString(), "flags": self._getStateFlags()})
 
 	def mcReceivedRegisteredMessage(self, command, output):
 		self._sendFeedbackCommandOutput(command, output)
+
+	def _setJobData(self, filename, filesize, sd):
+		super(PrinterMarlin, self)._setJobData(filename, filesize, sd)
+		self._comm.totalPrintTime = self._estimatedPrintTime
 
 	#~~ sd file handling
 
@@ -471,6 +525,15 @@ class PrinterMarlin(Printer):
 	def getPrintTime(self):
 		return self._comm.getPrintTime()
 
+	def getConsumedFilament(self):
+		return self._comm.getConsumedFilament()
+
+	def getTotalConsumedFilament(self):
+		return self._comm.getTotalConsumedFilament()
+
+	def getSelectedTool(self):
+		return self._comm.getSelectedTool()
+
 	def getPrintProgress(self):
 		return self._comm.getPrintProgress()
 
@@ -495,3 +558,7 @@ class PrinterMarlin(Printer):
 	def setPause(self, paused):
 		if self._comm:
 			self._comm.setPause(paused)
+
+	def resetSerialLogging(self):
+		if self._comm:
+			self._comm.resetSerialLogging()

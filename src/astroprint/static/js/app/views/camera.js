@@ -12,23 +12,32 @@ var CameraView = CameraViewBase.extend({
   {
     this.onHide();//re-used function
     this.videoStreamingError = value.message;
+
+    if(value.message.indexOf('camera settings have been changed') > -1){
+      this.videoStreamingErrorTitle = 'Camera settings changed'
+    } else {
+      this.videoStreamingErrorTitle = null;
+    }
     this.render();
   },
   onCameraBtnClicked: function(e)
   {
     e.preventDefault();
 
+    var target = $(e.currentTarget);
+    var loadingBtn = target.closest('.loading-button');
+
     $('.camera-screen').hide();
-    this.$('.loading-button').addClass('loading');
+    loadingBtn.addClass('loading');
 
     this.buttonEvent()
       .fail(function(){
         $('.camera-screen').show();
         noty({text: "Camera error.", timeout: 3000});
       })
-      .always(_.bind(function(){
-        this.$('.loading-button').removeClass('loading');
-      }, this))
+      .always(function(){
+        loadingBtn.removeClass('loading');
+      });
   },
   getPhotoContainer: function()
   {
