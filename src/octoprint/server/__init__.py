@@ -139,7 +139,7 @@ def index():
 			lastMessage= softwareManager.lastMessage,
 			variantData= variantManager().data,
 			astroboxName= networkManager().getHostname(),
-			locale= get_locale()
+			locale= get_locale(),
 			wsToken= create_ws_token(userManager.findUser(loggedUsername).publicKey if loggedUsername else None)
 		)
 
