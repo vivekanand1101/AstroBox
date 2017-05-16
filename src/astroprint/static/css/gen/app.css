@@ -46,7 +46,8 @@ body {
 #filament-unload-wizard-nav,
 #controls-nav,
 #print-from-storage-nav,
-#preheat-wizard-nav {
+#preheat-wizard-nav,
+#external-storage-wizard-nav {
 	display: flex;
 	flex-direction: row;
 	width: 100%;
