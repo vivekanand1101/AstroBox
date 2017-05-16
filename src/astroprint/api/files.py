@@ -352,6 +352,39 @@ def usb_file_info():
     return flask.jsonify(data)
 
 
+@api.route("/usbfiles/printfile")
+@api.route("/usbfiles/printfile/")
+def printFileCommand():
+    filepath = flask.request.args.get('futurepath')
+    if not os.path.exists(filepath)
+        return make_response("File not found %s" % (filepath), 404)
+
+    # valid file commands, dict mapping command name to mandatory parameters
+    valid_commands = {
+        "select": []
+    }
+
+    printer = printerManager()
+    # selects/loads a file
+    printAfterLoading = False
+    if not printer.isOperational():
+        #We try at least once
+        printer.connect()
+
+        start = time.time()
+        connect_timeout = 5 #5 secs
+
+        while not printer.isOperational() and not printer.isClosedOrError() and time.time() - start < connect_timeout:
+            time.sleep(1)
+
+        if not printer.isOperational():
+            return make_response("The printer is not responding, can't start printing", 409)
+        printAfterLoading = True
+        sd = False
+        filenameToSelect = printer.fileManager.getAbsolutePath(filename)
+        printer.selectFile(filenameToSelect, sd, printAfterLoading)
+
+    return NO_CONTENT
 # @api.route("/files/printusb")
 # @api.route("/files/printusb/")
 # def print_from_usb():
