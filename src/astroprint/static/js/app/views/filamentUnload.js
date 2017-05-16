@@ -6,7 +6,8 @@ var FilamentUnloadView = Backbone.View.extend({
 	el: '#filament-unload-view',
 	events: {
 		'click .next-button' : 'revealNextStep',
-		'click .cancel-button': 'resetState'
+		'click .cancel-button': 'resetState',
+		'click #unload-select-preheat-temp-button': 'startHeating'
 	},
 	xhrResponse: null,
 	tempView: null,
@@ -15,9 +16,20 @@ var FilamentUnloadView = Backbone.View.extend({
 	extruderPercentage: null,
 	initialize: function() {
 		this.listenTo(app.socketData, 'change:temps', this.tempUpdateAlert);
+
+		this.tempView = new TempBarVerticalView({
+      scale: [0, app.printerProfile.get('max_nozzle_temp')],
+      el: this.$el.find('.temp-control-cont.nozzle'),
+      type: 'tool0'
+    });
 	},
 	render: function() {
 		this.$("#filament-unload-wizard__preheating-progress-section").find('.temp-value').html(this.template1({tempObj: this.updatedTemp}));
+	},
+	startHeating: function(e) {
+		var parent = $(e.target)[0].parentElement;
+    var extruder = $(parent).find('.target-value-input').val();
+    this.tempView.startPreheating(extruder);
 	},
 	tempUpdateAlert: function(s, value) {
 		this.updatedTemp = value;
