@@ -69,3 +69,43 @@
 	padding: 36px 0;
 	margin: 0;
 }
+
+/* Styling for External Stroage Wizard goes here */
+
+.external-storage-wizard__heading {
+	font-size: 22px;
+	text-align: center;
+	padding: 14px 0 9px;
+	font-weight: 500;
+	margin: -32px 0 0;
+}
+
+.external-storage-wizard__files-list {
+	list-style: none;
+	margin: 0 auto;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	width: 89%;
+	height: 336px;
+	overflow-y: scroll;
+}
+
+.external-storage-wizard__files-list__file {
+	/*display: flex;*/
+	/*flex-direction: row;*/
+	height: 56px;
+	border-bottom: .5px solid gray;
+}
+
+.external-storage__file-img {
+	float: left;
+}
+
+.external-storage__file-name {
+	line-height: 56px;
+	vertical-align: middle;
+	float: left;
+	padding: 0 17px;
+	font-size: 20px;
+}
