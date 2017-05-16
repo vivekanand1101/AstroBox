@@ -9,6 +9,7 @@ import yaml
 import logging
 import re
 import shutil
+import copy
 
 APPNAME="AstroBox"
 
@@ -113,7 +114,14 @@ default_settings = {
     },
     "controls": [],
     "system": {
-        "actions": []
+        "actions": {
+            'shutdown': {
+                'command': 'sudo shutdown now',
+            },
+            'restart': {
+                'command': 'sudo restart',
+            }
+        }
     },
     "accessControl": {
         "enabled": True,
@@ -178,6 +186,10 @@ default_settings = {
     "usb": {
         "filelist": [],
         "folder": "/media/pi",
+    },
+    "setup": {
+        "machineId": None,
+        "accessCode": None,
     },
 }
 
@@ -325,8 +337,10 @@ class Settings(object):
         if not self._dirty and not force:
             return
 
+        conf = copy.deepcopy(self._config)
+        conf['usb'] = default_settings['usb']
         with open(self._configfile, "wb") as configFile:
-            yaml.safe_dump(self._config, configFile, default_flow_style=False, indent="    ", allow_unicode=True)
+            yaml.safe_dump(conf, configFile, default_flow_style=False, indent="    ", allow_unicode=True)
             self._dirty = False
         self.load()
 
