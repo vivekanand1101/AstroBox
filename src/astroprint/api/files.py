@@ -301,8 +301,8 @@ def deletePrintFile(filename, target):
 	return NO_CONTENT
 
 
-@api.route("/files/usblist")
-@api.route("/files/usblist/")
+@api.route("/usbfiles/usblist")
+@api.route("/usbfiles/usblist/")
 def get_files_from_usb():
     s = settings()
     files = s.get(['usb', 'filelist'])
@@ -312,8 +312,8 @@ def get_files_from_usb():
     return flask.jsonify(d)
 
 
-@api.route("/files/copyusb")
-@api.route("/files/copyusb/")
+@api.route("/usbfiles/copyusb")
+@api.route("/usbfiles/copyusb/")
 def copy_from_usb():
     filename = flask.request.args.get('filename')
     filepath = flask.request.args.get('filepath')
@@ -338,9 +338,55 @@ def copy_from_usb():
             'status': 'success',
             'msg': 'File copied',
             'futurepath': futurepath,
+            'localFileName': filename,
     })
 
 
+@api.route("/usbfiles/usbinfo")
+@api.route("/usbfiles/usbinfo/")
+def usb_file_info():
+    ''' Get file info which is Currently in usb '''
+
+    filename = flask.request.args.get('filename')
+    filepath = flask.request.args.get('filepath')
+    data = _getFileDetails('local', filepath)
+    return flask.jsonify(data)
+
+
+@api.route("/usbfiles/printfile")
+@api.route("/usbfiles/printfile/")
+def usbprintFileCommand():
+    filepath = flask.request.args.get('futurepath')
+    #if not os.path.exists(filepath):
+    #    return make_response("File not found %s" % (filepath), 404)
+
+    # valid file commands, dict mapping command name to mandatory parameters
+    valid_commands = {
+        "select": []
+    }
+
+    printer = printerManager()
+    # selects/loads a file
+    printAfterLoading = False
+    if not printer.isOperational():
+        #We try at least once
+        printer.connect()
+
+        start = time.time()
+        connect_timeout = 5 #5 secs
+
+        while not printer.isOperational() and not printer.isClosedOrError() and time.time() - start < connect_timeout:
+            time.sleep(1)
+
+        if not printer.isOperational():
+            return make_response("The printer is not responding, can't start printing", 409)
+        printAfterLoading = True
+        sd = False
+        filenameToSelect = printer.fileManager.getAbsolutePath(filename)
+        printer.selectFile(filenameToSelect, sd, printAfterLoading)
+        # printer.selectFile(filepath, sd, printAfterLoading)
+
+    return NO_CONTENT
 # @api.route("/files/printusb")
 # @api.route("/files/printusb/")
 # def print_from_usb():

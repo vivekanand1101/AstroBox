@@ -53,15 +53,35 @@ def _get_gcode_files(directory):
 class EtherBoxHandler(FileSystemEventHandler):
     ''' Watch for USB insertion for print from storage feature '''
 
+    def __init__(self, *args, **kwargs):
+        ''' Initiate the object '''
+        super(EtherBoxHandler, self).__init__(*args, **kwargs)
+        self._callbacks = []
+
+    def registerCallback(self, callback):
+        ''' Register the sockjs method to send data about usb to frontend '''
+        self._callbacks.append(callback)
+
     def on_created(self, event):
         ''' Called when the media is inserted '''
         usb_path = event.src_path
         gcode_files = _get_gcode_files(usb_path)
         if not gcode_files:
             return
+        for callback in self._callbacks:
+            try:
+                callback.sendEvent("usb_inserted", usb_path)
+            except:
+                pass
         s = settings()
         s.set(['usb', 'filelist'], gcode_files)
 
     def on_deleted(self, event):
         s = settings()
         s.set(['usb', 'filelist'], [])
+
+        for callback in self._callbacks:
+            try:
+                callback.sendEvent("usb_removed", usb_path)
+            except:
+                pass
