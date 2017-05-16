@@ -68,7 +68,7 @@ Content-Type: text/html
 			<h1>Your ETHERBOX is still booting up.</h1>
 			<hr>
 			<h2>Please hit the button below to reload the page.</h2>
-			<button class="reload-btn" onclick="location.reload()">Reload</button>
+			<button class="reload-btn" onclick="location.reload()">Reconnect</button>
 		</div>
 	</div>
 </body>

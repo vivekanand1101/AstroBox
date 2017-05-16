@@ -28,4 +28,5 @@
 .next-button--unreachable {
 	font-size: 16px;
 	border-radius: 5px;
+	margin: 10px auto !important;
 }
