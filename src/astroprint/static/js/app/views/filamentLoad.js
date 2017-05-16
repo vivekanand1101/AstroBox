@@ -14,6 +14,7 @@ var FilamentLoadView = Backbone.View.extend({
 	updatedTemp: null,
 	template1: null,
 	extruderPercentage: null,
+	timeLoading: null,
 	initialize: function(options) {
 		this.listenTo(app.socketData, 'change:temps', this.tempUpdateAlert);
 
@@ -93,6 +94,8 @@ var FilamentLoadView = Backbone.View.extend({
 
 			// Killing the ajax command sent from the previous step on click of the NEXT button
 			// this.xhrResponse.abort();
+
+			clearInterval(this.timeLoading);
 			currentView.removeClass('active').addClass('hide');
 			this.$el.find("#filament-load-wizard__finish-section").removeClass('hide').addClass('active');
 
@@ -104,7 +107,17 @@ var FilamentLoadView = Backbone.View.extend({
 		}
 	},
 	extrudeTapped: function() {
+		var self = this;
+
 		this._sendExtrusionCommand(1);
+
+		this.timeLoading = setInterval(function() {
+
+			console.log("10mm extrusion command is send in 5 sec");
+      self._sendExtrusionCommand(1);
+
+    }, 2500);
+
 	},
 	_sendExtrusionCommand: function(direction, handleData) {
 

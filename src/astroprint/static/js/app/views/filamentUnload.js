@@ -14,6 +14,7 @@ var FilamentUnloadView = Backbone.View.extend({
 	updatedTemp: null,
 	template1: null,
 	extruderPercentage: null,
+	timeUnloading: null,
 	initialize: function() {
 		this.listenTo(app.socketData, 'change:temps', this.tempUpdateAlert);
 
@@ -89,6 +90,7 @@ var FilamentUnloadView = Backbone.View.extend({
 
 			// Killing the ajax command sent from the previous step on click of the NEXT button
 			// this.xhrResponse.abort();
+			clearInterval(this.timeUnloading);
 			currentView.removeClass('active').addClass('hide');
 			this.$el.find("#filament-unload-wizard__finish-section").removeClass('hide').addClass('active');
 
@@ -100,7 +102,16 @@ var FilamentUnloadView = Backbone.View.extend({
 		}
 	},
 	retractTapped: function() {
+		var self = this;
+
 		this._sendRetractionCommand(-1);
+
+		this.timeUnloading = setInterval(function() {
+
+			console.log("10mm retraction command is send in 5 sec");
+      self._sendRetractionCommand(-1);
+
+    }, 5000);
 	},
 	_sendRetractionCommand: function(direction) {
 		var self = this;
