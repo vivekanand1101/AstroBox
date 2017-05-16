@@ -5,7 +5,8 @@
 var FilamentLoadView = Backbone.View.extend({
 	el: '#filament-load-view',
 	events: {
-		'click .next-button' : 'revealNextStep'
+		'click .next-button': 'revealNextStep',
+		'click .cancel-button': 'resetState'
 	},
 	xhrResponse: null,
 	tempView: null,
@@ -43,6 +44,11 @@ var FilamentLoadView = Backbone.View.extend({
 		}
 
 		progressBar.val(this.extruderPercentage);
+	},
+	resetState: function() {
+		var currentView = this.$el.find('.active');
+		$(currentView).removeClass('active').addClass('hide');
+		this.$("#filament-load-wizard__temp-control").removeClass('hide').addClass('active');
 	},
 	revealNextStep: function(e) {
 		var currentView = this.$el.find('.active');
