@@ -11,6 +11,7 @@ import octoprint.util as util
 
 import flask
 from flask import request, jsonify, make_response, url_for
+from werkzeug import secure_filename
 
 from octoprint.events import Events
 from octoprint.settings import settings, valid_boolean_trues
@@ -326,9 +327,9 @@ def copy_from_usb():
     # copy the file
     s = settings()
     path = s.getBaseFolder("uploads")
-    futurepath = os.path.abspath(os.path.join(path, filename))
+    futurepath = os.path.abspath(os.path.join(path, secure_filename(filename)))
     try:
-        shutil.copy2(filepath, path)
+        shutil.copy2(filepath, futurepath)
     except Exception as e:
         return flask.jsonify({
             'status': 'failed',
@@ -338,7 +339,7 @@ def copy_from_usb():
             'status': 'success',
             'msg': 'File copied',
             'futurepath': futurepath,
-            'localFileName': filename,
+            'localFileName': secure_filename(filename),
     })
 
 
