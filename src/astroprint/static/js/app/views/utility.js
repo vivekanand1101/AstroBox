@@ -51,7 +51,7 @@ var UtilityView = Backbone.View.extend({
   doTurnoff: function() {
     var data = {"action": "shutdown", "command": "sudo shutdown now"};
     $.ajax({
-      url: "/api/" + "system",
+      url: API_BASEURL + "system",
       type: "POST",
       dataType: 'json',
       contentType: "application/json; charset=UTF-8",
@@ -67,7 +67,7 @@ var UtilityView = Backbone.View.extend({
   doRestart: function() {
     var data = {"action": "restart", "command": "sudo reboot now"};
     $.ajax({
-      url: "/api/" + "system",
+      url: API_BASEURL + "system",
       type: "POST",
       dataType: 'json',
       contentType: "application/json; charset=UTF-8",
