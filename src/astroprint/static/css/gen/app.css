@@ -73,7 +73,8 @@ body {
 	text-align: left;
 }
 
-.wizard-name--printing {
+.wizard-name--printing,
+.wizard-name--preheating {
 	width: 100%;
 }
 
