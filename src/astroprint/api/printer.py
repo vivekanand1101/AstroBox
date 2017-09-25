@@ -143,6 +143,44 @@ def printerToolCommand():
 
 	return NO_CONTENT
 
+@api.route("/printer/filament", methods=["POST"])
+@restricted_access
+def printerExtrudeCommand():
+	pm = printerManager()
+
+	if not pm.isOperational():
+		return make_response("Printer is not operational", 409)
+
+    valid_commands ={
+    "extrude": ["amount"]
+    }
+    validation_regex = re.compile("tool\d+")
+	command, data, response = util.getJsonCommandFromRequest(request, valid_commands)
+	if response is not None:
+		return response
+
+	##~~ extrusion
+	if command == "extrude":
+		if pm.isPrinting():
+			# do not extrude when a print job is running
+			return make_response("Printer is currently printing", 409)
+
+		amount = data["amount"]
+		speed = data.get("speed")
+		tool = data.get("tool")
+		if not isinstance(amount, (int, long, float)):
+			return make_response("Not a number for extrusion amount: %r" % amount, 400)
+
+		if tool is not None and re.match(validation_regex, tool) is None:
+			return make_response("Invalid extruder value: %r" % tool, 400)
+
+		if speed and not isinstance(speed, (int, long, float)):
+			speed = None
+
+		pm.extrude(int(tool[len("tool"):]) if tool is not None else None, amount, speed)
+
+	return NO_CONTENT
+
 @api.route("/printer/tool", methods=["GET"])
 def printerToolState():
 	def deleteBed(x):
