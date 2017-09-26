@@ -65,14 +65,12 @@ def printerState():
 @api.route("/printer/abl", methods=["GET"])
 def autoBedLevelCommand():
     pm = printerManager()
-
-	if pm.isBusy():
+    if pm.isBusy():
 		return make_response("Print in progress!", 412)
     pm.autoBedLevel()
     return NO_CONTENT
 
 #~~ Tool
-
 
 @api.route("/printer/tool", methods=["POST"])
 @restricted_access
