@@ -173,7 +173,11 @@ default_settings = {
         "variantFile": None,
         "useUnreleased": False,
         "lastCheck": None
-    }
+    },
+    "usb": {
+        "filelist": [],
+        "folder": "/media/pi",
+    },
 }
 
 valid_boolean_trues = [True, "true", "yes", "y", "1"]
