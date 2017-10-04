@@ -25,7 +25,7 @@ def settings(init=False, configfile=None, basedir=None):
 
 default_settings = {
     "serial": {
-        "port": None,
+        "port": '/dev/ttyACM0',
         "baudrate": 115200,
         "autoconnect": True,
         "log": False,
@@ -173,7 +173,11 @@ default_settings = {
         "variantFile": None,
         "useUnreleased": False,
         "lastCheck": None
-    }
+    },
+    "usb": {
+        "filelist": [],
+        "folder": "/media/pi",
+    },
 }
 
 valid_boolean_trues = [True, "true", "yes", "y", "1"]
