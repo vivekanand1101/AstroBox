@@ -1,0 +1,72 @@
+<!--
+*********************************
+* Code by Kanishka Mohan Madhuni *
+**********************************
+-->
+
+<div id="external-storage-wizard">
+
+	<!-- nav-bar goes here -->
+	<nav id="external-storage-wizard-nav">
+		<div class="wizard-name">
+			Browse - External Storage
+		</div>
+		<a href="#print-from-storage" class="back-button">
+			Back
+		</a>
+	</nav>
+
+	<!-- heading goes here -->
+	<h1 class="external-storage-wizard__heading">Choose the file you want to print </h1>
+
+	<!-- File list goes here -->
+	
+	<ul class="external-storage-wizard__files-list">
+
+		<script type="text/template" id="external-storage-file-list">
+			<% _.each(fileList, function(file) { %>
+				<li class="external-storage-wizard__files-list__file">
+					<img class="external-storage__file-img" src="{{ url_for('static', filename='img/print-from-storage/file-icon.svg') }}" width="56" height="56" alt="File Img">
+					<span class="external-storage__file-name"><%= file.filename %></span>
+				</li>
+			<% }); %>
+		</script>
+
+	</ul>
+
+	<!-- external storage confirm print modal -->
+
+	<div class="external-stroage-wizard__confrim-print-modal hide">
+			<!-- navigation bar -->
+			<nav id="external-storage-wizard__confirm-print-nav">
+				<div class="wizard-name">Browse - External Storage</div>
+				<a href="#external-storage" class="back-button back-button--external-storage">Back</a>
+			</nav>
+			
+			<!-- file-details container -->
+			<div class="file-details">
+				<img src="{{ url_for('static', filename='img/print-from-storage/file-icon.svg') }}" alt="File Format" class="file-format-img" width="112" height="112">
+				<h2 class="file-name file-name--external-storage"></h2>
+				<div class="file-date file-date--external-storage">
+					No Content Available
+				</div>
+			</div>
+
+			<!-- print-info container -->
+			<div class="print-info--external-storage">
+				<div class="print-info__no-details">
+					Analyzing G-Code
+				</div>
+			</div>
+
+			<!-- print-actions container -->
+			<div class="actions">
+				<div class="loading-button">
+					<a href="#" class="remove idle copy--external-storage">COPY</a>
+					<a href="#" class="print print-file--external-storage">PRINT</a>
+				</div>
+			</div>
+
+	</div>
+
+</div>

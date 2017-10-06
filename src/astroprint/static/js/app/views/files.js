@@ -21,7 +21,7 @@ var PrintFileInfoDialog = Backbone.View.extend({
   },
   initialize: function(params)
   {
-    console.log("PrintFileInfoDialog is being initialized");
+    // console.log("PrintFileInfoDialog is being initialized");
     this.file_list_view = params.file_list_view;
   },
   render: function()
@@ -35,7 +35,9 @@ var PrintFileInfoDialog = Backbone.View.extend({
   {
     this.print_file_view = print_file_view;
     this.render();
-    this.$el.foundation('reveal', 'open');
+    // this.$el.foundation('reveal', 'open');
+    console.log("I need to open the modal");
+    this.$el.removeClass('hide');
   },
   onDeleteClicked: function(e)
   {
@@ -73,21 +75,21 @@ var PrintFileInfoDialog = Backbone.View.extend({
         }
       });
     }
+
+    this.$el.addClass('hide');
   },
-  onPrintClicked: function(e)
+  onPrintClicked: function(e, params)
   {
-    this.print_file_view.printClicked(e);
-    // this.$el.foundation('reveal', 'close');
-    this.$el.css('display', 'none');
+    this.print_file_view.printClicked(e, null);
+    this.$el.addClass('hide');
   },
   onDownloadClicked: function(e)
   {
     this.print_file_view.downloadClicked(e);
-    // this.$el.foundation('reveal', 'close');
-    this.$el.css('display', 'none');
+    this.$el.addClass('hide');
   },
   hideModel: function() {
-    this.$el.css('display', 'none !important');
+    this.$el.addClass('hide');
   }
 });
 
@@ -99,7 +101,7 @@ var PrintFileView = Backbone.View.extend({
   downloadProgress: null,
   initialize: function(options)
   {
-    console.log("PrintFileView is being initialized");
+    // console.log("PrintFileView is being initialized");
     this.list = options.list;
     this.print_file = options.print_file;
   },
@@ -107,7 +109,7 @@ var PrintFileView = Backbone.View.extend({
   {
     var print_file = this.print_file.toJSON();
 
-    console.log(print_file);
+    // console.log(print_file);
 
     if (print_file.local_filename) {
       this.$el.removeClass('remote');
@@ -141,16 +143,23 @@ var PrintFileView = Backbone.View.extend({
   {
     if (evt) evt.preventDefault();
 
-    $("#print-file-info").css('display', 'block');
+    // $("#print-file-info").css('display', 'block');
+    $("#print-file-info").removeClass('hide');
 
     this.list.info_dialog.open(this);
   },
   // callback function to handle the Print button clicked event
-  printClicked: function (evt)
+  printClicked: function (evt, params)
   {
     if (evt) evt.preventDefault();
 
-    var filename = this.print_file.get('local_filename');
+    // console.log(params);
+
+    if (params !== null) {
+      var filename = params.filename;
+    } else {
+      var filename = this.print_file.get('local_filename');
+    }
 
     if (filename) {
       //We can't use evt because this can come from another source than the row print button
@@ -194,7 +203,7 @@ var StorageControlView = Backbone.View.extend({
   selected: null,
   initialize: function(options)
   {
-    console.log("StorageControlView is being initialized");
+    // console.log("StorageControlView is being initialized");
     this.print_file_view = options.print_file_view;
   },
   selectStorage: function(storage)
@@ -233,7 +242,7 @@ var PrintFilesListView = Backbone.View.extend({
     'click .list-header button.sync': 'forceSync'
   },
   initialize: function(options) {
-    console.log("PrintFilesListView is being initialized");
+    // console.log("PrintFilesListView is being initialized");
     this.file_list = new PrintFileCollection();
     this.info_dialog = new PrintFileInfoDialog({file_list_view: this});
     this.storage_control_view = new StorageControlView({
