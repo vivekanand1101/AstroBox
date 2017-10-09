@@ -129,7 +129,7 @@ def login_astroprint():
             if ap.signin(machineId, accessCode):
                 s = settings()
                 s.set(['setup','machineId'], machineId)
-                s.set(['setup','accesssCode'], accesssCode)
+                s.set(['setup','accessCode'], accessCode)
                 s.save()
                 return make_response("OK", 200)
 
