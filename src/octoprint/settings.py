@@ -181,7 +181,7 @@ default_settings = {
     },
     "setup": {
         "machineId":None,
-        "accesssCode":None,
+        "accessCode":None,
     },
 }
 
