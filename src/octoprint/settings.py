@@ -179,6 +179,10 @@ default_settings = {
         "filelist": [],
         "folder": "/media/pi",
     },
+    "setup": {
+        "machineId":None,
+        "accesssCode":None,
+    },
 }
 
 valid_boolean_trues = [True, "true", "yes", "y", "1"]
