@@ -180,8 +180,8 @@ default_settings = {
         "folder": "/media/pi",
     },
     "setup": {
-        "machineId":None,
-        "accessCode":None,
+        "machineId": None,
+        "accessCode": None,
     },
 }
 
