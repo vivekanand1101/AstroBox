@@ -60,7 +60,6 @@ var AstroBoxApp = Backbone.View.extend({
   initialize: function()
   {
     $(document).on('dragstart', function() {
-      console.log("Hutiye ko pehchano");
       return false;
     });
 
