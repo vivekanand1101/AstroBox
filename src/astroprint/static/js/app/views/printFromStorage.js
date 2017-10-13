@@ -237,7 +237,7 @@ var ExternalStorageView = Backbone.View.extend({
     var scrollHeight = target[0].scrollHeight;
 
     self.$('.down-button').removeClass('disable-btn');
-    
+
     target.scroll(function() {
       if (self.scrolled === 0) {
         // console.log("Reached bottom");
