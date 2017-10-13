@@ -96,6 +96,7 @@ var ExternalStorageView = Backbone.View.extend({
 	list: null,
 	print_file: null,
 	copySuccessData: null,
+  scrolled: 0,
 	initialize: function(params) {
 		if (params !== undefined) {
 			this.fileList = params;
