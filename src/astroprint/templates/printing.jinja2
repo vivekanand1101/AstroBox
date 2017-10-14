@@ -48,35 +48,35 @@
 
     </div>
 
-    <div class="info info--printing-wizard">
-      <div class="printing-wizard__time-left">
-        <h2 class="printing-wizard__time-left__heading">Time Remaining</h2>
-        <div class="printing-wizard__time-left__value">
-          <span class="highlighted estimated-hours">--</span>:<span class="highlighted estimated-minutes">--</span>:<span class="highlighted estimated-seconds">--</span>
-        </div>
+    <div class="button-container">
+      <div class="loading-button printing-wizard-btn--left">
+        <button class="success pause-print next-button">Pause Print</button>
       </div>
-      <div class="printing-wizard__layer-left">
-        <h2 class="printing-wizard__layer-left__heading">Printing Layer</h2>
-        <div class="printing-wizard__layer-left__value">
-          <span class="current-layer highlighted"></span><span class="highlighted layer-count"></span>
-        </div>
+      <!-- <button class="radius controls expand" style="display:none">Printer Controls</button> -->
+      <div class="printing-wizard-btn--right">
+        <button class="alert stop-print next-button">Cancel</button>
       </div>
     </div>
 
   </div>
 </div>
 
-
-
-<div class="button-container">
-  <div class="loading-button printing-wizard-btn--left">
-    <button class="success pause-print next-button">Print</button>
+<div class="info info--printing-wizard">
+  <div class="printing-wizard__time-left">
+    <h2 class="printing-wizard__time-left__heading">Time Remaining</h2>
+    <div class="printing-wizard__time-left__value">
+      <span class="highlighted estimated-hours">--</span>:<span class="highlighted estimated-minutes">--</span>:<span class="highlighted estimated-seconds">--</span>
+    </div>
   </div>
-  <!-- <button class="radius controls expand" style="display:none">Printer Controls</button> -->
-  <div class="printing-wizard-btn--right">
-    <button class="alert stop-print next-button">Cancel</button>
+  <div class="printing-wizard__layer-left">
+    <h2 class="printing-wizard__layer-left__heading">Printing Layer</h2>
+    <div class="printing-wizard__layer-left__value">
+      <span class="current-layer highlighted"></span><span class="highlighted layer-count"></span>
+    </div>
   </div>
 </div>
+
+
 
 <div id="cancel-print-modal" class="reveal-modal hide" data-reveal align="center">
   <div class="modal-body">

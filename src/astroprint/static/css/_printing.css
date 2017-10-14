@@ -36,7 +36,7 @@
 }
 
 .print-info--printing-wizard {
-	width: 65%;
+  width: 65%;
 }
 
 .printing-wizard__nozzle-container,
@@ -62,7 +62,8 @@
 .printing-wizard__time-left,
 .printing-wizard__layer-left {
 	display: flex;
-	justify-content: space-between;
+	/*justify-content: space-between;*/
+  justify-content: center;
 }
 
 .printing-wizard__layer-left__heading,
@@ -71,25 +72,42 @@
   font-size: 18px;
   vertical-align: middle;
   line-height: 47px;
+  width: 50%;
+  text-align: right;
+  padding-right: 20px;
 }
 
 .printing-wizard__time-left__value,
 .printing-wizard__layer-left__value {
 	font-size: 40px;
+  width: 60%;
+  text-align: left;
+  padding-left: 20px;
 }
 
+/* commenting the previous styles
+
 .button-container {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0;
+}
+
+*/
+
+.button-container {
+  width: 100%;
 	display: flex;
 	justify-content: center;
 	margin: 16px 0;
 }
 
 .printing-wizard-btn--left {
-	margin-right: 16px;
+	margin-right: 5px;
 }
 
 .printing-wizard-btn--right {
-	margin-left: 16px;
+	margin-left: 5px;
 }
 
 #cancel-print-modal {
@@ -119,7 +137,7 @@
 }
 
 .warning-icon {
-	margin: 8px 0;
+	margin: 8px 0 0;
 }
 
 .warning-msg {
