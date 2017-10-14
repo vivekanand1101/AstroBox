@@ -55,7 +55,8 @@
 
 .printing-wizard__progress {
 	margin: 0 8px 0 !important;
-	width: 344px !important;
+  /*width: 344px !important;*/
+	width: 250px !important;
 	height: 32px !important;
 }
 
@@ -83,6 +84,13 @@
   width: 60%;
   text-align: left;
   padding-left: 20px;
+}
+
+.temp-current {
+  border: 3px solid transparent;
+  padding: 1px;
+  font-size: 22px;
+  text-align: center;
 }
 
 /* commenting the previous styles
