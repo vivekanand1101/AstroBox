@@ -117,33 +117,6 @@
 	font-size: 20px;
 }
 
-.external-stroage-wizard__reload-files-modal {
-	position: absolute;
-	top: 56px;
-	left: 50%;
-	transform: translateX(-50%);
-	background-color: rgba(0, 0, 0, 0.85);
-	width: 800px;
-	height: 424px;
-}
-
-.external-stroage-wizard__reload-files-modal__container {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	width: 600px;
-	border-radius: 10px;
-	padding: 20px;
-	background-color: white;
-	line-height: 1.5;
-	text-align: center;
-}
-
-.next-button--reload-files {
-	margin: 18.720px 0;
-}
-
 /* Styling for Internal Storage Wizard goes here */
 .design-list-container .row {
 	width: 100%;

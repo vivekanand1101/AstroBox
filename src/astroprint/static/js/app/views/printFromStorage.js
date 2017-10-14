@@ -103,7 +103,6 @@ var ExternalStorageView = Backbone.View.extend({
 		}
 
     if (!$.isEmptyObject(params)) {
-      this.$('.external-stroage-wizard__reload-files-modal').addClass('hide');
       this.$('.down-button').removeClass('disable-btn');
     }
 
@@ -128,8 +127,7 @@ var ExternalStorageView = Backbone.View.extend({
 				'click .copy--external-storage': 'copyFileToLocal',
 				'click .print-file--external-storage': 'printFile',
         'click .up-button': 'scrollUp',
-        'click .down-button': 'scrollDown',
-        'click .next-button--reload-files': 'reloadFiles'
+        'click .down-button': 'scrollDown'
 			});
 		}
 	},
@@ -244,20 +242,6 @@ var ExternalStorageView = Backbone.View.extend({
       if (self.scrolled === 0) {
         // console.log("Reached bottom");
         self.$('.up-button').addClass('disable-btn');
-      }
-    });
-  },
-  reloadFiles: function() {
-    console.log("Call for reloading files from pendrive is called");
-    $.ajax({
-      url: '/api/usbfiles/usblist',
-      type: 'GET',
-      success: function(obj) {
-        console.log(obj);
-        new ExternalStorageView(obj);
-      },
-      error: function(xhr) {
-        console.log(xhr);
       }
     });
   }
