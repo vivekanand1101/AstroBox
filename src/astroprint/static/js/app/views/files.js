@@ -21,25 +21,23 @@ var PrintFileInfoDialog = Backbone.View.extend({
   },
   initialize: function(params)
   {
-    console.log("PrintFileInfoDialog is being initialized");
     this.file_list_view = params.file_list_view;
   },
   render: function()
-  { 
-    console.log("PrintFileInfoDialog render function called");
+  {
     this.$el.find('.dlg-content').html(this.template({
       p: this.print_file_view.print_file.toJSON(),
       time_format: app.utils.timeFormat
     }));
 
-    console.log(this.print_file_view.print_file);
+    // console.log(this.print_file_view.print_file);
   },
   open: function(print_file_view)
   {
     this.print_file_view = print_file_view;
     this.render();
     // this.$el.foundation('reveal', 'open');
-    console.log("I need to open the modal");
+    // console.log("I need to open the modal");
     this.$el.removeClass('hide');
   },
   onDeleteClicked: function(e)
@@ -104,13 +102,11 @@ var PrintFileView = Backbone.View.extend({
   downloadProgress: null,
   initialize: function(options)
   {
-    console.log("PrintFileView is being initialized");
     this.list = options.list;
     this.print_file = options.print_file;
   },
   render: function()
   {
-    console.log("PrintFileView render function is called");
     var print_file = this.print_file.toJSON();
 
     // console.log(print_file);
@@ -207,7 +203,6 @@ var StorageControlView = Backbone.View.extend({
   selected: null,
   initialize: function(options)
   {
-    console.log("StorageControlView is being initialized");
     this.print_file_view = options.print_file_view;
   },
   selectStorage: function(storage)
@@ -246,7 +241,6 @@ var PrintFilesListView = Backbone.View.extend({
     'click .list-header button.sync': 'forceSync'
   },
   initialize: function(options) {
-    console.log("PrintFilesListView is being initialized");
     this.file_list = new PrintFileCollection();
     this.info_dialog = new PrintFileInfoDialog({file_list_view: this});
     this.storage_control_view = new StorageControlView({
@@ -262,7 +256,6 @@ var PrintFilesListView = Backbone.View.extend({
   },
   render: function()
   {
-    console.log("PrintFilesListView render function is called");
     var list = this.$('.design-list-container');
     var selectedStorage = this.storage_control_view.selected;
 
@@ -474,7 +467,6 @@ var FilesView = Backbone.View.extend({
     'click .down-button': 'scrollDown'
   },
   initialize: function(options){
-    console.log("FilesView function is initialized");
     // Initializing the PrintFilesListView and passing the params
     this.printFilesListView = new PrintFilesListView({
       el: this.$el.find('.design-list'),
@@ -494,7 +486,7 @@ var FilesView = Backbone.View.extend({
 
       var actualFilesLength = self.printFilesListView.print_file_views.length;
       self.fileListLength = actualFilesLength;
-      console.log("The current no of files are : " + self.fileListLength);
+      // console.log("The current no of files are : " + self.fileListLength);
 
       if (actualFilesLength <= 5) {
         // console.log("No of files are < than 5, no scrolling");
