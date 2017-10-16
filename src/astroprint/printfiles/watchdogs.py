@@ -17,6 +17,7 @@ from watchdog.events import FileSystemEventHandler
 from octoprint.settings import settings
 
 
+
 class UploadCleanupWatchdogHandler(PatternMatchingEventHandler):
     """
     Takes care of automatically deleting metadata entries for files
@@ -50,17 +51,16 @@ def _get_gcode_files(directory):
     return allfiles
 
 
+global CALLBACKS
 class EtherBoxHandler(FileSystemEventHandler):
     ''' Watch for USB insertion for print from storage feature '''
 
     def __init__(self, *args, **kwargs):
         ''' Initiate the object '''
         super(EtherBoxHandler, self).__init__(*args, **kwargs)
-        self._callbacks = []
-
-    def registerCallback(self, callback):
-        ''' Register the sockjs method to send data about usb to frontend '''
-        self._callbacks.append(callback)
+        global CALLBACKS
+        self.logger = logging.getLogger(__name__)
+        CALLBACKS = []
 
     def on_created(self, event):
         ''' Called when the media is inserted '''
@@ -68,10 +68,14 @@ class EtherBoxHandler(FileSystemEventHandler):
         gcode_files = _get_gcode_files(usb_path)
         if not gcode_files:
             return
-        for callback in self._callbacks:
+        for callback in CALLBACKS:
             try:
                 callback.sendEvent("usb_inserted", usb_path)
-            except:
+                self.logger.info("Event sent: %s", usb_path)
+                self.logger.info("All callbacks %s", CALLBACKS)
+            except Exception as e:
+                self.logger.exception("error: %s", e)
+                self.logger.exception("All callbacks %s", CALLBACKS)
                 pass
         s = settings()
         s.set(['usb', 'filelist'], gcode_files)
@@ -80,8 +84,20 @@ class EtherBoxHandler(FileSystemEventHandler):
         s = settings()
         s.set(['usb', 'filelist'], [])
 
-        for callback in self._callbacks:
+        for callback in CALLBACKS:
             try:
-                callback.sendEvent("usb_removed", usb_path)
-            except:
+                callback.sendEvent("usb_removed", event.src_path)
+                self.logger.info("Usb removed: %s", event.src_path)
+            except Exception as e:
+                self.logger.exception("error in removed: %s", event)
+                self.logger.exception("error: %s", e)
+                self.logger.exception("Event sent: %s", event.src_path)
+                self.logger.exception("To %s", callback)
+                self.logger.exception("All callbacks %s", CALLBACKS)
                 pass
+
+
+def getEtherBoxHandlerCallback():
+    ''' Give one EtherBoxHandler '''
+    global CALLBACKS
+    return CALLBACKS
