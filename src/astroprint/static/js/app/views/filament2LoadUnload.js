@@ -44,7 +44,7 @@ var Filament2LoadView = Backbone.View.extend({
       this.updateProgressBar();
     }
 
-    if (this.extruderPercentage === 100) {
+    if (this.extruderPercentage === 97) {
       this.revealNextBtn();
     }
   },
@@ -232,7 +232,7 @@ var Filament2UnloadView = Backbone.View.extend({
       this.updateProgressBar();
     }
 
-    if (this.extruderPercentage === 100) {
+    if (this.extruderPercentage === 97) {
       this.revealNextBtn();
     }
   },
