@@ -103,19 +103,36 @@
 
 */
 
+/* Change: Shifting the Resume and Cancel button on navigation */
 .button-container {
+  /*width: 100%;*/
   width: 100%;
 	display: flex;
-	justify-content: center;
-	margin: 16px 0;
+  /*justify-content: center;*/
+	justify-content: flex-end;
+  /*margin: 16px 0;*/
+	margin: 0;
+}
+
+/* Change: Shifting the Resume and Cancel button on navigation */
+.next-button--pause,
+.next-button--cancel {
+  height: 56px !important;
+  width: 150px !important;
 }
 
 .printing-wizard-btn--left {
-	margin-right: 5px;
+  /*margin-right: 5px;*/
+	margin-right: 0;
 }
 
 .printing-wizard-btn--right {
 	margin-left: 5px;
+}
+
+/* Change: Shifting the Resume and Cancel button on navigation */
+.info--printing-wizard {
+  margin-top: 32px;
 }
 
 #cancel-print-modal {
