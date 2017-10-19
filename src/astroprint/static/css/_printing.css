@@ -170,6 +170,10 @@
 	margin: 0;
 }
 
+.button-container--cancel-print-modal {
+  margin: 16px 0;
+}
+
 .cancel-btn--no,
 .cancel-btn--yes {
 	width: 200px;
