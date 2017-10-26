@@ -106,7 +106,7 @@
 /* Change: Shifting the Resume and Cancel button on navigation */
 .button-container {
   /*width: 100%;*/
-  width: 100%;
+  /*width: 100%;*/
 	display: flex;
   /*justify-content: center;*/
 	justify-content: flex-end;
@@ -118,7 +118,8 @@
 .next-button--pause,
 .next-button--cancel {
   height: 56px !important;
-  width: 150px !important;
+  width: 140px !important;
+  font-size: 18px !important;
 }
 
 .printing-wizard-btn--left {
