@@ -1,3 +1,24 @@
+.wizard-name--printing {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.printing-screen-status,
+.printing-file-name {
+  font-size: 20px;
+  line-height: 30px;
+  vertical-align: middle;
+}
+
+.printing-screen-status {
+  margin-right: 8px;
+}
+
+.printing-file-name {
+  overflow: hidden;
+}
+
 #printing-info-container {
 	display: flex;
 	flex-direction: row;
