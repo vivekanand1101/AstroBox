@@ -1,8 +1,6 @@
-/*
- *  (c) Daniel Arroyo. 3DaGoGo, Inc. (daniel@astroprint.com)
- *
- *  Distributed under the GNU Affero General Public License http://www.gnu.org/licenses/agpl.html
- */
+/******************************************
+* Code Modified by Kanishka Mohan Madhuni *
+*******************************************/
 
 $.ajaxSetup({
   type: 'POST',
@@ -55,7 +53,12 @@ var AstroBoxApp = Backbone.View.extend({
   events: {
     'click button.turn-off, a.turn-off': 'turnOffClicked',
     'click button.reboot': 'rebootClicked',
-    'click a.launch-ap': 'launchAstroPrint'
+    'click a.launch-ap': 'launchAstroPrint',
+    'click .power-button': 'onPowerClicked',
+    'click .power-off-modal': 'closePowerModal',
+    'click .power-off-modal__button-container': 'noHideModel',
+    'click .power-off-button': 'doTurnoff',
+    'click .restart-button': 'doRestart'
   },
   initialize: function()
   {
@@ -109,6 +112,55 @@ var AstroBoxApp = Backbone.View.extend({
     this.listenTo(this.socketData, 'change:printing', this.reportPrintingChange );
     this.listenTo(this.socketData, 'change:online', this.onlineStatusChange );
     this.listenTo(this.socketData, "change:box_reachable", this.onReachableChanged );
+    this.listenTo(this.socketData, 'change:usb_status', this.usbStatusChanged);
+  },
+  onPowerClicked: function() {
+    this.$('.power-off-modal').removeClass('hide');
+  },
+  closePowerModal: function() {
+    this.$('.power-off-modal').addClass('hide');
+  },
+  noHideModel: function(e) {
+    e.stopPropagation();
+  },
+  doTurnoff: function() {
+    var data = {"action": "shutdown", "command": "sudo shutdown now"};
+    $.ajax({
+      url: API_BASEURL + "system",
+      type: "POST",
+      dataType: 'json',
+      contentType: "application/json; charset=UTF-8",
+      data: JSON.stringify(data),
+      success: function() {
+        console.log("success!!!!");
+      },
+      error: function(xhr) {
+        console.log(xhr);
+      }
+    });
+  },
+  doRestart: function() {
+    var data = {"action": "restart", "command": "sudo reboot now"};
+    $.ajax({
+      url: API_BASEURL + "system",
+      type: "POST",
+      dataType: 'json',
+      contentType: "application/json; charset=UTF-8",
+      data: JSON.stringify(data),
+      success: function() {
+        console.log("success!!!!");
+      },
+      error: function(xhr) {
+        console.log(xhr);
+      }
+    });
+  },
+  usbStatusChanged: function(s, value) {
+    if (value) {
+      this.$('.usb-icon-img').css('opacity', '1');
+    } else if (!value) {
+      this.$('.usb-icon-img').css('opacity', '.2');
+    }
   },
   turnOffClicked: function()
   {
