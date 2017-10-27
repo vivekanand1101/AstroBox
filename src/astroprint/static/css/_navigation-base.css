@@ -111,7 +111,10 @@
 }
 
 .update-icon-img,
-.wifi-icon-img,
+.wifi-icon-img {
+	opacity: 0;
+}
+
 .usb-icon-img {
 	opacity: .2;
 }
