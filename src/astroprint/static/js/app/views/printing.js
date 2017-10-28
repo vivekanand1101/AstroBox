@@ -40,7 +40,8 @@ var PrintingView = Backbone.View.extend({
     'click button.pause-print': 'togglePausePrint',
     'click button.controls': 'showControlPage',
     'show': 'show',
-    'hide': 'onHide'
+    'hide': 'onHide',
+    'click .printing-screen-refresh-btn': 'refreshPage'
   },
   nozzleBar: null,
   extraBar: null,
@@ -143,6 +144,9 @@ var PrintingView = Backbone.View.extend({
     } else {
       this.bedBar.$el.addClass('hide');
     }
+  },
+  refreshPage: function() {
+    window.location.reload();
   },
   onTempsChanged: function(s, value) {
 
