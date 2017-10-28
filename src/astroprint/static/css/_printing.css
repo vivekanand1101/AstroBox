@@ -211,3 +211,14 @@
 .cancel-btn--yes {
 	margin-left: 8px;
 }
+
+.printing-screen-refresh-btn {
+  width: 70px;
+  height: 70px;
+  position: fixed;
+  bottom: 63px;
+  right: 50px;
+  border-radius: 10px;
+  border: 1px solid black;
+  box-shadow: 2px 2px 1px 1px;
+}
